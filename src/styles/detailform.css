@@ -1,0 +1,126 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree&family=Kanit:wght@300;400&family=Prompt:ital@0;1&family=Roboto:wght@400;500&family=Sarabun&display=swap');
+
+
+.SarabunFont {
+    font-family: 'Sarabun', sans-serif !important;
+}
+
+
+.tableherd{
+  border:0px solid #000000;
+  display: table;
+  margin: 0 auto;
+  width: 1023px;
+  } 
+  .tableCenter{
+    border: 0px solid #000000;
+    display: table;
+    margin: 0 auto;
+    width: 1023px;
+  } 
+  .tableCenters{
+  border:0px solid #000000;
+  display: table;
+  margin: 0 auto;
+  width: 1023px;
+  } 
+  .tableCenters_header{
+  border-top: 1px solid #000000;
+  border-right: 1px solid #000000;
+  border-bottom: 0px solid #000000;
+  border-left: 1px solid #000000;
+  display: table;
+  display: table;
+  margin: 0 auto;
+  width: 1023px;
+  }
+  .tableCenters_headerFooterLeft{
+  border-top: 1px solid #000000;
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+  border-left: 1px solid #000000;
+  display: table;
+  display: table;
+  margin: 0 auto;
+  width: 550px;
+  }
+  .tableCenters_headerFooterRight{
+  border-top: 0px solid #000000;
+  border-right: 0px solid #000000;
+  border-bottom: 0px solid #000000;
+  border-left: 0px solid #000000;
+  display: table;
+  display: table;
+  margin: 0 auto;
+  width: 473px;
+  }
+  .tableCenters_body{
+  border-top: 1px solid #000000;
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+  border-left: 1px solid #000000;
+  display: table;
+  margin: 0 auto;
+  width: 1023px;
+  } 
+
+  .box_nrPer{
+  border-top: 1px solid #000000;
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+  border-left: 1px solid #000000;
+  display: table;
+  margin: 0 auto;
+  width: 1023px;
+  } 
+
+  .tableCenters_footer{
+  border-top: 0px solid #000000;
+  border-right: 0px solid #000000;
+  border-bottom: 0px solid #000000;
+  border-left: 0px solid #000000;
+  display: table;
+  margin: 0 auto;
+  width: 1023px;	
+  }
+
+  
+
+  .table_Data tr td {
+  border-top: 1px solid #000000;
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+  border-left: 1px solid #000000;
+  }
+  img {
+  /* position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: -1; */
+  }
+  /*ไม่แสดงปุ่มเวลาพิมพ์*/
+  @media print 
+  { 
+  #non-printable { display: none; } 
+  #printable { display: block; } 
+  .headBG {background:#0063DF;}
+  }
+  .theadBG {   
+  background-color:#0063DF;   
+  }
+a.aDetailDoc:hover, 
+a.aDetailDoc:active {
+  color : #000;
+  text-decoration: underline;
+}
+
+.testh1{
+  font-size: 40pt;
+}
+
+
+
+.textbody {
+  font-size: 16pt;
+}
