@@ -163,7 +163,7 @@ const Navbar = ({ FullnamePer,contDataMenuChkCD1, contDataMenuChkCD2, getcountid
       {/* Brand */}
       <NavLink className="brand-link brand-minimal" end>
         <img
-          src="/SAKCreditScoring/SakERP.png"
+          src="/SakERP.png"
           className="brand-image"
           style={{ height: 30, width: "auto" }}
         />

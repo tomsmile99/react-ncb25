@@ -221,7 +221,7 @@ const SalepersonView_updatephoto = ({ idForm }) => {
           timer: 2000,
           showConfirmButton: false,
         }).then(() => {
-          window.location.assign("/SAKCreditScoring/Salesperson");
+          window.location.assign("/Salesperson");
         });
       }
     } catch (err) {

@@ -273,7 +273,7 @@ const SalepersonView_Litemain = () => {
         });
 
         getEmployeeDB_Admin();
-        window.location.assign("/SAKCreditScoring/Salesperson");
+        window.location.assign("/Salesperson");
         // fetchData(); // โหลดข้อมูลใหม่
       } else {
         Swal.fire({
@@ -522,7 +522,7 @@ const SalepersonView_Litemain = () => {
                         }}
                       >
                          <img
-                        src="/SAKCreditScoring/Documents-amico.png"
+                        src="/Documents-amico.png"
                         className="brand-image pt-2"
                         style={{ height: 250, width: "auto" }}
                         alt="loop-color"
@@ -690,7 +690,7 @@ const SalepersonView_Litemain = () => {
         {/* โลโก้ + หัว */}
         <div style={{ textAlign: "left", marginBottom: "12px" }}>
           <img
-            src="/SAKCreditScoring/logo SAK เลขเสียภาษี.png"
+            src="/logo SAK เลขเสียภาษี.png"
             alt="logo"
             style={{ width: "400px", height: "auto" }} // ✅ ปรับขนาดใหญ่ขึ้น
           />

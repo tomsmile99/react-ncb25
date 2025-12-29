@@ -341,7 +341,7 @@ const SalepersonView_Examination_Cancel = () => {
   const handleView = (item) => {
     const id = item.CTM_form_number;
 
-    const url = `${window.location.origin}/SAKCreditScoring/DataReportDSRs/${id}`;
+    const url = `${window.location.origin}/DataReportDSRs/${id}`;
 
     window.open(url, "_blank");
   };
@@ -349,7 +349,7 @@ const SalepersonView_Examination_Cancel = () => {
   const handleViewModel = (item) => {
     const id = item;
 
-    const url = `${window.location.origin}/SAKCreditScoring/DataReportDSRs/${id}`;
+    const url = `${window.location.origin}/DataReportDSRs/${id}`;
 
     window.open(url, "_blank");
   };

@@ -422,7 +422,7 @@ const SalepersonView_Examination = () => {
           showConfirmButton: false,
         });
 
-        window.location.assign("/SAKCreditScoring/Sale_ExaminationCredit");
+        window.location.assign("/Sale_ExaminationCredit");
       }
     } catch (err) {
       console.error("Error:", err);
@@ -437,7 +437,7 @@ const SalepersonView_Examination = () => {
   const handleView = (item) => {
     const id = item.CTM_form_number;
 
-    const url = `${window.location.origin}/SAKCreditScoring/DataReportDSRs/${id}`;
+    const url = `${window.location.origin}/DataReportDSRs/${id}`;
 
     window.open(url, "_blank");
   };
@@ -445,7 +445,7 @@ const SalepersonView_Examination = () => {
   const handleViewModel = (item) => {
     const id = item;
 
-    const url = `${window.location.origin}/SAKCreditScoring/DataReportDSRs/${id}`;
+    const url = `${window.location.origin}/DataReportDSRs/${id}`;
 
     window.open(url, "_blank");
   };
@@ -540,7 +540,7 @@ const SalepersonView_Examination = () => {
                         }}
                       >
                         <img
-                          src="/SAKCreditScoring/Documents-amico.png"
+                          src="/Documents-amico.png"
                           className="brand-image pt-2"
                           style={{ height: 250, width: "auto" }}
                           alt="loop-color"
@@ -1224,7 +1224,7 @@ const SalepersonView_Examination = () => {
         {/* โลโก้ + หัว */}
         <div style={{ textAlign: "left", marginBottom: "12px" }}>
           <img
-            src="/SAKCreditScoring/logo SAK เลขเสียภาษี.png"
+            src="/logo SAK เลขเสียภาษี.png"
             alt="logo"
             style={{ width: "400px", height: "auto" }} // ✅ ปรับขนาดใหญ่ขึ้น
           />

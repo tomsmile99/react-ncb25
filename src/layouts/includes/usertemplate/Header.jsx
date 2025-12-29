@@ -19,7 +19,7 @@ const Header = () => {
 
           <li className="nav-item">
             <a
-              href="/SAKCreditScoring/คู่มือการใช้ระบบตรวจสอบเครดิต.pdf"
+              href="/คู่มือการใช้ระบบตรวจสอบเครดิต.pdf"
               className="nav-link font-weight-bold"
               target="_blank"
             >

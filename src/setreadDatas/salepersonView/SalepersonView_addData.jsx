@@ -190,7 +190,7 @@ const SalepersonView_addData = ({ idForm }) => {
           // console.log("📝 message:", message);
 
           // ✅ เด้งกลับไปหน้าตาราง + ส่ง id ที่เพิ่งบันทึกไปด้วย
-          window.location.assign("/SAKCreditScoring/Salesperson");
+          window.location.assign("/Salesperson");
           // navigate("/Salesperson", {
           //   state: {
           //     highlightId: idForm, // ✅ id ของรายการที่เพิ่งบันทึก
@@ -242,7 +242,7 @@ const SalepersonView_addData = ({ idForm }) => {
           // console.log("📦 ข้อมูลที่บันทึก:", result);
           // console.log("📝 message:", message);
           // ✅ เด้งกลับไปหน้าตาราง + ส่ง id ที่เพิ่งบันทึกไปด้วย
-          window.location.assign("/SAKCreditScoring/Salesperson");
+          window.location.assign("/Salesperson");
           // navigate("/Salesperson", {
           //   state: {
           //     highlightId: idForm, // ✅ id ของรายการที่เพิ่งบันทึก
@@ -729,7 +729,7 @@ const SalepersonView_addData = ({ idForm }) => {
 
             <label className="choice-box1">
               <img
-                src="/SAKCreditScoring/Fingerprint-rafiki.png"
+                src="/Fingerprint-rafiki.png"
                 alt="employee-order"
                 style={{
                   height: "150px",
@@ -756,7 +756,7 @@ const SalepersonView_addData = ({ idForm }) => {
 
             <label className="choice-box1">
               <img
-                src="/SAKCreditScoring/Agreement-amico.png"
+                src="/Agreement-amico.png"
                 alt="employee-order"
                 style={{
                   height: "150px",
@@ -806,7 +806,7 @@ const SalepersonView_addData = ({ idForm }) => {
           <div className="modal-content1 minimal-witness">
             <div className="witness-header">
               <img
-                src="/SAKCreditScoring/Telecommuting-pana.png"
+                src="/Telecommuting-pana.png"
                 alt="witness"
                 className="witness-illustration"
                 style={{ width: "140px" }}
@@ -888,7 +888,7 @@ const SalepersonView_addData = ({ idForm }) => {
           <div className="modal-content1 minimal-witness">
             <div className="witness-header">
               <img
-                src="/SAKCreditScoring/Telecommuting-pana.png"
+                src="/Telecommuting-pana.png"
                 alt="witness"
                 className="witness-illustration"
                 style={{ width: "140px" }}

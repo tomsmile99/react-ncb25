@@ -35,6 +35,7 @@ export default function AuthRouter() {
       const fullnamePer = Base64.decode(token.PerFuNas || "");
       const _PerST = Base64.decode(token.PerST || "");
       const _AgU = Base64.decode(token.AgU || "");
+      const _PerPST = Base64.decode(token.PerPST || "");
       const _PerRG = Base64.decode(token.PerRG || "");
       const _PerWP = Base64.decode(token.PerWP || "");
       const _PerExp_Token = Base64.decode(token.PerExp_Token || "");
@@ -58,9 +59,12 @@ export default function AuthRouter() {
 
       // ✅ เช็คสิทธิ์
       const userRG = ["1", "2", "3", "4", "5"];
-      const adminWP = ["WP1073", "WP1031"];
 
-      const isUser = userRG.includes(_PerRG) && _PerST === "1";
+      const userPST = ["PST014", "PST015", "PST016", "PST017", "PST018", "PST019", "PST020", "PST025", "PST083","PST084"];
+
+      const adminWP = ["WP1073", "WP1031", "WP0010"];
+
+      const isUser = userRG.includes(_PerRG) && userPST.includes(_PerPST) && _PerST === "1";
       const isAdmin =
         adminWP.includes(_PerWP) || (_AgU === "AGAD" && _PerST === "1");
 

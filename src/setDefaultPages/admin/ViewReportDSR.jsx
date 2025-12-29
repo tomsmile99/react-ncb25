@@ -131,7 +131,7 @@ const ViewReportDSR = () => {
         {/* HEADER */}
         <div className="header-section">
           <img
-            src="/SAKCreditScoring/logo SAK เลขเสียภาษี.png"
+            src="/logo SAK เลขเสียภาษี.png"
             className="logo-img"
           />
         </div>

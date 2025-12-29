@@ -274,7 +274,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
           // 🔥 เงื่อนไขใหม่: ถ้ายังไม่เลื
           setConsentError(false);
           if (!formData2.customerType) {
-            window.location.assign("/SAKCreditScoring/Salesperson");
+            window.location.assign("/Salesperson");
             return; // ⛔ หยุดการทำงานตรงนี้ทันที
           }
           // 🔥 ครั้งแรก → เปิด modal
@@ -284,7 +284,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
           }
           // 🔥 ครั้งที่สอง → redirect
           else {
-            window.location.assign("/SAKCreditScoring/Salesperson");
+            window.location.assign("/Salesperson");
           }
 
           // navigate("/Salesperson");
@@ -1027,7 +1027,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
                     className="btn-submit btn-secondary"
                     onClick={() => {
                       setConsentError(false);
-                      window.location.assign("/SAKCreditScoring/Salesperson");
+                      window.location.assign("/Salesperson");
                       return;
                     }}
                   >
@@ -1062,7 +1062,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
           {/* โลโก้ + หัว */}
           <div style={{ textAlign: "left", marginBottom: "12px" }}>
             <img
-              src="/SAKCreditScoring/logo SAK เลขเสียภาษี.png"
+              src="/logo SAK เลขเสียภาษี.png"
               alt="logo"
               style={{ width: "400px", height: "auto" }} // ✅ ปรับขนาดใหญ่ขึ้น
             />
