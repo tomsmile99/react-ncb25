@@ -12,6 +12,19 @@ body {
   animation: blink 1s infinite;
 }
 
+@font-face {
+  font-family: "THSarabunPSK";
+  src: url("/fonts/THSarabunPSK Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "THSarabunPSK";
+  src: url("/fonts/THSarabunPSK Bold.ttf") format("truetype");
+  font-weight: 500;
+}
+
 @keyframes blink {
   0% {
     opacity: 1;
@@ -1578,6 +1591,7 @@ tbody tr {
   font-size: 14px;
   background: #f9fbfd;
   transition: border 0.25s;
+  
 }
 
 .input-normal:focus {
