@@ -9,28 +9,25 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 import axios from "axios";
-const convertToThaiDate = (dateString) => {
-  const date = new Date(dateString);
-  const thaiMonths = [
-    "ม.ค.",
-    "ก.พ.",
-    "มี.ค.",
-    "เม.ย.",
-    "พ.ค.",
-    "มิ.ย.",
-    "ก.ค.",
-    "ส.ค.",
-    "ก.ย.",
-    "ต.ค.",
-    "พ.ย.",
-    "ธ.ค.",
-  ];
-  const day = date.getDate();
-  const month = thaiMonths[date.getMonth()];
-  const year = date.getFullYear() + 543;
 
-  return `${day} ${month} ${year}`;
-};
+const thaiMonths = [
+  { value: 1, label: "มกราคม" },
+  { value: 2, label: "กุมภาพันธ์" },
+  { value: 3, label: "มีนาคม" },
+  { value: 4, label: "เมษายน" },
+  { value: 5, label: "พฤษภาคม" },
+  { value: 6, label: "มิถุนายน" },
+  { value: 7, label: "กรกฎาคม" },
+  { value: 8, label: "สิงหาคม" },
+  { value: 9, label: "กันยายน" },
+  { value: 10, label: "ตุลาคม" },
+  { value: 11, label: "พฤศจิกายน" },
+  { value: 12, label: "ธันวาคม" },
+];
+
+const currentYearBE = new Date().getFullYear() + 543;
+const maxYearBE = currentYearBE - 20; // 🔑 อายุ ≥ 20 ปี
+const minYearBE = maxYearBE - 80; // เผื่อย้อนหลัง (ปรับได้)
 
 const SalepersonView_addData = ({ idForm }) => {
   const navigate = useNavigate();
@@ -54,6 +51,32 @@ const SalepersonView_addData = ({ idForm }) => {
   const PerRG = Base64.decode(getstore.PerRG);
 
   const [phoneError, setPhoneError] = useState(false);
+  const [FullNameTitle, setFullNameTitle] = useState("");
+
+  const GetDataTitle = async () => {
+    try {
+      const res = await apiClient.get("/api/insurances/datacustomersTitle", {
+        params: {
+          PerD_title: PerD,
+        },
+      });
+
+      const { status, data: result, message } = res.data;
+
+      if (status === 200) {
+        const fullname = `${result.title_name}${result.firstname_PSN} ${result.lastname_PSN}`;
+
+        setFullNameTitle(fullname);
+
+        console.log("✅ ดึงข้อมูลคำนำหน้าสำเร็จ", PerD);
+        console.log("📦 result:", result);
+      } else {
+        console.warn("⚠️ status ไม่ใช่ 200 :", message);
+      }
+    } catch (error) {
+      console.error("❌ ส่งข้อมูลไม่สำเร็จ (GetDataTitle):", error);
+    }
+  };
 
   const [formData, setFormData] = useState({
     title: "",
@@ -98,7 +121,7 @@ const SalepersonView_addData = ({ idForm }) => {
   const lastNameList = ["ใจดี", "สุขสันต์", "ยิ้มแย้ม", "สุขสม", "ทองแท้"];
 
   const [recorder, setRecorder] = useState({
-    fullname: PerFuNas_AgU, //ชื่อ
+    fullname: FullNameTitle, //ชื่อ
     position: PerPST_N, //ตำแหน่ง
     branch: PerBL_N, //เขต
     zone: PerWP_N, //สาขา
@@ -124,6 +147,25 @@ const SalepersonView_addData = ({ idForm }) => {
     }
   };
 
+  const [birthdayTH, setBirthdayTH] = useState({
+    day: "",
+    month: "",
+    year: "", // พ.ศ.
+  });
+
+  const convertBirthdayToCE = () => {
+    const { day, month, year } = birthdayTH;
+
+    if (!day || !month || !year) return null;
+
+    const yearCE = parseInt(year, 10) - 543;
+
+    return `${yearCE}-${String(month).padStart(2, "0")}-${String(day).padStart(
+      2,
+      "0"
+    )}`;
+  };
+
   const handleChange = (e) => {
     const { name } = e.target;
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -134,6 +176,17 @@ const SalepersonView_addData = ({ idForm }) => {
     }
   };
 
+  const setBirthdayFromCard = (birthDateEn) => {
+    if (!birthDateEn) return;
+
+    const [year, month, day] = birthDateEn.split("-");
+
+    setBirthdayTH({
+      day: String(parseInt(day, 10)),
+      month: String(parseInt(month, 10)),
+      year: String(parseInt(year, 10) + 543), // 🔑 ค.ศ. → พ.ศ.
+    });
+  };
   const handleSubmitWitness = async () => {
     // ✅ 0. ต้องเลือกวิธีลงชื่อก่อน
     if (!signMethod) {
@@ -151,7 +204,7 @@ const SalepersonView_addData = ({ idForm }) => {
 
       // ✅ ถ้านามสกุลลูกค้า ≠ พนักงาน → เอาพนักงานเป็นพยาน 1 อัตโนมัติ
       if (customerLastname !== employeeLastname) {
-        const [fname, lname] = recorder.fullname.split(" ");
+        const [fname, lname] = FullNameTitle.split(" ");
         witness1ToSend = { firstname: fname, lastname: lname };
         setWitness1(witness1ToSend);
       }
@@ -162,9 +215,17 @@ const SalepersonView_addData = ({ idForm }) => {
         return;
       }
 
+      const birthdayCE = convertBirthdayToCE();
+
+      if (!birthdayCE) {
+        alert("กรุณากรอกวันเดือนปีเกิดให้ครบ");
+        return;
+      }
+
       // ✅ รวม payload ส่ง API (พยาน 1 + พยาน 2)
       const payload = {
         ...formData,
+        birthday: birthdayCE, // ✅ เก็บเป็น ค.ศ.
         signMethod,
         witness1: witness1ToSend,
         witness2: witness2, // ✅ สำคัญมาก
@@ -208,17 +269,26 @@ const SalepersonView_addData = ({ idForm }) => {
     // ✅ กรณีใช้ "ลายเซ็น"
     // ============================
     if (signMethod === "signature") {
+      const birthdayCE = convertBirthdayToCE();
+
+      if (!birthdayCE) {
+        alert("กรุณากรอกวันเดือนปีเกิดให้ครบ");
+        return;
+      }
+
       let witnessToSend;
 
       if (witness1.firstname && witness1.lastname) {
         witnessToSend = witness1;
       } else {
-        const [fname, lname] = recorder.fullname.split(" ");
+        const [fname, lname] = FullNameTitle.split(" ");
         witnessToSend = { firstname: fname, lastname: lname };
       }
 
       const payload = {
         ...formData,
+        birthday: birthdayCE, // ✅ เก็บเป็น ค.ศ.
+
         signMethod,
         witness1: witnessToSend,
         idForm: idForm,
@@ -255,7 +325,7 @@ const SalepersonView_addData = ({ idForm }) => {
     }
   };
 
-  const employeeLastname = recorder.fullname.split(" ").pop().trim();
+  const employeeLastname = FullNameTitle.split(" ").pop().trim();
   const customerLastname = formData.lastname.trim();
 
   const handleCheckLastname = () => {
@@ -361,6 +431,8 @@ const SalepersonView_addData = ({ idForm }) => {
           CTM_province: card.address.province || "-",
           CTM_postal_code: card.address.zipcode || "-",
         }));
+        // 🔑 เพิ่มบรรทัดนี้
+        setBirthdayFromCard(birthDateEn);
 
         Swal.fire({
           icon: "success",
@@ -400,10 +472,11 @@ const SalepersonView_addData = ({ idForm }) => {
 
   //คะแนนประเมินแต่ละรอบ
 
-  // useEffect(() => {
-  //   getEmployeeDB_Admin(currentPage, query);
-  //   // Attendance();
-  // }, [currentPage, query]);
+  useEffect(() => {
+    GetDataTitle();
+
+    // Attendance();
+  }, []);
 
   return (
     <div>
@@ -422,7 +495,7 @@ const SalepersonView_addData = ({ idForm }) => {
             <div className="rec-info">
               <div className="rec-row">
                 <strong>ชื่อผู้บันทึก:</strong>
-                <span>{recorder.fullname}</span>
+                <span>{FullNameTitle}</span>
               </div>
 
               <div className="rec-row">
@@ -509,14 +582,57 @@ const SalepersonView_addData = ({ idForm }) => {
             </div>
 
             <div className="form-group small">
-              <label>วันเดือนปีเกิด</label>
-              <input
-                type="date"
-                name="birthday"
-                lang="th-TH" // พยายามบอก browser ให้ใช้ format ไทย
-                value={formData.birthday || ""}
-                onChange={handleChange}
-              />
+              <label>วันเดือนปีเกิด (พ.ศ.)</label>
+
+              <div style={{ display: "flex", gap: "6px" }}>
+                {/* วัน */}
+                <input
+                  type="number"
+                  placeholder="วัน"
+                  min={1}
+                  max={31}
+                  value={birthdayTH.day}
+                  onChange={(e) =>
+                    setBirthdayTH({ ...birthdayTH, day: e.target.value })
+                  }
+                  style={{ width: "70px" }}
+                />
+
+                {/* เดือน (ชื่อไทย) */}
+                <select
+                  value={birthdayTH.month}
+                  onChange={(e) =>
+                    setBirthdayTH({ ...birthdayTH, month: e.target.value })
+                  }
+                  style={{ width: "140px" }}
+                >
+                  <option value="">เดือน</option>
+                  {thaiMonths.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+
+                {/* ปี พ.ศ. (อายุ ≥ 20 ปี) */}
+                <select
+                  value={birthdayTH.year}
+                  onChange={(e) =>
+                    setBirthdayTH({ ...birthdayTH, year: e.target.value })
+                  }
+                  style={{ width: "120px" }}
+                >
+                  <option value="">ปี พ.ศ.</option>
+                  {Array.from(
+                    { length: maxYearBE - minYearBE + 1 },
+                    (_, i) => maxYearBE - i
+                  ).map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="form-group small">

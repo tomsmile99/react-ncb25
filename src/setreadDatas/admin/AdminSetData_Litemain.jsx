@@ -106,8 +106,7 @@ const AdminSetData_Litemain = () => {
   ]);
   const [reasons, setReasons] = useState([{ reason: "" }]);
 
-  const [searchQuery, setSearchQuery] = useState("");  //ค้นหา
-
+  const [searchQuery, setSearchQuery] = useState(""); //ค้นหา
 
   //คำนวณคะแนน
 
@@ -899,8 +898,10 @@ const AdminSetData_Litemain = () => {
             onClick={() => setActiveTab("wait")}
           >
             <img
-              // src="/SAKCreditScoring/Checklist-amico.png"
-               src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Checklist-amico.png`}
+              src="/Checklist-amico.png"
+              // src={`${
+              //   import.meta.env.VITE_REACT_APP_PHOTO
+              // }/Checklist-amico.png`}
               style={{ height: 80 }}
             />
             <div style={{ marginLeft: 12 }}>
@@ -919,8 +920,10 @@ const AdminSetData_Litemain = () => {
             onClick={() => setActiveTab("pass")}
           >
             <img
-
-                 src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Insurance-amico (1).png`}
+             src="/Insurance-amico (1).png"
+              // src={`${
+              //   import.meta.env.VITE_REACT_APP_PHOTO
+              // }/Insurance-amico (1).png`}
               style={{ height: 80 }}
             />
             <div style={{ marginLeft: 12 }}>
@@ -940,8 +943,8 @@ const AdminSetData_Litemain = () => {
           >
             <img
             
-             
-                src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Cancel-bro.png`}
+              // src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Cancel-bro.png`}
+               src="/Cancel-bro.png"
               style={{ height: 80 }}
             />
             <div style={{ marginLeft: 12 }}>
@@ -959,8 +962,8 @@ const AdminSetData_Litemain = () => {
             onClick={() => setActiveTab("fail")}
           >
             <img
-             src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Cancel-bro.png`}
-            
+             src="/Cancel-bro.png"
+              // src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Cancel-bro.png`}
               style={{ height: 80 }}
             />
             <div style={{ marginLeft: 12 }}>
@@ -1245,11 +1248,11 @@ const AdminSetData_Litemain = () => {
                                         color: waitStatus.textColor,
                                         cursor: "pointer",
                                         minWidth: "120px",
-                                        boxShadow: "0 1px 3px rgba(0,0,0,0.08)", 
+                                        boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
                                       }}
                                       className="status-badge  smooth-blink-strong"
                                     >
-                                      เริ่มการตรวจสอบ 
+                                      เริ่มการตรวจสอบ
                                     </button>
                                   ) : (
                                     // ⛔ ไอดีไม่ตรง → กำลังตรวจสอบ (กดไม่ได้)
@@ -2105,7 +2108,7 @@ const AdminSetData_Litemain = () => {
                 <div className="form-group">
                   {/* 🔹 ส่วนเลือกสถานะ */}
                   <div className="form-group">
-                    <div className="radio-group">
+                    <div className="radio-group mt-3">
                       <label className="form-label">
                         สถานะ <span className="required">*</span> :
                       </label>
@@ -2158,37 +2161,48 @@ const AdminSetData_Litemain = () => {
                       <div className="credit-row">
                         {/* 🔹 เข้าร่วมโครงการ */}
                         <div className="form-group">
-                          <label>
-                            ลูกค้าเข้าร่วมโครงการ{" "}
-                            <span style={{ color: "red", fontWeight: "bold" }}>
-                              “คุณสู้ เราช่วย”
-                            </span>{" "}
-                            หรือไม่ <span className="required">*</span> :
-                          </label>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "16px",
+                              fontSize:"18px"
+                            }}
+                          >
+                            <label>
+                              ลูกค้าเข้าร่วมโครงการ{" "}
+                              <span
+                                style={{ color: "red", fontWeight: "bold" }}
+                              >
+                                “คุณสู้ เราช่วย”
+                              </span>{" "}
+                              หรือไม่ <span className="required">*</span> :
+                            </label>
 
-                          <label>
-                            <input
-                              type="radio"
-                              className="ml-2 mr-2"
-                              name="joinProject"
-                              value="no"
-                              checked={joinProject === "no"}
-                              onChange={() => setJoinProject("no")}
-                            />{" "}
-                            ไม่เข้าร่วม
-                          </label>
+                            <label style={{ marginBottom: 0 }}>
+                              <input
+                                type="radio"
+                                className="ml-2 mr-2"
+                                name="joinProject"
+                                value="no"
+                                checked={joinProject === "no"}
+                                onChange={() => setJoinProject("no")}
+                              />
+                              ไม่เข้าร่วม
+                            </label>
 
-                          <label>
-                            <input
-                              type="radio"
-                              className="ml-2 mr-2"
-                              name="joinProject"
-                              value="yes"
-                              checked={joinProject === "yes"}
-                              onChange={() => setJoinProject("yes")}
-                            />{" "}
-                            เข้าร่วม
-                          </label>
+                            <label style={{ marginBottom: 0 }}>
+                              <input
+                                type="radio"
+                                className="ml-2 mr-2"
+                                name="joinProject"
+                                value="yes"
+                                checked={joinProject === "yes"}
+                                onChange={() => setJoinProject("yes")}
+                              />
+                              เข้าร่วม
+                            </label>
+                          </div>
                         </div>
 
                         {/* 🔹 รายได้ */}
@@ -2196,15 +2210,22 @@ const AdminSetData_Litemain = () => {
                       <label className="form-label-inline">
                         1. มีสินเชื่อส่วนบุคคลภายใต้การกำกับ จำนวน{" "}
                         <span className="required">*</span> :{" "}
-                        <label>
-                          <input
-                            type="number"
-                            placeholder="กรุณากรอก"
-                            className="input-normal"
-                            value={valueCredit}
-                            onChange={(e) => setValueCredit(e.target.value)}
-                          />
-                        </label>
+                      <label>
+  <input
+    type="number"
+    placeholder="กรุณากรอก"
+    className="input-normal"
+    value={valueCredit}
+    onChange={(e) => setValueCredit(e.target.value)}
+    style={{
+      height: "35px",        // 🔽 ลดความสูง
+      padding: "2px 6px",    // 🔽 ลดช่องว่างใน
+      lineHeight: "1.2",
+      fontSize: "14px",
+    }}
+  />
+</label>
+
                         <label className="mr-1 ml-3">
                           แห่ง{" "}
                           <span style={{ color: "red" }}>
@@ -2450,8 +2471,8 @@ const AdminSetData_Litemain = () => {
                               value="มีสถานะบัญชี (21) - หนี้ค้างชำระเกิน 90 วัน
                               จากเหตุการณ์ไม่ปกติ"
                             >
-                              มีสถานะบัญชี (21) - หนี้ค้างชำระเกิน 90 วัน
-                              จากเหตุการณ์ไม่ปกติ
+                              มีสถานะบัญชี (21)-หนี้ค้างชำระเกิน 90 วัน
+                              เนื่องจากได้รับผลกระทบจากสถานการณ์ไม่ปกติ
                             </option>
 
                             <option value="มีสถานะบัญชี (30) - อยู่ในกระบวนการทางกฎหมาย">
@@ -2470,8 +2491,8 @@ const AdminSetData_Litemain = () => {
                               value="มีสถานะบัญชี (32) - ศาลพิพากษายกฟ้อง
                               (ขาดอายุความหรือเหตุอื่น)"
                             >
-                              มีสถานะบัญชี (32) - ศาลพิพากษายกฟ้อง
-                              (ขาดอายุความหรือเหตุอื่น)
+                              มีสถานะบัญชี (32)-ศาลพิพากษายกฟ้อง
+                              เนื่องจากขาดอายุความหรือเหตุอื่นฯ
                             </option>
 
                             <option value="มีสถานะบัญชี (33) - ปิดบัญชีเนื่องจากตัดหนี้สูญ">
@@ -2534,8 +2555,8 @@ const AdminSetData_Litemain = () => {
                               value="มีสถานะบัญชี (53) - หนี้ค้างชำระเกิน 90 วัน
                               อยู่ในกระบวนการทางกฎหมาย และหยุดนำส่งข้อมูล"
                             >
-                              มีสถานะบัญชี (53) - หนี้ค้างชำระเกิน 90 วัน
-                              อยู่ในกระบวนการทางกฎหมาย และหยุดนำส่งข้อมูล
+                              มีสถานะบัญชี (53)-หนี้ค้างชำระเกิน 90 วัน
+                              โดยอยู่ในกระบวนการทางกฎหมาย และหยุดนำส่งข้อมูล
                             </option>
                           </select>
 
@@ -2620,49 +2641,137 @@ const AdminSetData_Litemain = () => {
                               </option>
                               <option>
                                 00 :
-                                ไม่มีประวัติสินเชื่อทุกที่ในรายงานข้อมูลเครดิต
+                                ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต
+                                (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)
                               </option>
-                              <option>011 : ยอดหนี้ค้างสูง</option>
+                              <option>
+                                {" "}
+                                011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
                               <option>012 : ไม่ได้ใช้งาน</option>
-                              <option>013 : สัดส่วนยอดหนี้ต่อวงเงินสูง</option>
-                              <option>014 : ยอดหนี้ค้างชำระสูง</option>
-                              <option>015 : ไม่มีรายการค้างชำระ</option>
+                              <option>
+                                {" "}
+                                013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>
+                                {" "}
+                                014 : ยอดหนี้รวมคงค้าง
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>
+                                {" "}
+                                015 : ประวัติข้อมูลเครดิตที่ดี
+                                ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด
+                              </option>
                               <option>016 : ไม่ได้ใช้งาน</option>
                               <option>
-                                017 : จำนวนบัญชีหมุนเวียนที่มียอดคงเหลือสูง
+                                {" "}
+                                017 :
+                                ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
                               </option>
-                              <option>018 : จำนวนสินเชื่อน้อย</option>
-                              <option>019 : จำนวนสินเชื่อสูง</option>
-                              <option>020 : มีบัญชีค้างชำระเกิน 90 วัน</option>
-                              <option>021 : ประวัติการค้างชำระสูง</option>
-                              <option>023 : ประวัติการชำระดี</option>
-                              <option>025 : ปิดบัญชีหนี้คงค้างต่ำ</option>
-                              <option>026 : ปิดบัญชีหนี้คงค้างสูง</option>
-                              <option>028 : การสมัครสินเชื่อ</option>
-                              <option>029 : การสมัครสินเชื่อน้อย</option>
-                              <option>030 : การสมัครสินเชื่อสูง</option>
                               <option>
-                                031 : บัญชีหมุนเวียนมียอดคงเหลือต่ำ
+                                {" "}
+                                018 : วงเงินคงเหลือ
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย
                               </option>
-                              <option value="032">
-                                032 : ไม่มีการค้างชำระ
+                              <option>
+                                {" "}
+                                019 : ประวัติข้อมูลเครดิต
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด
                               </option>
-                              <option value="AA">AA : ชำระตรงเวลา</option>
-                              <option value="BB">
-                                BB : ค้างชำระ &gt; 90 วัน
+                              <option>
+                                {" "}
+                                020 :
+                                ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต
                               </option>
-                              <option value="VV">
-                                VV : ค้างชำระ &gt; 3 ครั้ง
+                              <option>
+                                {" "}
+                                021 : ประวัติสินเชื่อที่ดี
+                                ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น
                               </option>
-                              <option value="WW">
-                                WW : ค้างชำระ &gt; 5 ครั้ง
+                              <option>
+                                {" "}
+                                022 : ยอดหนี้ที่ค้างชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
                               </option>
-                              <option value="XX">
-                                XX : ไม่มียอดหนี้ และชำระดี
+                              <option>
+                                {" "}
+                                023 : ประวัติการค้างชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
                               </option>
-                              <option value="YY">YY : ไม่มีหนี้ค้างชำระ</option>
-                              <option value="ZZ">
-                                ZZ : ค้างชำระน้อยกว่า 5 ครั้ง
+                              <option>
+                                {" "}
+                                024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+
+                              <option>
+                                {" "}
+                                025 : ความหลากหลายของประเภทสินเชื่อ
+                                ที่ปรากฏในรายงานข้อมูลเครดิตน้อย
+                              </option>
+                              <option>
+                                {" "}
+                                026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต
+                                ค่อนข้างสูง
+                              </option>
+                              <option>027 : ไม่ได้ใช้งาน</option>
+                              <option>
+                                {" "}
+                                028 : การสืบค้นล่าสุด
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
+                              </option>
+                              <option>
+                                {" "}
+                                030 :
+                                จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>032 : ไม่ได้ใช้งาน</option>
+
+                              <option>
+                                {" "}
+                                TT : ปัจจุบันค้างชำระเกิน 90 วัน
+                                หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย
+                              </option>
+                              <option>
+                                {" "}
+                                VV :
+                                บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล
+                              </option>
+                              <option>
+                                {" "}
+                                WW : บัญชีมีการโต้แย้ง
+                                หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล
+                              </option>
+                              <option>
+                                {" "}
+                                XX : ไม่มีบัญชี
+                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
+                                มากกว่า หรือเท่ากับ 5 ครั้ง{" "}
+                              </option>
+                              <option>
+                                {" "}
+                                YY : ไม่มีบัญชี
+                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
+                                น้อยกว่า 5 ครั้ง{" "}
+                              </option>
+
+                              <option>
+                                {" "}
+                                ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต{" "}
                               </option>
                             </select>
                           ) : (
@@ -2679,38 +2788,138 @@ const AdminSetData_Litemain = () => {
                               </option>
                               <option>
                                 00 :
-                                ไม่มีประวัติสินเชื่อทุกที่ในรายงานข้อมูลเครดิต
+                                ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต
+                                (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)
                               </option>
-                              <option>011 : ยอดหนี้ค้างสูง</option>
+                              <option>
+                                {" "}
+                                011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
                               <option>012 : ไม่ได้ใช้งาน</option>
-                              <option>013 : สัดส่วนยอดหนี้ต่อวงเงินสูง</option>
-                              <option>014 : ยอดหนี้ค้างชำระสูง</option>
-                              <option>015 : ไม่มีรายการค้างชำระ</option>
+                              <option>
+                                {" "}
+                                013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>
+                                {" "}
+                                014 : ยอดหนี้รวมคงค้าง
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>
+                                {" "}
+                                015 : ประวัติข้อมูลเครดิตที่ดี
+                                ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด
+                              </option>
                               <option>016 : ไม่ได้ใช้งาน</option>
                               <option>
-                                017 : จำนวนบัญชีหมุนเวียนที่มียอดคงเหลือสูง
+                                {" "}
+                                017 :
+                                ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
                               </option>
-                              <option>018 : จำนวนสินเชื่อน้อย</option>
-                              <option>019 : จำนวนสินเชื่อสูง</option>
-                              <option>020 : มีบัญชีค้างชำระเกิน 90 วัน</option>
-                              <option>021 : ประวัติการค้างชำระสูง</option>
-                              <option>023 : ประวัติการชำระดี</option>
-                              <option>025 : ปิดบัญชีหนี้คงค้างต่ำ</option>
-                              <option>026 : ปิดบัญชีหนี้คงค้างสูง</option>
-                              <option>028 : การสมัครสินเชื่อ</option>
-                              <option>029 : การสมัครสินเชื่อน้อย</option>
-                              <option>030 : การสมัครสินเชื่อสูง</option>
                               <option>
-                                031 : บัญชีหมุนเวียนมียอดคงเหลือต่ำ
+                                {" "}
+                                018 : วงเงินคงเหลือ
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย
                               </option>
-                              <option>032 : ไม่มีการค้างชำระ</option>
-                              <option>AA : ชำระตรงเวลา</option>
-                              <option>BB : ค้างชำระ &gt; 90 วัน</option>
-                              <option>VV : ค้างชำระ &gt; 3 ครั้ง</option>
-                              <option>WW : ค้างชำระ &gt; 5 ครั้ง</option>
-                              <option>XX : ไม่มียอดหนี้ และชำระดี</option>
-                              <option>YY : ไม่มีหนี้ค้างชำระ</option>
-                              <option>ZZ : ค้างชำระน้อยกว่า 5 ครั้ง</option>
+                              <option>
+                                {" "}
+                                019 : ประวัติข้อมูลเครดิต
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด
+                              </option>
+                              <option>
+                                {" "}
+                                020 :
+                                ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                021 : ประวัติสินเชื่อที่ดี
+                                ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น
+                              </option>
+                              <option>
+                                {" "}
+                                022 : ยอดหนี้ที่ค้างชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                023 : ประวัติการค้างชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+
+                              <option>
+                                {" "}
+                                025 : ความหลากหลายของประเภทสินเชื่อ
+                                ที่ปรากฏในรายงานข้อมูลเครดิตน้อย
+                              </option>
+                              <option>
+                                {" "}
+                                026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต
+                                ค่อนข้างสูง
+                              </option>
+                              <option>027 : ไม่ได้ใช้งาน</option>
+                              <option>
+                                {" "}
+                                028 : การสืบค้นล่าสุด
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
+                              </option>
+                              <option>
+                                {" "}
+                                030 :
+                                จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>032 : ไม่ได้ใช้งาน</option>
+
+                              <option>
+                                {" "}
+                                TT : ปัจจุบันค้างชำระเกิน 90 วัน
+                                หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย
+                              </option>
+                              <option>
+                                {" "}
+                                VV :
+                                บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล
+                              </option>
+                              <option>
+                                {" "}
+                                WW : บัญชีมีการโต้แย้ง
+                                หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล
+                              </option>
+                              <option>
+                                {" "}
+                                XX : ไม่มีบัญชี
+                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
+                                มากกว่า หรือเท่ากับ 5 ครั้ง{" "}
+                              </option>
+                              <option>
+                                {" "}
+                                YY : ไม่มีบัญชี
+                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
+                                น้อยกว่า 5 ครั้ง{" "}
+                              </option>
+
+                              <option>
+                                {" "}
+                                ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต{" "}
+                              </option>
                             </select>
                           )}
 

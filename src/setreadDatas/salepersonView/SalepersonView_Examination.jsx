@@ -107,11 +107,11 @@ const SalepersonView_Examination = () => {
   const formatPhoneFront = (phone = "") => {
     const digits = phone.replace(/\D/g, ""); // เอาเฉพาะตัวเลข
 
-    if (digits.length < 4) return digits;
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
 
-    return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
   };
-
   const thaiMonths = [
     "มกราคม",
     "กุมภาพันธ์",
@@ -1210,32 +1210,34 @@ const SalepersonView_Examination = () => {
           left: "-9999px",
           visibility: "hidden",
 
-          width: "740px", // ✅ คุมความกว้าง
-          minHeight: "1040px", // ✅ ไม่ให้ยืดเกิน
-          padding: "24px 32px",
+          width: "730px",
+          minHeight: "1000px",
+          padding: "20px 32px",
+          background: "#ffffff",
 
-          background: "#fff",
-          fontFamily: "TH Sarabun New, sans-serif",
-          fontSize: "14px", // 🔻 ลดจาก 16 → 14
-          lineHeight: "1.6", // 🔻 จาก 1.75 → 1.6
+          fontFamily: "THSarabunPSK",
+          fontSize: "22px", // ✅ ใช้ px
+          fontWeight: 400, // ✅ น้ำหนักจริง
+          lineHeight: "1.4",
           color: "#4d4d4d",
         }}
       >
         {/* โลโก้ + หัว */}
-        <div style={{ textAlign: "left", marginBottom: "12px" }}>
+        <div style={{ textAlign: "left", marginBottom: "8px" }}>
           <img
             src="/logo SAK เลขเสียภาษี.png"
             alt="logo"
-            style={{ width: "400px", height: "auto" }} // ✅ ปรับขนาดใหญ่ขึ้น
+            style={{ width: "350px", height: "auto" }} // ✅ ปรับขนาดใหญ่ขึ้น
           />
         </div>
-        <br />
+
         <div
           style={{
             textAlign: "center",
-            fontSize: "16px",
-            // fontWeight: "bold",
-            marginTop: "10px",
+            fontSize: "22px",
+
+            fontWeight: "bold",
+            marginTop: "5px",
           }}
         >
           หนังสือให้ความยินยอมในการเปิดเผยข้อมูล
@@ -1243,78 +1245,103 @@ const SalepersonView_Examination = () => {
 
         <div
           style={{
-            marginTop: "20px",
+            marginTop: "10px",
             fontSize: "14px",
             textAlign: "right",
             width: "100%",
+            marginBottom: "15px",
           }}
         >
           {/* ทำที่ */}
 
-          <div
-            style={{
-              marginTop: "20px",
-              fontSize: "14px",
-              textAlign: "right",
-              width: "100%",
-            }}
-          >
-            {/* ✅ ทำที่ (ความยาวรวม = วันที่ทั้งหมด) */}
-            <div>
-              ทำที่&nbsp;
-              <span
-                style={{
-                  display: "inline-block",
-                  width: "279px", // ✅ ให้เท่ากับความยาววันที่รวม
-                  borderBottom: "1px dotted #000",
-                  textAlign: "center",
-                }}
-              >
-                {getDataShowPdf?.CTM_business_zone}
-              </span>
-            </div>
-
+          <div>
             {/* ✅ วันที่ */}
             {(() => {
               const { day, month, year } = getThaiDateParts(
                 getDataShowPdf?.CTM_created_at
               );
+              // const { day, month, year } = getThaiDateParts(dateNow);
 
               return (
-                <div style={{ marginTop: "6px" }}>
-                  วันที่&nbsp;
-                  <span
+                <div style={{ fontSize: "22px" }}>
+                  {/* ✅ ทำที่ (ความยาวรวม = วันที่ทั้งหมด) */}
+
+                  <div
                     style={{
-                      display: "inline-block",
-                      width: "40px",
-                      borderBottom: "1px dotted #000",
-                      textAlign: "center",
+                      display: "grid",
+                      gridTemplateColumns: "60px auto", // ⭐ ล็อกความกว้างคำ
+                      rowGap: "6px",
+
+                      lineHeight: "1.6",
+                      justifyContent: "end",
                     }}
                   >
-                    {day}
-                  </span>
-                  &nbsp;เดือน&nbsp;
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: "110px",
-                      borderBottom: "1px dotted #000",
-                      textAlign: "center",
-                    }}
-                  >
-                    {month}
-                  </span>
-                  &nbsp;พ.ศ.&nbsp;
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: "60px",
-                      borderBottom: "1px dotted #000",
-                      textAlign: "center",
-                    }}
-                  >
-                    {year}
-                  </span>
+                    {/* แถวทำที่ */}
+                    <div style={{ textAlign: "right" }} className="mt-1">
+                      ทำที่
+                    </div>
+                    <div>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: "279px",
+                          borderBottom: "1px dotted #000",
+                          textAlign: "center",
+
+                          lineHeight: "1", // 🔑 บีบ baseline ลง
+                          paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                        }}
+                      >
+                        {getDataShowPdf?.CTM_business_zone}
+                      </span>
+                    </div>
+
+                    {/* แถววันที่ */}
+                    <div style={{ textAlign: "right" }} className="mt-1">
+                      วันที่
+                    </div>
+                    <div>
+                      <div
+                        style={{
+                          display: "inline-block",
+                          width: "40px",
+                          borderBottom: "1px dotted #000",
+                          textAlign: "center",
+
+                          lineHeight: "1", // 🔑 บีบ baseline ลง
+                          paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                        }}
+                      >
+                        {day}
+                      </div>
+                      &nbsp;เดือน&nbsp;
+                      <div
+                        style={{
+                          display: "inline-block",
+                          width: "110px",
+                          borderBottom: "1px dotted #000",
+                          textAlign: "center",
+                          lineHeight: "1", // 🔑 บีบ baseline ลง
+                          paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                        }}
+                      >
+                        {month}
+                      </div>
+                      &nbsp;พ.ศ.&nbsp;
+                      <div
+                        style={{
+                          display: "inline-block",
+                          width: "60px",
+                          borderBottom: "1px dotted #000",
+                          textAlign: "center",
+                          lineHeight: "1", // 🔑 บีบ baseline ลง
+                          paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                        }}
+                      >
+                        {year}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })()}
@@ -1324,183 +1351,255 @@ const SalepersonView_Examination = () => {
         <div
           style={{
             border: "1px solid #000",
-            marginTop: "12px",
-            padding: "8px",
-            fontSize: "14px",
           }}
         >
-          <b>บุคคลธรรมดา</b>
-          <hr />
-          <br />
-          ข้าพเจ้า นาย/นาง/นางสาว{" "}
-          <span
+          {/* 🔷 แถบหัวข้อ */}
+          <div
             style={{
-              display: "inline-block",
-              minWidth: "200px",
-              borderBottom: "1px dotted #000",
-              textAlign: "center",
+              borderBottom: "1px solid #000",
+              padding: "6px 12px",
+              fontWeight: 400, // ✅ ตัวบาง
             }}
           >
-            {getDataShowPdf?.CTM_firstname || ""}
-          </span>{" "}
-          นามสกุล{" "}
-          <span
-            style={{
-              display: "inline-block",
-              minWidth: "200px",
-              borderBottom: "1px dotted #000",
-              textAlign: "center",
-            }}
-          >
-            {getDataShowPdf?.CTM_lastname || ""}
-          </span>
-          <br />
-          วัน/เดือน/ปี พ.ศ.เกิด{" "}
-          <span
-            style={{
-              display: "inline-block",
-              minWidth: "200px",
-              borderBottom: "1px dotted #000",
-              textAlign: "center",
-            }}
-          >
-            {convertToThaiDate(getDataShowPdf?.CTM_birthdate) || ""}
-          </span>{" "}
-          หมายเลขโทรศัพท์
-          <span
-            style={{
-              display: "inline-block",
-              minWidth: "200px",
-              borderBottom: "1px dotted #000",
-              textAlign: "center",
-            }}
-          >
-            {formatPhoneFront(getDataShowPdf?.CTM_phone)}
-          </span>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            บัตรประจำตัวประชาชนเลขที่ :{" "}
-            {getDataShowPdf?.CTM_citizen_id?.replaceAll("-", "") // ✅ ลบ - ออกก่อน (ถ้ามี)
-              .split("") // ✅ แยกเป็นตัวอักษร
-              .map((digit, index) => (
-                <span
-                  key={index}
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  {/* ✅ ช่องตัวเลข */}
+            บุคคลธรรมดา
+          </div>
+
+          {/* 🔷 เนื้อหา */}
+          <div style={{ padding: "9px" }}>
+            <div style={{ marginBottom: "4px" }} className="mt-1">
+              ข้าพเจ้า นาย/นาง/นางสาว{" "}
+              <div
+                style={{
+                  display: "inline-block",
+                  minWidth: "200px",
+                  borderBottom: "1px dotted #000",
+                  textAlign: "center",
+
+                  lineHeight: "1", // 🔑 บีบ baseline ลง
+                  paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                }}
+              >
+                {getDataShowPdf?.CTM_firstname || ""}
+              </div>{" "}
+              นามสกุล{" "}
+              <div
+                style={{
+                  display: "inline-block",
+                  minWidth: "220px",
+                  borderBottom: "1px dotted #000",
+                  textAlign: "center",
+                  lineHeight: "1", // 🔑 บีบ baseline ลง
+                  paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                }}
+              >
+                {getDataShowPdf?.CTM_lastname || ""}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: "8px" }} className="mt-1">
+              วัน/เดือน/ปี พ.ศ.เกิด{" "}
+              <div
+                style={{
+                  display: "inline-block",
+                  minWidth: "233px",
+                  borderBottom: "1px dotted #000",
+                  textAlign: "center",
+                  lineHeight: "1", // 🔑 บีบ baseline ลง
+                  paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                }}
+              >
+                {convertToThaiDate(getDataShowPdf?.CTM_birthdate) || ""}
+              </div>{" "}
+              หมายเลขโทรศัพท์{" "}
+              <div
+                style={{
+                  display: "inline-block",
+                  minWidth: "163px",
+                  borderBottom: "1px dotted #000",
+                  textAlign: "center",
+                  lineHeight: "1", // 🔑 บีบ baseline ลง
+                  paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                }}
+              >
+                {formatPhoneFront(getDataShowPdf?.CTM_phone)}
+              </div>
+            </div>
+
+            {/* 🔷 เลขบัตรประชาชน */}
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <span style={{ marginRight: "6px" }}>
+                บัตรประจำตัวประชาชนเลขที่ :
+              </span>
+
+              {getDataShowPdf?.CTM_citizen_id?.replaceAll("-", "")
+                .split("")
+                .map((digit, index) => (
                   <span
+                    key={index}
                     style={{
-                      width: "15px",
-                      height: "25px",
-                      border: "1px solid #000",
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "14px",
-                      fontWeight: "100",
                     }}
                   >
-                    {digit}
-                  </span>
+                    {/* ช่องตัวเลข */}
+                    <span
+                      style={{
+                        width: "16px",
+                        height: "24px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "22px",
+                        lineHeight: "1",
 
-                  {/* ✅ ขีดคั่นตำแหน่งตามรูปบัตร ปชช */}
-                  {[0, 4, 9, 11].includes(index) && (
-                    <span style={{ margin: "0 6px", fontSize: "20px" }}>-</span>
-                  )}
-                </span>
-              ))}
+                        border: "1px solid #000",
+                        marginLeft: index === 0 ? "0" : "-1px", // 🔑 ซ้อนเส้น
+                      }}
+                    >
+                      {digit}
+                    </span>
+
+                    {/* ขีดคั่น เฉพาะตำแหน่งที่กำหนด */}
+                    {[0, 4, 9, 11].includes(index) && (
+                      <span
+                        style={{
+                          margin: "0 6px", // ✅ เว้นเฉพาะตรง -
+                          fontSize: "20px",
+                          lineHeight: "1",
+                        }}
+                      >
+                        -
+                      </span>
+                    )}
+                  </span>
+                ))}
+            </div>
           </div>
         </div>
 
-        <p
+        <div
+          className="row mb-2 pt-4"
           style={{
-            marginTop: "19px",
-            textAlign: "justify",
-            textIndent: "6em",
-            fontSize: "14px",
-            wordBreak: "break-word",
+            fontFamily: "THSarabunPSK",
+            textAlign: "justify", // ✅ Justify
+            textAlignLast: "left", // ✅ บรรทัดสุดท้ายไม่ยืด
+            fontWeight: 400, // ✅ น้ำหนักจริง
+            lineHeight: "1.35",
+            wordBreak: "normal",
+            overflowWrap: "normal",
           }}
         >
-          ข้าพเจ้าตกลงยินยอมให้ บริษัท ข้อมูลเครดิตแห่งชาติ จำกัด (“บริษัท”)
-          เปิดเผยหรือให้นำข้อมูลของ ข้าพเจ้าแก่ บริษัท ศักดิ์สยามลิสซิ่ง จำกัด
-          (มหาชน) ซึ่งเป็นสมาชิกที่ข้าพเจ้าใช้บริการของบริษัท เพื่อประโยชน์ในการ
-          วิเคราะห์สินเชื่อตามกฎหมายสินเชื่อ/ขอออกบัตรเครดิตของข้าพเจ้าที่ให้ไว้กับบริษัทดังกล่าวข้างต้นรวมทั้งเพื่อ
-          ประโยชน์ในการทบทวนสินเชื่อ ต่ออายุสัญญาสินเชื่อ/บัตรเครดิต
-          การบริหารและป้องกันความเสี่ยงตามข้อกำหนด ของธนาคารแห่งประเทศไทย
-          และให้ถือว่าคู่ฉบับ และบรรดาสำเนา ภายถ่าย ข้อมูลอิเล็กทรอนิกส์
-          หรือโทรสารที่ทำ สำเนาขึ้นมาจากหนังสือให้ความยินยอมฉบับนี้
-          โดยการถ่ายสำเนา ถ่ายภาพหรือบันทึกไว้ไม่ว่าในรูปแบบใดๆ
-          เป็นหลักฐานในการให้ความยินยอมของข้าพเจ้าเช่นเดียวกัน
-        </p>
-        <p
-          style={{
-            marginTop: "12px",
-            textAlign: "justify",
-            textIndent: "6em",
-            fontSize: "14px",
-          }}
-        >
+          <div style={{ paddingLeft: "100px", letterSpacing: "0.4px" }}>
+            ข้าพเจ้าตกลงยินยอมให้ บริษัท ข้อมูลเครดิตแห่งชาติ จำกัด (“บริษัท”)
+            เปิดเผยหรือให้ข้อมูลของ
+          </div>
+
+          <div style={{ letterSpacing: "0.5px" }}>
+            ข้าพเจ้าแก่ บริษัท ศักดิ์สยามลิสซิ่ง จำกัด (มหาชน)
+            ซึ่งเป็นสมาชิกหรือผู้ใช้บริการของบริษัท เพื่อประโยชน์ในการ
+          </div>
+
+          <div style={{ letterSpacing: "0.81px" }}>
+            วิเคราะห์สินเชื่อ
+            ตามคำขอสินเชื่อ/ขอออกบัตรเครดิตของข้าพเจ้าที่ให้ไว้กับบริษัทดังกล่าวข้างต้น
+            รวมทั้งเพื่อ
+          </div>
+
+          <div style={{ letterSpacing: "0.4px" }}>
+            ประโยชน์ในการทบทวนสินเชื่อ ต่ออายุสัญญาสินเชื่อ/บัตรเครดิต
+            การบริหารและป้องกันความเสี่ยงตามข้อกำหนด
+          </div>
+
+          <div style={{ letterSpacing: "0.3px" }}>
+            ของธนาคารแห่งประเทศไทย และให้ถือว่าคู่ฉบับ และบรรดาสำเนา ภาพถ่าย
+            ข้อมูลอิเล็กทรอนิกส์ หรือโทรสารที่ทำ
+          </div>
+
+          <div style={{ letterSpacing: "0.7px" }}>
+            สำเนาขึ้นจากหนังสือให้ความยินยอมฉบับนี้ โดยการถ่ายสำเนา
+            ถ่ายภาพหรือบันทึกไว้ไม่ว่าในรูปแบบใดๆ เป็น
+          </div>
+
+          <div style={{ letterSpacing: "0.4px" }}>
+            หลักฐานในการให้ความยินยอมของข้าพเจ้าเช่นเดียวกัน
+          </div>
+        </div>
+
+        <div style={{ paddingLeft: "100px", letterSpacing: "0.4px" }}>
           ข้าพเจ้าจึงได้ลงลายมือชื่อไว้เป็นสำคัญ
-        </p>
+        </div>
+
         {/* ✅ โซนลายเซ็นทั้งหมด */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end",
-            marginTop: "20px",
+            marginTop: "18px",
           }}
         >
           {/* ✅ กล่องผู้ให้ความยินยอม */}
           <div
             style={{
               border: "1px solid #000",
-              borderRadius: "10px",
-              width: "360px",
-              padding: "12px",
-              marginBottom: "16px",
+              borderRadius: "22px",
+              width: "400px",
+              padding: "6px 10px", // 🔻 จาก 10px → 6px
+              marginBottom: "12px",
               textAlign: "center",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <div
+              style={{ display: "flex", alignItems: "center" }}
+              className="pt-2"
+            >
               {/* ไอคอนติ๊ก */}
-              <span
-                style={{
-                  width: "14px",
-                  height: "14px",
-                  border: "1px solid #000",
-                  borderRadius: "80%",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "10px",
-                  marginRight: "6px",
-                }}
-              >
-                ✓
-              </span>
+              <img src="/5290982.png" width={20} alt="signature-icon" />
 
               {/* ข้อความ + เส้น */}
-              <div style={{ textAlign: "left" }}>
-                ลงชื่อ
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: "260px",
-                    borderBottom: "1px dotted #000",
-                    marginLeft: "8px",
-                  }}
-                ></span>
+              <div style={{ textAlign: "left", fontSize: "20px" }}>
+                &nbsp;&nbsp;ลงชื่อ&nbsp;
+                ..........................................................................
+                <br />
+              </div>
+            </div>
+            <div
+              style={{
+                // marginLeft: "56px",
+                marginTop: "6px",
+                width: "430px",
+                position: "relative",
+                fontSize: "20px",
+              }}
+            >
+              {/* วงเล็บ + เส้น */}(
+              ..........................................................................
+              )
+              <span style={{ fontSize: "20px", marginLeft: "8px" }}>
+                ตัวบรรจง
+              </span>
+              {/* ชื่อ (ลอยบนเส้น) */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "-10px", // 🔑 ปรับระดับความลอย
+                  left: "45%",
+                  transform: "translateX(-50%)",
+                  background: "#fff", // 🔑 กันเส้นทับตัวอักษร
+                  padding: "0 8px",
+                  whiteSpace: "nowrap",
+                  fontWeight: "normal",
+                }}
+              >
+                {getDataShowPdf?.CTM_title_name}
+                {getDataShowPdf?.CTM_firstname} {getDataShowPdf?.CTM_lastname}
               </div>
             </div>
 
-            <div>
-              ({getDataShowPdf?.CTM_title_name}
-              {getDataShowPdf?.CTM_firstname} {getDataShowPdf?.CTM_lastname})
-              ตัวบรรจง
+            <div style={{ fontSize: "20px", fontWeight: 800 }}>
+              ผู้ให้ความยินยอม
             </div>
-            <div>ผู้ให้ความยินยอม</div>
           </div>
-
           {/* ✅ โซนพยาน (จัดซ้าย–ขวา) */}
           <div
             style={{
@@ -1527,45 +1626,80 @@ const SalepersonView_Examination = () => {
             <div
               style={{
                 border: "1px solid #000",
-                borderRadius: "10px",
-                width: "360px",
-                padding: "12px",
+                borderRadius: "22px",
+                width: "400px",
+                padding: "6px 10px", // 🔻 จาก 10px → 6px
+                marginBottom: "12px",
                 textAlign: "center",
               }}
             >
-              <div style={{ textAlign: "left" }}>
-                ลงชื่อ{" "}
-                <span
-                  style={{
-                    display: "inline-block",
-                    width: "260px", // ✅ ปรับความยาวเส้นได้
-                    borderBottom: "1px dotted #000",
-                    marginLeft: "8px",
-                  }}
-                ></span>
+              <div
+                style={{ display: "flex", alignItems: "center" }}
+                className="pt-2"
+              >
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <div style={{ textAlign: "left", fontSize: "20px" }}>
+                  &nbsp;&nbsp;ลงชื่อ&nbsp;
+                  ..........................................................................
+                  <br />
+                </div>
               </div>
 
-              <div>({getDataShowPdf?.Form_witness1_name}) ตัวบรรจง</div>
-              <div>พยาน</div>
+              <div
+                style={{
+                  // marginLeft: "56px",
+                  marginTop: "6px",
+                  width: "430px",
+                  position: "relative",
+                  fontSize: "20px",
+                }}
+              >
+                (
+                ..........................................................................
+                )
+                <span style={{ fontSize: "20px", marginLeft: "8px" }}>
+                  ตัวบรรจง
+                </span>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-10px", // 🔑 ปรับระดับความลอย
+                    left: "45%",
+                    transform: "translateX(-50%)",
+                    background: "#fff", // 🔑 กันเส้นทับตัวอักษร
+                    padding: "0 8px",
+                    whiteSpace: "nowrap",
+                    fontWeight: "normal",
+                  }}
+                >
+                  {getDataShowPdf?.Form_witness1_name}
+                </div>
+              </div>
+
+              <div style={{ fontSize: "20px", fontWeight: 800 }}>พยาน</div>
             </div>
           </div>
         </div>
 
-        <br />
         {/* ✅ กรอบหมายเหตุ */}
         <div
           style={{
             border: "1px solid #000",
             padding: "6px 10px",
-            marginTop: "15px",
-            fontSize: "14px",
+
+            fontSize: "20px",
             lineHeight: "1.4",
             textAlign: "justify",
           }}
         >
           <strong>หมายเหตุ :</strong>{" "}
-          ข้อมูลนี้เป็นของให้แก่สมาชิกหรือผู้ใช้บริการเป็นองค์ประกอบหนึ่งในการพิจารณาสินเชื่อของสถาบันการเงิน
-          แต่การเปิดเผยข้อมูลนี้จะผูกพันถึงสิทธิของเจ้าของข้อมูลที่จะให้ความยินยอมหรือไม่ก็ได้
+          ข้อมูลที่เปิดเผยให้แก่สมาชิกหรือผู้ใช้บริการเป็นองค์ประกอบหนึ่งในการพิจารณาสินเชื่อของสถาบันการเงิน
+          &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+          <span>
+            {" "}
+            &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+            &nbsp;แต่การเปิดเผยข้อมูลดังกล่าวเป็นสิทธิของเจ้าของข้อมูลที่จะให้ความยินยอมหรือไม่ก็ได้
+          </span>
         </div>
       </div>
     </div>
