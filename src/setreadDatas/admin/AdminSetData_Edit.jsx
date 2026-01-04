@@ -267,6 +267,11 @@ const AdminSetData_Edit = () => {
     window.open(pdfURL, "_blank");
   };
 
+  const openFileInNewTab = (relativePath) => {
+    const base = import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB;
+    window.open(`${base}/${relativePath}`, "_blank");
+  };
+
   const handleStatusClick = async (idForm) => {
     setSelectedItem(idForm);
 
@@ -636,7 +641,7 @@ const AdminSetData_Edit = () => {
                     <td>{item.belong}</td> */}
                     {/* <td>{item.region}</td> */}
                     <td>{convertToThaiDate(item.date_upEvidence)}</td>
-                     <td className="text">
+                    <td className="text">
                       <button
                         className="doc-btn doc-consent mr-1"
                         onClick={() =>
@@ -649,13 +654,9 @@ const AdminSetData_Edit = () => {
                         <BsFiletypeDoc />
                       </button>
 
-                  
-
-
                       <button
                         className="doc-btn doc-application mr-1"
                         onClick={() =>
-                         
                           openFileInNewTab(
                             `img/application/${item.Form_application_document}`
                           )
@@ -668,11 +669,9 @@ const AdminSetData_Edit = () => {
                       <button
                         className="doc-btn doc-idcard mr-2 mt-1"
                         onClick={() =>
-           
-                           openFileInNewTab(
+                          openFileInNewTab(
                             `img/idcard/${item.Form_idcard_photo}`
                           )
-       
                         }
                         title="รูปบัตรประชาชน"
                       >
@@ -728,7 +727,8 @@ const AdminSetData_Edit = () => {
                     </td>
                     {/* <td>{convertToThaiDate(item.Form_date_inspertor)}</td> */}
                     <td className="cell-highlight">
-                     {" "} {item.SCORE_additional_fee}
+                      {" "}
+                      {item.SCORE_additional_fee}
                     </td>
                   </tr>
                 ))}
@@ -744,7 +744,7 @@ const AdminSetData_Edit = () => {
               />
             </div>
           ) : ( */}
-            <div style={{ height: "500px" }}></div>
+          <div style={{ height: "500px" }}></div>
           {/* )} */}
         </div>
       </div>
