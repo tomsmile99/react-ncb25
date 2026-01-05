@@ -71,8 +71,8 @@ const Header = () => {
           
 
           <div className="contact-actions">
-            <a href="tel:881800" className="contact-phone">
-              เบอร์ภายใน 881800
+            <a href="tel:881522" className="contact-phone">
+              เบอร์ภายใน 881522
             </a>
             {/* <a href="tel:0891234567" className="contact-phone secondary">
               เบอร์ส่วนตัว 089-123-4567

@@ -170,13 +170,19 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
           CTM_business_region: data.CTM_business_region || "",
 
           customerType: data.Form_loan_type || "",
-          loanAmount: data.Form_loan_amount || "",
+          loanAmount: data.Form_loan_amount || "", //เก่า
+
+          
         });
 
         setFormData2({
-          customerType: data.Form_customer_type || "",
+          // customerType: data.Form_customer_type || "",
           loanAmount: data.Form_loan_amount || "", // ⭐ ตั้งค่าที่ get มา
-          loanType: data.Form_loan_type || "",
+          // loanType: data.Form_loan_type || "",
+
+
+          loanType: data.Form_customer_type || "",
+          customerType: data.Form_loan_type || "",
         });
 
         // ⭐ ตั้งค่าภาพ (รองรับ URL หรือ Base64)
@@ -696,6 +702,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
                 <option value="7">สินเชื่อเช่าซื้อ (รถจักรยานยนต์ใหม่)</option>
                 <option value="8">สินเชื่อเช่าซื้อ (รถแลกเงิน)</option>
                 <option value="9">สินเชื่อทะเบียนรถ</option>
+                 <option value="10">สินเชื่อโซลาร์แอร์</option>
               </select>
             </div>
 

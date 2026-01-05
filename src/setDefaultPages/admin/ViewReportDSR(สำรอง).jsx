@@ -103,34 +103,37 @@ const ViewReportDSR = () => {
     handleStatusClick(CTM_Idnumber);
   }, [CTM_Idnumber]);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "P")) {
-        e.preventDefault();
-        Swal.fire({
-          icon: "warning",
-          title: "ไม่อนุญาตให้พิมพ์เอกสารนี้",
-          text: "เอกสารนี้ใช้สำหรับงานตรวจสอบเครดิตภายในเท่านั้น",
-          confirmButtonText: "รับทราบ",
-          confirmButtonColor: "#dc2626",
-          backdrop: true,
-        });
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
+    useEffect(() => {
+      const handleKeyDown = (e) => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === "p" || e.key === "P")) {
+          e.preventDefault();
+          Swal.fire({
+            icon: "warning",
+            title: "ไม่อนุญาตให้พิมพ์เอกสารนี้",
+            text: "เอกสารนี้ใช้สำหรับงานตรวจสอบเครดิตภายในเท่านั้น",
+            confirmButtonText: "รับทราบ",
+            confirmButtonColor: "#dc2626",
+            backdrop: true,
+          });
+        }
+      };
+  
+      window.addEventListener("keydown", handleKeyDown);
+  
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }, []);
 
   return (
     <>
-      <div className="report-container watermark">
+ <div className="report-container watermark">
         {/* HEADER */}
         <div className="header-section">
-          <img src="/logo SAK เลขเสียภาษี.png" className="logo-img" />
+          <img
+            src="/logo SAK เลขเสียภาษี.png"
+            className="logo-img"
+          />
         </div>
 
         <div style={{ fontSize: "18px", fontWeight: 600 }}>
@@ -151,7 +154,7 @@ const ViewReportDSR = () => {
           <div>
             <span style={{ fontSize: "16px", textAlign: "right" }}>
               ชื่อ - นามสกุล ลูกค้า : {getDataShow.CTM_title_name}
-              {getDataShow.CTM_firstname} {getDataShow.CTM_lastname}{" "}
+              {getDataShow.CTM_firstname} {getDataShow.CTM_lastname}
             </span>
           </div>
           <div>
@@ -169,9 +172,7 @@ const ViewReportDSR = () => {
           </div>
           <div>
             <span style={{ fontSize: "16px" }}>
-         วงเงินขอสินเชื่อ :{" "}
-{Number(getDataShow?.Form_loan_amount || 0).toLocaleString("th-TH")} บาท
-
+              วงเงินขอสินเชื่อ : {getDataShow.Form_loan_amount}
             </span>
           </div>
           <div>
@@ -183,16 +184,6 @@ const ViewReportDSR = () => {
             </span>
           </div>
         </div>
-        <center>
-          {getDataShow?.SCORE_project_status === "y" && (
-            <span
-              style={{ color: "red", fontWeight: "bold", fontSize: "26px" }}
-            >
-              ลูกค้าเข้าร่วมโครงการ "คุณสู้ เราช่วย"
-            </span>
-          )}
-        </center>
-
         {/* SECTION 1–2 */}
         <table className="section-table">
           <tbody>
@@ -212,7 +203,7 @@ const ViewReportDSR = () => {
             </tr>
             <tr>
               <td>
-                <b style={{ fontSize: "18px" }}>3. คะแนนเครดิต</b>
+                <b style={{fontSize : "18px"}}>3. คะแนนเครดิต</b>
                 <table className="section-table">
                   <thead>
                     <tr>
@@ -295,28 +286,21 @@ const ViewReportDSR = () => {
                 </table>
                 {/* REASONS */}
                 <div className="reason-block">
-                  <b style={{ color: "red" }}>3.1 เหตุผลประกอบเพิ่มเติม</b>
+                  <b>3.1 เหตุผลประกอบเพิ่มเติม</b>
 
                   <div className="reason-content">
                     {getDataReasons.length > 0 ? (
                       getDataReasons.map((item, index) => (
-                        <div
-                          key={index}
-                          className="reason-item"
-                         
-                        >
-                          {item.account_status}{" "}
-                          จำนวน {item.account_total} บัญชี
-                          
+                        <div key={index} className="reason-item">
+                          {item.account_status}
                         </div>
-                        
                       ))
                     ) : (
                       <div className="reason-item">-</div>
                     )}
                   </div>
 
-                  <b > 3.2 เหตุผลประกอบคะแนนเครดิต</b>
+                  <b>3.2 เหตุผลประกอบคะแนนเครดิต</b>
 
                   <div className="reason-content">
                     {getDataScore.length > 0 ? (
@@ -356,12 +340,12 @@ const ViewReportDSR = () => {
             <span className="notice-no">1.</span>
             <div className="notice-text">
               {/* <span className="notice-bold"> */}
-              คุณสมบัติผู้ขอสินเชื่อส่วนบุคคล รายได้ไม่เกิน 30,000 บาท/เดือน
-              มีสินเชื่อส่วนบุคคลภายใต้การกำกับไม่เกิน 2 แห่ง
+               คุณสมบัติผู้ขอสินเชื่อส่วนบุคคล รายได้ไม่เกิน 30,000 บาท/เดือน มีสินเชื่อส่วนบุคคลภายใต้การกำกับไม่เกิน 2 แห่ง
               {/* </span> */}
-              <span className="notice-bold">
-                (ตามเรทพิจารณาการให้สินเชื่อส่วนบุคคลภายใต้การกำกับ)
+                <span className="notice-bold">
+                  (ตามเรทพิจารณาการให้สินเชื่อส่วนบุคคลภายใต้การกำกับ)
               </span>
+          
             </div>
           </div>
 
@@ -369,8 +353,7 @@ const ViewReportDSR = () => {
           <div className="notice-row">
             <span className="notice-no">2.</span>
             <div className="notice-text">
-              ลูกค้าใหม่ ที่มีสถานะเป็นบุคคลล้มละลาย ไม่ให้สินเชื่อ
-              (ตามประกาศที่ 882/2556)
+            ลูกค้าใหม่ ที่มีสถานะเป็นบุคคลล้มละลาย ไม่ให้สินเชื่อ (ตามประกาศที่ 882/2556)
             </div>
           </div>
 
@@ -378,8 +361,7 @@ const ViewReportDSR = () => {
           <div className="notice-row">
             <span className="notice-no">3.</span>
             <div className="notice-text">
-              ผลการตรวจสอบข้อมูลเครดิต เป็นไปตามประกาศ
-              เรื่องหลักเกณฑ์การพิจารณาผลตรวจสอบข้อมูลเครดิต ก่อนอนุมัติสินเชื่อ
+            ผลการตรวจสอบข้อมูลเครดิต เป็นไปตามประกาศ เรื่องหลักเกณฑ์การพิจารณาผลตรวจสอบข้อมูลเครดิต ก่อนอนุมัติสินเชื่อ
               {/* <span className="notice-dots"> ................ </span> */}
             </div>
           </div>

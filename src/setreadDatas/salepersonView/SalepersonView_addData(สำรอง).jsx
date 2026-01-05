@@ -341,61 +341,6 @@ const SalepersonView_addData = ({ idForm }) => {
       return;
     }
 
-    if (!formData?.CTM_citizen_id || formData.CTM_citizen_id.trim() === "") {
-      setPhoneError(true);
-      Swal.fire({
-        icon: "warning",
-        title: "กรุณากรอกหมายเลขบัตรประชาชน",
-        text: "ต้องระบุหมายเลขบัตรประชาชน",
-        confirmButtonText: "ตกลง",
-      });
-      return;
-    }
-
-    if (!formData?.title || formData.title.trim() === "") {
-      setPhoneError(true);
-      Swal.fire({
-        icon: "warning",
-        title: "กรุณากรอกคำนำหน้าชื่อลูกค้า",
-        text: "ต้องระบุคำนำหน้าชื่อลูกค้า",
-        confirmButtonText: "ตกลง",
-      });
-      return;
-    }
-
-    if (!formData?.firstname || formData.firstname.trim() === "") {
-      setPhoneError(true);
-      Swal.fire({
-        icon: "warning",
-        title: "กรุณากรอกชื่อลูกค้า",
-        text: "ต้องระบุชื่อลูกค้า",
-        confirmButtonText: "ตกลง",
-      });
-      return;
-    }
-
-    if (!formData?.lastname || formData.lastname.trim() === "") {
-      setPhoneError(true);
-      Swal.fire({
-        icon: "warning",
-        title: "กรุณากรอกนามสกุล",
-        text: "ต้องระบุนามสกุล",
-        confirmButtonText: "ตกลง",
-      });
-      return;
-    }
-
-    // 🔴 บังคับระบุวันเดือนปีเกิด (พ.ศ.)
-    if (!birthdayTH.day || !birthdayTH.month || !birthdayTH.year) {
-      Swal.fire({
-        icon: "warning",
-        title: "กรุณาระบุวันเดือนปีเกิด",
-        text: "ต้องระบุ วัน / เดือน / ปีเกิด (พ.ศ.) ให้ครบถ้วน",
-        confirmButtonText: "ตกลง",
-      });
-      return;
-    }
-
     if (!customerLastname) return setShowWarningPopup(true);
 
     // ถ้าลูกค้านามสกุล = พนักงาน → ต้องแก้พยานคนแรกก่อน

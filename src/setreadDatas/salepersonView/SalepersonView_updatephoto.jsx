@@ -541,6 +541,7 @@ const SalepersonView_updatephoto = ({ idForm }) => {
                 <option value="7">สินเชื่อเช่าซื้อ (รถจักรยานยนต์ใหม่)</option>
                 <option value="8">สินเชื่อเช่าซื้อ (รถแลกเงิน)</option>
                 <option value="9">สินเชื่อทะเบียนรถ</option>
+                <option value="10">สินเชื่อโซลาร์แอร์</option>
               </select>
             </div>
 
