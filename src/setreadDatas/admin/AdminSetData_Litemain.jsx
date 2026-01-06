@@ -145,14 +145,11 @@ const AdminSetData_Litemain = () => {
         setLevel("GG");
         setRisk("ความเสี่ยงปานกลาง");
         setResult("ผ่าน");
-      }else if (num >= 300 && num <= 615) {
+      } else if (num >= 300 && num <= 615) {
         setLevel("HH");
         setRisk("ความเสี่ยงสูง");
         setResult("ไม่ผ่าน");
       }
-
-
-
 
       // 🔹 ตัวเลขพิเศษต้องเช็กก่อนช่วง 0–615
       else if (num === 10) {
@@ -209,7 +206,7 @@ const AdminSetData_Litemain = () => {
 
     const num = parseFloat(value);
     if (!isNaN(num) && num >= 0) {
-      const percent = Math.ceil((num / 10000) * 100); // ปัดเศษขึ้น
+      const percent = Math.round((num / 10000) * 100); // 🔑 ปัดตาม 0.5
       setProbabilityPercent(`${percent}%`);
     } else {
       setProbabilityPercent("");
@@ -350,18 +347,17 @@ const AdminSetData_Litemain = () => {
   };
 
   const loanTypeMap = {
-  1: "สินเชื่อส่วนบุคคล",
-  2: "สินเชื่อนาโนไฟแนนซ์",
-  3: "สินเชื่อที่ดิน",
-  4: "สินเชื่อโซลาร์รูฟท็อป",
-  5: "สินเชื่อโซลาร์อินเวอร์",
-  6: "สินเชื่อโซลาร์ไมโครอินเวอร์เตอร์",
-  7: "สินเชื่อเช่าซื้อ (รถจักรยานยนต์ใหม่)",
-  8: "สินเชื่อเช่าซื้อ (รถแลกเงิน)",
-  9: "สินเชื่อทะเบียนรถ",
-  10: "สินเชื่อโซลาร์แอร์",
-};
-
+    1: "สินเชื่อส่วนบุคคล",
+    2: "สินเชื่อนาโนไฟแนนซ์",
+    3: "สินเชื่อที่ดิน",
+    4: "สินเชื่อโซลาร์รูฟท็อป",
+    5: "สินเชื่อโซลาร์อินเวอร์",
+    6: "สินเชื่อโซลาร์ไมโครอินเวอร์เตอร์",
+    7: "สินเชื่อเช่าซื้อ (รถจักรยานยนต์ใหม่)",
+    8: "สินเชื่อเช่าซื้อ (รถแลกเงิน)",
+    9: "สินเชื่อทะเบียนรถ",
+    10: "สินเชื่อโซลาร์แอร์",
+  };
 
   //____________________________add row 1________________________________//
 
@@ -430,17 +426,19 @@ const AdminSetData_Litemain = () => {
   const [submitted, setSubmitted] = useState(false);
   const [reportDateError, setReportDateError] = useState("");
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
     try {
       setSubmitted(true);
+      
+      e.preventDefault();
 
-      // if (!reportDate || reportDate.trim() === "") {
-      //   setReportDateError("กรุณาระบุวันที่รายงานผล");
-      //   return; // ❌ หยุดการทำงาน
-      // } else {
-      //   setReportDateError("");
-      // }
-
+      // 🔴 ดักเฉพาะกรณี "พบข้อมูล"
+      if (approval === "approved") {
+        if (!reportDate || reportDate.trim() === "") {
+          setReportDateError("กรุณาระบุวันที่รายงานผล");
+          return; // ❌ หยุดการทำงาน
+        }
+      }
       // -----------------------------
       // 1) Filter ข้อมูลก่อนส่ง
       // -----------------------------
@@ -483,6 +481,7 @@ const AdminSetData_Litemain = () => {
           ChkStatusEdit: ChkDataEdit,
         };
       } else if (approval === "rejected") {
+
         payload = {
           ctmId: selectedItem,
           approval,
@@ -493,10 +492,12 @@ const AdminSetData_Litemain = () => {
           PerFuNas,
           PerPST_N,
           LevelStaus: "Lv1N",
-          StatusEdit: "0",
+          // StatusEdit: "0",
           StatusCancel: "Cancel",
           ChkStatusEdit: ChkDataEdit,
         };
+
+        console.log(payload);
       } else if (approval === "pending") {
         payload = {
           ctmId: selectedItem,
@@ -945,7 +946,7 @@ const AdminSetData_Litemain = () => {
             onClick={() => setActiveTab("pass")}
           >
             <img
-             src="/Insurance-amico (1).png"
+              src="/Insurance-amico (1).png"
               // src={`${
               //   import.meta.env.VITE_REACT_APP_PHOTO
               // }/Insurance-amico (1).png`}
@@ -967,9 +968,8 @@ const AdminSetData_Litemain = () => {
             onClick={() => setActiveTab("cancel")}
           >
             <img
-            
               // src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Cancel-bro.png`}
-               src="/Cancel-bro.png"
+              src="/Cancel-bro.png"
               style={{ height: 80 }}
             />
             <div style={{ marginLeft: 12 }}>
@@ -987,7 +987,7 @@ const AdminSetData_Litemain = () => {
             onClick={() => setActiveTab("fail")}
           >
             <img
-             src="/Cancel-bro.png"
+              src="/Cancel-bro.png"
               // src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Cancel-bro.png`}
               style={{ height: 80 }}
             />
@@ -1484,7 +1484,7 @@ const AdminSetData_Litemain = () => {
                           ตำแหน่ง: {item.CTM_position || "-"}
                         </div>
                       </td>
-                      <td> {item.CTM_branch || "-"}</td>
+                      <td> {item.CTM_business_zone || "-"}</td>
                       <td> {item.belong || "-"}</td>
                       <td> {item.region || "-"}</td>
                       <td className="text">
@@ -1534,6 +1534,7 @@ const AdminSetData_Litemain = () => {
                             <button
                               className="btn-icon"
                               onClick={() => handleView(item)}
+                              title="รายงานผล"
                             >
                               <AiOutlineFileSearch />
                             </button>
@@ -1558,9 +1559,9 @@ const AdminSetData_Litemain = () => {
                             <center>
                               <span
                                 className="status-badge status-pass"
-                                onClick={() =>
-                                  handleStatusClick(item.CTM_form_number)
-                                }
+                                // onClick={() =>
+                                //   handleStatusClick(item.CTM_form_number)
+                                // }
                                 style={{ cursor: "pointer" }}
                               >
                                 ตรวจแล้ว
@@ -1615,10 +1616,10 @@ const AdminSetData_Litemain = () => {
                     <th className="text" style={{ width: "15%" }}>
                       ผู้ขอสืบค้น
                     </th>
-                    <th className="text" style={{ width: "10%" }}>
+                    <th className="text" style={{ width: "8%" }}>
                       สาขา / หน่วย
                     </th>
-                    <th className="text" style={{ width: "10%" }}>
+                    <th className="text" style={{ width: "8%" }}>
                       เขต
                     </th>
                     <th className="text" style={{ width: "5%" }}>
@@ -1637,14 +1638,14 @@ const AdminSetData_Litemain = () => {
                     <th className="text" style={{ width: "10%" }}>
                       วัน/เวลา ที่ตรวจสอบ
                     </th>
-                    <th className="text" style={{ width: "7%" }}>
+                    {/* <th className="text" style={{ width: "7%" }}>
                       รายงานผล
-                    </th>
+                    </th> */}
 
                     <th className="text-center" style={{ width: "10%" }}>
                       สถานะ
                     </th>
-                    <th className="text-center" style={{ width: "20%" }}>
+                    <th className="text-center" style={{ width: "25%" }}>
                       รายละเอียด
                     </th>
                   </tr>
@@ -1673,7 +1674,7 @@ const AdminSetData_Litemain = () => {
                           ตำแหน่ง: {item.CTM_position || "-"}
                         </div>
                       </td>
-                      <td> {item.CTM_branch || "-"}</td>
+                      <td> {item.CTM_business_zone || "-"}</td>
                       <td> {item.belong || "-"}</td>
                       <td> {item.region || "-"}</td>
                       <td className="text">
@@ -1717,7 +1718,7 @@ const AdminSetData_Litemain = () => {
 
                       <td>{item.Form_Name_Inspector}</td>
                       <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
-                      <td className="text">
+                      {/* <td className="text">
                         <center>
                           <div className="">
                             <button
@@ -1728,7 +1729,7 @@ const AdminSetData_Litemain = () => {
                             </button>
                           </div>
                         </center>
-                      </td>
+                      </td> */}
 
                       <td className="text">
                         {item.Form_verification_status === "Lv0" && (
@@ -1759,9 +1760,9 @@ const AdminSetData_Litemain = () => {
                         {item.Form_verification_status === "Lv1N" && (
                           <span
                             className="status-badge status-cancel"
-                            onClick={() =>
-                              handleStatusClick(item.CTM_form_number)
-                            }
+                            // onClick={() =>
+                            //   handleStatusClick(item.CTM_form_number)
+                            // }
                             style={{ cursor: "pointer" }}
                           >
                             1N ยกเลิกรายการตรวจสอบ
@@ -1863,7 +1864,7 @@ const AdminSetData_Litemain = () => {
                           ตำแหน่ง: {item.CTM_position || "-"}
                         </div>
                         <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          สาขา/หน่วย: {item.CTM_branch || "-"}
+                          สาขา/หน่วย: {item.CTM_business_zone || "-"}
                         </div>
                         <div style={{ fontSize: "12px", color: "#6c757d" }}>
                           เขต: {item.belong || "-"}
@@ -2019,7 +2020,8 @@ const AdminSetData_Litemain = () => {
                   <strong>ตำแหน่ง :</strong> {getDataShow?.CTM_position || "-"}
                 </div>
                 <div>
-                  <strong>สาขา/หน่วย :</strong> {getDataShow?.CTM_branch || "-"}
+                  <strong>สาขา/หน่วย :</strong>{" "}
+                  {getDataShow?.CTM_business_zone || "-"}
                 </div>
                 <div>
                   <strong>วัน/เวลาที่ยื่นขอสืบค้น :</strong>{" "}
@@ -2192,7 +2194,7 @@ const AdminSetData_Litemain = () => {
                               display: "flex",
                               alignItems: "center",
                               gap: "16px",
-                              fontSize:"18px"
+                              fontSize: "18px",
                             }}
                           >
                             <label>
@@ -2236,22 +2238,21 @@ const AdminSetData_Litemain = () => {
                       <label className="form-label-inline">
                         1. มีสินเชื่อส่วนบุคคลภายใต้การกำกับ จำนวน{" "}
                         <span className="required">*</span> :{" "}
-                      <label>
-  <input
-    type="number"
-    placeholder="กรุณากรอก"
-    className="input-normal"
-    value={valueCredit}
-    onChange={(e) => setValueCredit(e.target.value)}
-    style={{
-      height: "35px",        // 🔽 ลดความสูง
-      padding: "2px 6px",    // 🔽 ลดช่องว่างใน
-      lineHeight: "1.2",
-      fontSize: "14px",
-    }}
-  />
-</label>
-
+                        <label>
+                          <input
+                            type="number"
+                            placeholder="กรุณากรอก"
+                            className="input-normal"
+                            value={valueCredit}
+                            onChange={(e) => setValueCredit(e.target.value)}
+                            style={{
+                              height: "35px", // 🔽 ลดความสูง
+                              padding: "2px 6px", // 🔽 ลดช่องว่างใน
+                              lineHeight: "1.2",
+                              fontSize: "14px",
+                            }}
+                          />
+                        </label>
                         <label className="mr-1 ml-3">
                           แห่ง{" "}
                           <span style={{ color: "red" }}>

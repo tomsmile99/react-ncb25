@@ -262,6 +262,29 @@ const reportNCBLite = () => {
     }
   };
 
+  const renderApprovalResult = (item) => {
+  // 1️⃣ ถ้า Form_Approval_results ว่าง
+  if (!item.Form_Approval_results) {
+    if (item.Form_verification_status === "Lv0") {
+      return "รอพิจารณา";
+    }
+    return "-";
+  }
+
+  // 2️⃣ ถ้า Form_Approval_results มีค่า
+  switch (item.Form_Approval_results) {
+    case "approved":
+      return "อนุมัติ";
+    case "rejected":
+      return "ไม่อนุมัติ";
+    case "Cancel":
+      return "ยกเลิกรายการ";
+    default:
+      return "-";
+  }
+};
+
+
   const handleExportExcel = async () => {
     try {
       const { data } = await apiClient.get(
@@ -295,7 +318,7 @@ const reportNCBLite = () => {
         "ชื่อ-นามสกุล ลูกค้า":
           `${item.CTM_title_name ?? ""}${item.CTM_firstname ?? ""} ${item.CTM_lastname ?? ""}` ??
           "",
-        "วัน/เดือน/ปี เกิด": formatThaiDateTime(item.CTM_birthdate) ?? "-",
+        "วัน/เดือน/ปี เกิด": formatThaiDate(item.CTM_birthdate) ?? "-",
         หมายเลขโทรศัพท์: item.CTM_phone ?? "-",
         เลขที่บัตรประชาชน: item.CTM_citizen_id ?? "-",
         ผู้ขอสืบค้น: item.CTM_recorder_fullname ?? "-",
@@ -308,8 +331,9 @@ const reportNCBLite = () => {
         ประเภทสินเชื่อ: item.LTNL_Name ?? "-",
         วงเงินขอสินเชื่อ: item.Form_loan_amount ?? "-",
         คะแนนเครดิต: item.SCORE_credit_score ?? "-",
-        "คุณสู้ เราช่วย": item.SCORE_project_status === "y" ? "เคย" : "ไม่เคย",
-        ผลการพิจารณา: item.SCORE_project_status === "y" ? "เคย" : "ไม่เคย",
+        "คุณสู้ เราช่วย": item.SCORE_project_status === "y" ? "เข้าร่วม" : "ไม่เข้าร่วม",
+        ผลการพิจารณา: item.SCORE_project_status === "y" ? "เป็น" : "ไม่เป็น",
+       ผลการพิจารณาการให้สินเชื่อ : renderApprovalResult(item),
         ระดับคะแนนเครดิต: item.SCORE_credit_level ?? "-",
         ความน่าจะเป็นในการชำระหนี้: item.SCORE_payment_behavior ?? "-",
         เปอร์เซ็นต์การชำระหนี้: item.SCORE_percent_behavior ?? "-",

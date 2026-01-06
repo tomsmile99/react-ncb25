@@ -169,9 +169,11 @@ const ViewReportDSR = () => {
           </div>
           <div>
             <span style={{ fontSize: "16px" }}>
-         วงเงินขอสินเชื่อ :{" "}
-{Number(getDataShow?.Form_loan_amount || 0).toLocaleString("th-TH")} บาท
-
+              วงเงินขอสินเชื่อ :{" "}
+              {Number(getDataShow?.Form_loan_amount || 0).toLocaleString(
+                "th-TH"
+              )}{" "}
+              บาท
             </span>
           </div>
           <div>
@@ -300,23 +302,19 @@ const ViewReportDSR = () => {
                   <div className="reason-content">
                     {getDataReasons.length > 0 ? (
                       getDataReasons.map((item, index) => (
-                        <div
-                          key={index}
-                          className="reason-item"
-                         
-                        >
-                          {item.account_status}{" "}
-                          จำนวน {item.account_total} บัญชี
-                          
+                        <div key={index} className="reason-item">
+                          {item.account_status}
+                          {item.account_total ? (
+                            <> จำนวน {item.account_total} บัญชี</>
+                          ) : null}
                         </div>
-                        
                       ))
                     ) : (
                       <div className="reason-item">-</div>
                     )}
                   </div>
 
-                  <b > 3.2 เหตุผลประกอบคะแนนเครดิต</b>
+                  <b> 3.2 เหตุผลประกอบคะแนนเครดิต</b>
 
                   <div className="reason-content">
                     {getDataScore.length > 0 ? (
