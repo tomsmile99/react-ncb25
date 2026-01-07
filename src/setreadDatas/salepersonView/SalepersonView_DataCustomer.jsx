@@ -171,15 +171,12 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
 
           customerType: data.Form_loan_type || "",
           loanAmount: data.Form_loan_amount || "", //เก่า
-
-          
         });
 
         setFormData2({
           // customerType: data.Form_customer_type || "",
           loanAmount: data.Form_loan_amount || "", // ⭐ ตั้งค่าที่ get มา
           // loanType: data.Form_loan_type || "",
-
 
           loanType: data.Form_customer_type || "",
           customerType: data.Form_loan_type || "",
@@ -211,6 +208,18 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
     try {
       const formDataUpload = new FormData();
 
+        // ⭐ แปลงวันเกิด พ.ศ. → ค.ศ.
+    const birthdayCE = convertBirthdayToCE(birthdayTH);
+
+    if (!birthdayCE) {
+      Swal.fire({
+        icon: "warning",
+        title: "ข้อมูลไม่ครบ",
+        text: "กรุณากรอกวันเดือนปีเกิดให้ครบ",
+      });
+      return;
+    }
+
       /* ===============================
       🧾 ข้อมูลฟอร์ม (JSON)
     =============================== */
@@ -219,6 +228,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
         ...formData2,
         idForm: idForm,
         LvChk: getDataLvChk,
+         CTM_birthdate: birthdayCE,
       };
 
       formDataUpload.append("payload", JSON.stringify(payload));
@@ -337,8 +347,8 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
       const { status, result, message } = data;
 
       if (status === 200) {
-        console.log("✅ ดึงข้อมูล PDF สำเร็จ");
-        console.log("📦 result จากหลังบ้าน:", result);
+        // console.log("✅ ดึงข้อมูล PDF สำเร็จ");
+        // console.log("📦 result จากหลังบ้าน:", result);
         setgetDataShow(result[0]);
 
         setTimeout(() => {
@@ -399,6 +409,37 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
     }img/${folder}/${img}`;
   };
 
+  //วันเดือนปีเกิด
+  const [birthdayTH, setBirthdayTH] = useState({
+    day: "",
+    month: "",
+    year: "",
+  });
+
+  const thaiMonths1 = [
+    { value: "01", label: "มกราคม" },
+    { value: "02", label: "กุมภาพันธ์" },
+    { value: "03", label: "มีนาคม" },
+    { value: "04", label: "เมษายน" },
+    { value: "05", label: "พฤษภาคม" },
+    { value: "06", label: "มิถุนายน" },
+    { value: "07", label: "กรกฎาคม" },
+    { value: "08", label: "สิงหาคม" },
+    { value: "09", label: "กันยายน" },
+    { value: "10", label: "ตุลาคม" },
+    { value: "11", label: "พฤศจิกายน" },
+    { value: "12", label: "ธันวาคม" },
+  ];
+
+  const convertBirthdayToCE = () => {
+    const { day, month, year } = birthdayTH;
+    if (!day || !month || !year) return null;
+
+    const ceYear = parseInt(year, 10) - 543;
+
+    return `${ceYear}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  };
+
   useEffect(() => {
     handleDownloadPDF(idForm);
   }, []);
@@ -406,6 +447,17 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
   useEffect(() => {
     chksentFileRef.current = 1;
   }, [idForm]);
+  useEffect(() => {
+    if (formData?.CTM_birthdate) {
+      const [y, m, d] = formData.CTM_birthdate.split("-");
+
+      setBirthdayTH({
+        day: d,
+        month: m,
+        year: (parseInt(y, 10) + 543).toString(),
+      });
+    }
+  }, [formData?.CTM_birthdate]);
 
   return (
     <div>
@@ -526,20 +578,63 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
               />
             </div>
 
-            <div className="form-group small">
+            {/* <div className="form-group small">
               <label>วันเดือนปีเกิด</label>
               <input
                 type="date"
                 name="birthday"
                 value={formData.CTM_birthdate || ""}
                 onChange={handleChange}
-                // readOnly
+               
               />
 
-              {/* แสดงวันที่แบบไทยด้านล่าง */}
-              {/* <div style={{ marginTop: "5px", marginLeft: "6px" }}>
-                {convertToThaiDate(formData.CTM_birthdate)}
-              </div> */}
+             
+            </div> */}
+
+            <div className="form-group small">
+              <label>วันเดือนปีเกิด (พ.ศ.)</label>
+
+              <div style={{ display: "flex", gap: "6px" }}>
+                {/* วัน */}
+                <input
+                  type="number"
+                  placeholder="วัน"
+                  min={1}
+                  max={31}
+                  value={birthdayTH.day}
+                  onChange={(e) =>
+                    setBirthdayTH({ ...birthdayTH, day: e.target.value })
+                  }
+                  style={{ width: "70px" }}
+                />
+
+                {/* เดือน */}
+                <select
+                  value={birthdayTH.month}
+                  onChange={(e) =>
+                    setBirthdayTH({ ...birthdayTH, month: e.target.value })
+                  }
+                  style={{ width: "140px" }}
+                >
+                  <option value="">เดือน</option>
+                  {thaiMonths1.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+
+                {/* ปี พ.ศ. */}
+                <input
+                  type="number"
+                  placeholder="พ.ศ."
+                  value={birthdayTH.year}
+                  onChange={(e) =>
+                    setBirthdayTH({ ...birthdayTH, year: e.target.value })
+                  }
+                  style={{ width: "90px" }}
+                />
+              </div>
             </div>
 
             <div className="form-group small">
@@ -702,7 +797,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
                 <option value="7">สินเชื่อเช่าซื้อ (รถจักรยานยนต์ใหม่)</option>
                 <option value="8">สินเชื่อเช่าซื้อ (รถแลกเงิน)</option>
                 <option value="9">สินเชื่อทะเบียนรถ</option>
-                 <option value="10">สินเชื่อโซลาร์แอร์</option>
+                <option value="10">สินเชื่อโซลาร์แอร์</option>
               </select>
             </div>
 

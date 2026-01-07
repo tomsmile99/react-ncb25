@@ -2529,11 +2529,14 @@ input[type="date"]:focus {
 .notice-sub {
   font-size: 13px;
 }
+
+
 .switch-booking {
   position: relative;
   display: inline-block;
   width: 90px;
   height: 34px;
+  
 }
 
 /* ซ่อน checkbox */

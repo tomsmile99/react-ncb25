@@ -277,6 +277,7 @@ const AdminSetData_Litemain = () => {
       console.error("Error fetching data:", error.message);
     }
   };
+
   //เปิดไฟล์เป็น PDF
 
   const openImageBase64AsPDF = (base64String) => {
@@ -429,7 +430,7 @@ const AdminSetData_Litemain = () => {
   const handleSubmit = async (e) => {
     try {
       setSubmitted(true);
-      
+
       e.preventDefault();
 
       // 🔴 ดักเฉพาะกรณี "พบข้อมูล"
@@ -481,7 +482,6 @@ const AdminSetData_Litemain = () => {
           ChkStatusEdit: ChkDataEdit,
         };
       } else if (approval === "rejected") {
-
         payload = {
           ctmId: selectedItem,
           approval,
@@ -801,13 +801,13 @@ const AdminSetData_Litemain = () => {
     window.open(`${base}/${relativePath}`, "_blank");
   };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setNow(new Date());
+  //   }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+  //   return () => clearInterval(timer);
+  // }, []);
 
   //รวมฟังก์ชันนับจำนวน
 
@@ -882,24 +882,49 @@ const AdminSetData_Litemain = () => {
   };
 
   // 🔁 เปลี่ยน tab → รีเซ็ตหน้า + โหลด notification
-  useEffect(() => {
-    setCurrentPage(1);
 
+  //เก่า
+  // useEffect(() => {
+  //   setCurrentPage(1);
+
+  //   loadUserNotification1();
+  //   loadUserNotification2();
+  //   loadUserNotification3();
+  //   loadUserNotification4();
+  // }, [activeTab]);
+
+  // useEffect(() => {
+  //   setCurrentPage(1);
+  //   getEmployeeDB_Admin(1);
+  // }, [searchQuery]);
+
+  // // 📦 โหลดข้อมูลตาราง (เปลี่ยน page หรือ tab)
+  // useEffect(() => {
+  //   getEmployeeDB_Admin(currentPage);
+  // }, [currentPage, activeTab]);
+
+  // 🔔 notification โหลดครั้งเดียว
+  useEffect(() => {
     loadUserNotification1();
     loadUserNotification2();
     loadUserNotification3();
     loadUserNotification4();
-  }, [activeTab]);
+  }, []);
 
+  // 🔁 reset page เมื่อเปลี่ยน tab
   useEffect(() => {
     setCurrentPage(1);
-    getEmployeeDB_Admin(1);
+  }, [activeTab]);
+
+  // 🔍 reset page เมื่อ search
+  useEffect(() => {
+    setCurrentPage(1);
   }, [searchQuery]);
 
-  // 📦 โหลดข้อมูลตาราง (เปลี่ยน page หรือ tab)
+  // 📦 โหลดข้อมูลตาราง (จุดเดียว)
   useEffect(() => {
     getEmployeeDB_Admin(currentPage);
-  }, [currentPage, activeTab]);
+  }, [currentPage, activeTab, searchQuery]);
 
   const handleRefresh = () => {
     // setCurrentPage(1); // กลับไปหน้าแรก
@@ -1078,49 +1103,49 @@ const AdminSetData_Litemain = () => {
                     <th className="text-center" style={{ width: "2%" }}>
                       ลำดับ
                     </th>
-                    <th className="text" style={{ width: "6%" }}>
+                    <th className="text" style={{ width: "7%" }}>
                       เลขที่แบบฟอร์ม
                     </th>
-                    <th className="text" style={{ width: "10%" }}>
+                    <th className="text" style={{ width: "8%" }}>
                       ชื่อ-สกุลลูกค้า
                     </th>
-                    <th className="text" style={{ width: "7%" }}>
+                    <th className="text" style={{ width: "3%" }}>
                       เลขบัตรประชาชน
                     </th>
-                    <th className="text" style={{ width: "6%" }}>
+                    <th className="text" style={{ width: "9%" }}>
                       ผู้ขอสืบค้น
                     </th>
-                    <th className="text" style={{ width: "10%" }}>
+                    {/* <th className="text" style={{ width: "10%" }}>
                       ตำแหน่ง
-                    </th>
+                    </th> */}
                     <th className="text" style={{ width: "6%" }}>
                       สาขา/หน่วย
                     </th>
-                    <th className="text" style={{ width: "10%" }}>
+                    <th className="text" style={{ width: "6%" }}>
                       เขต
                     </th>
-                    <th className="text" style={{ width: "5%" }}>
+                    <th className="text" style={{ width: "3%" }}>
                       ภาค
                     </th>
-                    <th className="text" style={{ width: "10%" }}>
+                    <th className="text" style={{ width: "7%" }}>
                       เอกสารประกอบ
                     </th>
-                    <th className="text" style={{ width: "10%" }}>
+                    <th className="text" style={{ width: "5%" }}>
                       วันที่/เวลา ที่ยื่นเรื่อง
                     </th>
 
-                    <th className="text-center" style={{ width: "10%" }}>
+                    <th className="text-center" style={{ width: "5%" }}>
                       สถานะ
                     </th>
 
-                    <th className="text-center" style={{ width: "15%" }}>
+                    <th className="text-center" style={{ width: "5%" }}>
                       การตรวจสอบ
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {probationaryEmployees.map((item, index) => (
-                    <tr key={index}>
+                    <tr key={item.CTM_form_number}>
                       <td className="text-center">
                         {(currentPage - 1) * limit + (index + 1)}
                       </td>
@@ -1131,8 +1156,13 @@ const AdminSetData_Litemain = () => {
                         {item.CTM_firstname} {item.CTM_lastname}
                       </td>
                       <td>{item.CTM_citizen_id}</td>
-                      <td>{item.CTM_recorder_fullname}</td>
-                      <td>{item.CTM_position}</td>
+                      <td>
+                        {item.CTM_recorder_fullname}
+                        <div style={{ fontSize: "10px" }}>
+                          ตำแหน่ง : {item.CTM_position}
+                        </div>
+                      </td>
+
                       <td>{item.CTM_business_zone}</td>
                       <td>{item.belong}</td>
                       <td>{item.CTM_business_region}</td>
@@ -1215,15 +1245,9 @@ const AdminSetData_Litemain = () => {
                         style={{ verticalAlign: "middle" }}
                       >
                         {(() => {
-                          const status = getWaitingStatus(item.date_upEvidence);
-                          const { minutes, seconds } = getDiffTime(
-                            item.date_upEvidence,
-                            now
-                          );
-
-                          const waitStatus = getWaitingStatus(
-                            item.date_upEvidence
-                          );
+                          // const waitStatus = getWaitingStatus(
+                          //   item.date_upEvidence
+                          // );
 
                           return (
                             <div
@@ -1246,8 +1270,8 @@ const AdminSetData_Litemain = () => {
                                     padding: "6px 18px",
                                     fontSize: "12px",
                                     fontWeight: 600,
-                                    backgroundColor: waitStatus.color,
-                                    color: waitStatus.textColor,
+                                    backgroundColor: "#f6b72ff5",
+                                       color: "#5a3103ff",
                                     cursor: "pointer",
                                     minWidth: "120px",
                                     boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
@@ -1269,8 +1293,8 @@ const AdminSetData_Litemain = () => {
                                         padding: "6px 18px",
                                         fontSize: "12px",
                                         fontWeight: 600,
-                                        backgroundColor: waitStatus.color,
-                                        color: waitStatus.textColor,
+                                        backgroundColor: "#039201ff",
+                                        color: "#f6f6f6ff",
                                         cursor: "pointer",
                                         minWidth: "120px",
                                         boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
@@ -1334,64 +1358,66 @@ const AdminSetData_Litemain = () => {
                               </div> */}
 
                               {/* เวลาเดิน */}
-                              <div
+                              {/* <div
                                 style={{
                                   fontSize: "11px",
                                   color: "#6c757d",
                                   fontVariantNumeric: "tabular-nums",
                                 }}
-                              >
-                                ⏱ {minutes}:
-                                {seconds.toString().padStart(2, "0")}
-                              </div>
+                              > */}
+                              {/* ⏱ {minutes}:
+                                {seconds.toString().padStart(2, "0")} */}
+                              {/* </div> */}
                             </div>
                           );
                         })()}
                       </td>
 
-                      <td>
-                        {item.Form_status_chk === "1" ? (
-                          <>
-                            {PerD === item.Form_idPer_chk ? (
-                              /* 🔒 สวิตช์เมื่อเปิดจองแล้ว */
+                      <td className="td-switch">
+                        <div className="switch-wrapper pb-4">
+                          {item.Form_status_chk === "1" ? (
+                            <>
+                              {PerD === item.Form_idPer_chk ? (
+                                /* 🔒 สวิตช์เมื่อเปิดจองแล้ว */
 
-                              <label className="switch-booking switch-locked">
-                                <input
-                                  type="checkbox"
-                                  checked={true} // ✅ ยึดจาก DB
-                                  onChange={() => handleReToggleBooking(item)}
-                                />
-                                <span className="slider">
-                                  <span className="text on">ตรวจอยู่</span>
-                                </span>
-                              </label>
-                            ) : (
-                              <label className="switch-booking switch-locked">
-                                <input
-                                  type="checkbox"
-                                  checked={true}
-                                  disabled
-                                />
-                                <span className="slider">
-                                  <span className="text on">ตรวจอยู่</span>
-                                </span>
-                              </label>
-                            )}
-                          </>
-                        ) : (
-                          /* 🔓 สวิตช์สำหรับกดเปิดจอง */
-                          <label className="switch-booking">
-                            <input
-                              type="checkbox"
-                              checked={false} // ✅ FIX สำคัญมาก
-                              onChange={() => handleToggleBooking(item)}
-                            />
-                            <span className="slider">
-                              <span className="text on"></span>
-                              <span className="text off">จองงาน</span>
-                            </span>
-                          </label>
-                        )}
+                                <label className="switch-booking switch-locked">
+                                  <input
+                                    type="checkbox"
+                                    checked={true} // ✅ ยึดจาก DB
+                                    onChange={() => handleReToggleBooking(item)}
+                                  />
+                                  <span className="slider">
+                                    <span className="text on">ตรวจอยู่</span>
+                                  </span>
+                                </label>
+                              ) : (
+                                <label className="switch-booking switch-locked">
+                                  <input
+                                    type="checkbox"
+                                    checked={true}
+                                    disabled
+                                  />
+                                  <span className="slider">
+                                    <span className="text on">ตรวจอยู่</span>
+                                  </span>
+                                </label>
+                              )}
+                            </>
+                          ) : (
+                            /* 🔓 สวิตช์สำหรับกดเปิดจอง */
+                            <label className="switch-booking">
+                              <input
+                                type="checkbox"
+                                checked={false} // ✅ FIX สำคัญมาก
+                                onChange={() => handleToggleBooking(item)}
+                              />
+                              <span className="slider">
+                                <span className="text on"></span>
+                                <span className="text off">จองงาน</span>
+                              </span>
+                            </label>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1462,7 +1488,7 @@ const AdminSetData_Litemain = () => {
                 </thead>
                 <tbody>
                   {probationaryEmployees.map((item, index) => (
-                    <tr key={index}>
+                    <tr key={item.CTM_form_number}>
                       <td className="text-center">
                         {(currentPage - 1) * limit + (index + 1)}
                       </td>
@@ -1652,7 +1678,7 @@ const AdminSetData_Litemain = () => {
                 </thead>
                 <tbody>
                   {probationaryEmployees.map((item, index) => (
-                    <tr key={index}>
+                    <tr key={item.CTM_form_number}>
                       <td className="text-center">
                         {(currentPage - 1) * limit + (index + 1)}
                       </td>
@@ -1835,7 +1861,7 @@ const AdminSetData_Litemain = () => {
                 </thead>
                 <tbody>
                   {probationaryEmployees.map((item, index) => (
-                    <tr key={index}>
+                    <tr key={item.CTM_form_number}>
                       <td className="text-center">
                         {" "}
                         {(currentPage - 1) * limit + (index + 1)}
