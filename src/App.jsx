@@ -112,7 +112,7 @@ const App = () => {
               {/* Admin */}
               <Route element={<LayoutAdmin />}>
                 <Route
-                  path="/Admin_CheckCredit"
+                  path="/Admin_CheckCredit_old"
                   element={<Admin_CheckCredit />}
                 />
                 <Route path="/AdminViewPage" element={<AdminViewPage />} />

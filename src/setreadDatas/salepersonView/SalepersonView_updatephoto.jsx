@@ -176,58 +176,109 @@ const SalepersonView_updatephoto = ({ idForm }) => {
     return !Object.values(newImageErrors).some(Boolean);
   };
 
-  const handleUpdateCustomer = async () => {
-    if (!validateForm() || !validateImages()) return;
+  // const handleUpdateCustomer = async () => {
+  //   if (!validateForm() || !validateImages()) return;
 
-    try {
-      const formDataUpload = new FormData();
+  //   try {
+  //     const formDataUpload = new FormData();
 
-      formDataUpload.append("idForm", idForm);
-      formDataUpload.append("loanType", formData2.loanType);
-      formDataUpload.append("loanAmount", formData2.loanAmount);
-      formDataUpload.append("customerType", formData2.customerType);
+  //     formDataUpload.append("idForm", idForm);
+  //     formDataUpload.append("loanType", formData2.loanType);
+  //     formDataUpload.append("loanAmount", formData2.loanAmount);
+  //     formDataUpload.append("customerType", formData2.customerType);
 
-      // ✅ แนบไฟล์
-      if (images.img1) formDataUpload.append("img1", images.img1);
-      if (images.img2) formDataUpload.append("img2", images.img2);
-      if (images.img3) formDataUpload.append("img3", images.img3);
+  //     // ✅ แนบไฟล์
+  //     if (images.img1) formDataUpload.append("img1", images.img1);
+  //     if (images.img2) formDataUpload.append("img2", images.img2);
+  //     if (images.img3) formDataUpload.append("img3", images.img3);
 
-      // console.log("📦 formDataUpload ก่อนส่ง:");
+  //     // console.log("📦 formDataUpload ก่อนส่ง:");
 
-      // for (let [key, value] of formDataUpload.entries()) {
-      //   if (value instanceof File) {
-      //     console.log(key, "=>", value.name, value.type, value.size + " bytes");
-      //   } else {
-      //     console.log(key, "=>", value);
-      //   }
-      // }
+  //     // for (let [key, value] of formDataUpload.entries()) {
+  //     //   if (value instanceof File) {
+  //     //     console.log(key, "=>", value.name, value.type, value.size + " bytes");
+  //     //   } else {
+  //     //     console.log(key, "=>", value);
+  //     //   }
+  //     // }
 
-      // return;
+  //     // return;
 
-      const { data } = await apiClient.post(
-        "/api/insurances/datacustomers/updateData_evidence",
-        formDataUpload
-      );
-      const { status, result, files, post } = data;
+  //     const { data } = await apiClient.post(
+  //       "/api/insurances/datacustomers/updateData_evidence",
+  //       formDataUpload
+  //     );
+  //     const { status, result, files, post } = data;
 
-      if (status === 200) {
-        // console.log("✅ status =", status);
-        // console.log("📨 message =", post);
-        // console.log("📄 files =", files);
+  //     if (status === 200) {
+  //       // console.log("✅ status =", status);
+  //       // console.log("📨 message =", post);
+  //       // console.log("📄 files =", files);
 
-        Swal.fire({
-          icon: "success",
-          title: "บันทึกสำเร็จ",
-          timer: 2000,
-          showConfirmButton: false,
-        }).then(() => {
-          window.location.assign("/Salesperson");
-        });
-      }
-    } catch (err) {
-      console.error(err);
+  //       Swal.fire({
+  //         icon: "success",
+  //         title: "บันทึกสำเร็จ",
+  //         timer: 2000,
+  //         showConfirmButton: false,
+  //       }).then(() => {
+  //         window.location.assign("/Salesperson");
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+
+const [isSubmitting, setIsSubmitting] = useState(false);
+
+const handleUpdateCustomer = async () => {
+  if (isSubmitting) return;            // ❌ กันกดซ้ำ
+  if (!validateForm() || !validateImages()) return;
+
+  setIsSubmitting(true);               // 🔒 ล็อกปุ่ม
+
+  try {
+    const formDataUpload = new FormData();
+
+    formDataUpload.append("idForm", idForm);
+    formDataUpload.append("loanType", formData2.loanType);
+    formDataUpload.append("loanAmount", formData2.loanAmount);
+    formDataUpload.append("customerType", formData2.customerType);
+
+    if (images.img1) formDataUpload.append("img1", images.img1);
+    if (images.img2) formDataUpload.append("img2", images.img2);
+    if (images.img3) formDataUpload.append("img3", images.img3);
+
+    const { data } = await apiClient.post(
+      "/api/insurances/datacustomers/updateData_evidence",
+      formDataUpload
+    );
+
+    if (data.status === 200) {
+      await Swal.fire({
+        icon: "success",
+        title: "บันทึกสำเร็จ",
+        timer: 2000,
+        showConfirmButton: false,
+        allowOutsideClick: false,      // ⭐ ห้ามคลิกนอก
+        allowEscapeKey: false,
+      });
+
+      window.location.assign("/Salesperson");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      icon: "error",
+      title: "เกิดข้อผิดพลาด",
+      text: "ไม่สามารถบันทึกข้อมูลได้",
+    });
+  } finally {
+    setIsSubmitting(false);             // 🔓 ปลดล็อก (กรณี error)
+  }
+};
+
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -706,24 +757,33 @@ const SalepersonView_updatephoto = ({ idForm }) => {
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <div style={{ display: "flex", gap: "8px" }}>
               <button
-                className="btn-submit"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px",
-                  padding: "12px 14px",
-                  fontSize: "13px",
-                  background: "#0d3b7a",
-                  color: "#fff",
-                  borderRadius: "20px",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-                onClick={handleUpdateCustomer}
-              >
-                <TiUpload size={16} /> อัปโหลดหลักฐาน
-              </button>
+            className="btn-submit"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+              padding: "12px 14px",
+              fontSize: "13px",
+              background: "#0d3b7a",
+              color: "#fff",
+              borderRadius: "20px",
+              border: "none",
+              cursor: isSubmitting ? "not-allowed" : "pointer",
+              opacity: isSubmitting ? 0.7 : 1,
+            }}
+            onClick={handleUpdateCustomer}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              "กำลังบันทึก..."
+            ) : (
+              <>
+                <TiUpload size={16} />
+                อัปโหลดหลักฐาน
+              </>
+            )}
+          </button>
             </div>
           </div>
         </div>
