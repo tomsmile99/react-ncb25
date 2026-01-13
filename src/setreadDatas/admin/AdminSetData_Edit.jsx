@@ -627,7 +627,7 @@ const AdminSetData_Edit = () => {
                         ตำแหน่ง: {item.CTM_position || "-"}
                       </div>
                       <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                        สาขา/หน่วย: {item.CTM_branch || "-"}
+                        สาขา/หน่วย: {item.CTM_business_zone || "-"}
                       </div>
                       <div style={{ fontSize: "12px", color: "#6c757d" }}>
                         เขต: {item.CTM_branch || "-"}

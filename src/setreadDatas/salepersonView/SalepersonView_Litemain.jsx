@@ -238,8 +238,8 @@ const SalepersonView_Litemain = () => {
 
   const [highlightId, setHighlightId] = useState(null);
 
-  const handleDel = async (id) => {
-    if (!id) return;
+  const handleDel = async (tableId, idNumber) => {
+    //  if (!tableId || !idNumber) return;
 
     // ยืนยันก่อนลบ
     const result = await Swal.fire({
@@ -258,7 +258,8 @@ const SalepersonView_Litemain = () => {
 
     try {
       const res = await apiClient.post("api/insurances/datacustomers/delete", {
-        id: id,
+        tableId,
+        idNumber,
       });
 
       if (res.data.status === 200) {
@@ -293,17 +294,15 @@ const SalepersonView_Litemain = () => {
       });
     }
   };
-  
- const formatPhoneFront = (phone = "") => {
-  const digits = phone.replace(/\D/g, ""); // เอาเฉพาะตัวเลข
 
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 6)
-    return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  const formatPhoneFront = (phone = "") => {
+    const digits = phone.replace(/\D/g, ""); // เอาเฉพาะตัวเลข
 
-  return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
-};
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
 
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  };
 
   const dateNow = new Date();
 
@@ -475,29 +474,42 @@ const SalepersonView_Litemain = () => {
                       <td>{convertToThaiDate(item.CTM_created_at)}</td>
 
                       {/* PDF */}
-                      <td className="text-center">
-                        <button
-                          className="btn-icon"
-                          onClick={() => handleDownloadPDF(item.CTM_Idnumber)}
-                          title="ฟอร์มหนังสือยินยอม"
-                        >
-                          <FaRegFilePdf />
-                        </button>
-                      </td>
+                     <td className="text-center">
+  {item.CTM_Idnumber && (
+    <button
+      className="btn-icon"
+      onClick={() => handleDownloadPDF(item.CTM_Idnumber)}
+      title="ฟอร์มหนังสือยินยอม"
+    >
+      <FaRegFilePdf />
+    </button>
+  )}
+</td>
+
 
                       {/* สถานะเอกสาร */}
                       <td className="text-center">
                         <div className="d-flex gap-2 justify-content-center">
-                          <NavLink
-                            to={`/Sale_uploadphotoDataCredit/${item.CTM_Idnumber}`}
-                            style={{ textDecoration: "none" }}
-                          >
-                            {item.Form_verification_status === "Lv0N" && (
-                              <span className="status-badge status-waitUb">
-                                01 - รออัปโหลดหลักฐาน
-                              </span>
-                            )}
-                          </NavLink>
+                          {item.CTM_Idnumber ? (
+                            <NavLink
+                              to={`/Sale_uploadphotoDataCredit/${item.CTM_Idnumber}`}
+                              style={{ textDecoration: "none" }}
+                            >
+                              {item.Form_verification_status === "Lv0N" && (
+                                <span className="status-badge status-waitUb">
+                                  01 - รออัปโหลดหลักฐาน
+                                </span>
+                              )}
+                            </NavLink>
+                          ) : (
+                            <span
+                              className="status-badge status-error"
+                              title="ไม่พบเลขฟอร์ม (CTM_Idnumber)"
+                            >
+                              ⚠️ รายการนี้เกิดข้อผิดพลาด
+                              กรุณาลบและกดเพิ่มลูกค้าใหม่
+                            </span>
+                          )}
 
                           {item.Form_verification_status === "Lv0" && (
                             <span
@@ -530,25 +542,24 @@ const SalepersonView_Litemain = () => {
                       {/* ปุ่มจัดการ */}
                       <td className="text-center">
                         <div className="d-flex gap-2 justify-content-center">
-                          {["Lv0N", "Lv1E"].includes(
-                            item.Form_verification_status
-                          ) && (
-                            <NavLink
-                              to={`/Sale_EditDataCustomer/${item.CTM_Idnumber}`}
-                            >
-                              <button className="btn-icon" title="แก้ไขข้อมูล">
-                                <FiEdit />
-                              </button>
-                            </NavLink>
-                          )}
-
+                          
+                         {item.CTM_Idnumber &&
+  ["Lv0N", "Lv1E"].includes(item.Form_verification_status) && (
+    <NavLink to={`/Sale_EditDataCustomer/${item.CTM_Idnumber}`}>
+      <button className="btn-icon" title="แก้ไขข้อมูล">
+        <FiEdit />
+      </button>
+    </NavLink>
+)}
                           {["Lv0N", ""].includes(
                             item.Form_verification_status
                           ) && (
                             <button
                               className="btn-icon"
                               title="ลบรายการ"
-                              onClick={() => handleDel(item.CTM_Idnumber)}
+                              onClick={() =>
+                                handleDel(item.CTM_table_id, item.CTM_Idnumber)
+                              }
                             >
                               <AiOutlineDelete />
                             </button>
@@ -592,7 +603,7 @@ const SalepersonView_Litemain = () => {
 
           fontFamily: "THSarabunPSK",
           fontSize: "22px", // ✅ ใช้ px
-          fontWeight: 400, // ✅ น้ำหนักจริง 
+          fontWeight: 400, // ✅ น้ำหนักจริง
           lineHeight: "1.4",
           color: "#4d4d4d",
         }}
@@ -652,7 +663,9 @@ const SalepersonView_Litemain = () => {
                     }}
                   >
                     {/* แถวทำที่ */}
-                    <div className="mt-1" style={{ textAlign: "right" }}>ทำที่</div>
+                    <div className="mt-1" style={{ textAlign: "right" }}>
+                      ทำที่
+                    </div>
                     <div>
                       <span
                         style={{
@@ -670,41 +683,46 @@ const SalepersonView_Litemain = () => {
                     </div>
 
                     {/* แถววันที่ */}
-                    <div className="mt-1" style={{ textAlign: "right" }}>วันที่</div>
+                    <div className="mt-1" style={{ textAlign: "right" }}>
+                      วันที่
+                    </div>
                     <div>
-                      <div className="mt-1"
+                      <div
+                        className="mt-1"
                         style={{
                           display: "inline-block",
                           width: "40px",
                           borderBottom: "1px dotted #000",
                           textAlign: "center",
-                             lineHeight: "1", // 🔑 บีบ baseline ลง
+                          lineHeight: "1", // 🔑 บีบ baseline ลง
                           paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
                         }}
                       >
                         {day}
                       </div>
                       &nbsp;เดือน&nbsp;
-                      <div className="mt-1"
+                      <div
+                        className="mt-1"
                         style={{
                           display: "inline-block",
                           width: "110px",
                           borderBottom: "1px dotted #000",
                           textAlign: "center",
-                             lineHeight: "1", // 🔑 บีบ baseline ลง
+                          lineHeight: "1", // 🔑 บีบ baseline ลง
                           paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
                         }}
                       >
                         {month}
                       </div>
                       &nbsp;พ.ศ.&nbsp;
-                      <div className="mt-1"
+                      <div
+                        className="mt-1"
                         style={{
                           display: "inline-block",
                           width: "60px",
                           borderBottom: "1px dotted #000",
                           textAlign: "center",
-                             lineHeight: "1", // 🔑 บีบ baseline ลง
+                          lineHeight: "1", // 🔑 บีบ baseline ลง
                           paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
                         }}
                       >
@@ -736,29 +754,31 @@ const SalepersonView_Litemain = () => {
 
           {/* 🔷 เนื้อหา */}
           <div style={{ padding: "9px" }} className="mt-1">
-            <div style={{ marginBottom: "4px" }} >
+            <div style={{ marginBottom: "4px" }}>
               ข้าพเจ้า นาย/นาง/นางสาว{" "}
-              <div className="mt-1"
+              <div
+                className="mt-1"
                 style={{
                   display: "inline-block",
                   minWidth: "200px",
                   borderBottom: "1px dotted #000",
                   textAlign: "center",
-                     lineHeight: "1", // 🔑 บีบ baseline ลง
-                          paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                  lineHeight: "1", // 🔑 บีบ baseline ลง
+                  paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
                 }}
               >
                 {getDataShow?.CTM_firstname || ""}
               </div>{" "}
               นามสกุล{" "}
-              <div className="mt-1"
+              <div
+                className="mt-1"
                 style={{
                   display: "inline-block",
                   minWidth: "220px",
                   borderBottom: "1px dotted #000",
                   textAlign: "center",
-                     lineHeight: "1", // 🔑 บีบ baseline ลง
-                          paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                  lineHeight: "1", // 🔑 บีบ baseline ลง
+                  paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
                 }}
               >
                 {getDataShow?.CTM_lastname || ""}
@@ -773,21 +793,22 @@ const SalepersonView_Litemain = () => {
                   minWidth: "233px",
                   borderBottom: "1px dotted #000",
                   textAlign: "center",
-                     lineHeight: "1", // 🔑 บีบ baseline ลง
-                          paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                  lineHeight: "1", // 🔑 บีบ baseline ลง
+                  paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
                 }}
               >
                 {convertToThaiDate(getDataShow?.CTM_birthdate) || ""}
               </div>{" "}
               หมายเลขโทรศัพท์{" "}
-              <div className="mt-1"
+              <div
+                className="mt-1"
                 style={{
                   display: "inline-block",
                   minWidth: "163px",
                   borderBottom: "1px dotted #000",
                   textAlign: "center",
-                     lineHeight: "1", // 🔑 บีบ baseline ลง
-                          paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
+                  lineHeight: "1", // 🔑 บีบ baseline ลง
+                  paddingBottom: "1px", // 🔑 ดันเส้นขึ้นมาใกล้ข้อความ
                 }}
               >
                 {formatPhoneFront(getDataShow?.CTM_phone)}
@@ -795,7 +816,7 @@ const SalepersonView_Litemain = () => {
             </div>
 
             {/* 🔷 เลขบัตรประชาชน */}
-            <div  style={{ display: "flex", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
               <span style={{ marginRight: "6px" }}>
                 บัตรประจำตัวประชาชนเลขที่ :
               </span>
@@ -847,7 +868,7 @@ const SalepersonView_Litemain = () => {
         </div>
 
         <div
-          className="row mb-2 pt-4"
+          className="row mb-2 pt-4 print-text"
           style={{
             fontFamily: "THSarabunPSK",
             textAlign: "justify", // ✅ Justify

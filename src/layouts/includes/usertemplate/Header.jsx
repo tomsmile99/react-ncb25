@@ -1,3 +1,4 @@
+import { TiBusinessCard } from "react-icons/ti";
 
 const Header = () => {
   return (
@@ -39,76 +40,149 @@ const Header = () => {
               ติดต่อสอบถาม
             </a>
           </li>
+          <li className="nav-item">
+            <a
+              href="model"
+              className="nav-link font-weight-bold"
+              data-toggle="modal"
+              data-target="#ContactModal1"
+            >
+              <TiBusinessCard fontSize={18} /> ติดตั้งเครื่องเสียบบัตร
+            </a>
+          </li>
         </ul>
       </nav>
-     {/* /.End Navbar */}
+      {/* /.End Navbar */}
 
-     <div
-  className="modal fade"
-  id="ContactModal"
-  tabIndex="-1"
-  role="dialog"
-  aria-hidden="true"
->
+      <div
+        className="modal fade"
+        id="ContactModal"
+        tabIndex="-1"
+        role="dialog"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog modal-dialog-centered" role="document">
+          <div className="modal-content contact-modal">
+            <div type="button" className="close" data-dismiss="modal">
+              <span>&times;</span>
+            </div>
 
-  
-  <div className="modal-dialog modal-dialog-centered" role="document">
-    <div className="modal-content contact-modal">
-      <div type="button" className="close" data-dismiss="modal">
-        <span>&times;</span>
-      </div>
+            <div className="modal-body text-center">
+              {/* ===== คนที่ 1 ===== */}
+              <div className="contact-card">
+                <i className="fas fa-headset contact-icon support"></i>
 
-      <div className="modal-body text-center">
-         {/* ===== คนที่ 1 ===== */}
-        <div className="contact-card">
-         <i className="fas fa-headset contact-icon support"></i>
+                <h6 className="contact-title">
+                  เจ้าหน้าที่ด้านงานตรวจสอบเครดิตลูกค้า
+                </h6>
 
-          <h6 className="contact-title">
-            เจ้าหน้าที่ด้านงานตรวจสอบเครดิตลูกค้า
-          </h6>
+                <p className="contact-name">( เจ้าหน้าที่ NCB )</p>
 
-          <p className="contact-name">( เจ้าหน้าที่ NCB )</p>
-          
-
-          <div className="contact-actions">
-            <a href="tel:881800" className="contact-phone">
-              เบอร์ภายใน 881800
-            </a>
-            {/* <a href="tel:0891234567" className="contact-phone secondary">
+                <div className="contact-actions">
+                  <a href="tel:881800" className="contact-phone">
+                    เบอร์ภายใน 881800
+                  </a>
+                  {/* <a href="tel:0891234567" className="contact-phone secondary">
               เบอร์ส่วนตัว 089-123-4567
             </a> */}
-          </div>
-        </div>
+                </div>
+              </div>
 
+              {/* ===== คนที่ 2 ===== */}
+              <div className="contact-card mt-4">
+                <i className="fas fa-user-cog contact-icon"></i>
 
-        {/* ===== คนที่ 2 ===== */}
-        <div className="contact-card mt-4">
-          <i className="fas fa-user-cog contact-icon"></i>
+                <h6 className="contact-title">
+                  ฝ่ายพัฒนาระบบส่งเสริมปฏิบัติการ
+                </h6>
 
-          <h6 className="contact-title">
-            ฝ่ายพัฒนาระบบส่งเสริมปฏิบัติการ
-          </h6>
+                <p className="contact-name">คุณศริวิมล ( Admin )</p>
 
-          <p className="contact-name">คุณศริวิมล ( Admin )</p>
-
-          <div className="contact-actions">
-            <a href="tel:881511" className="contact-phone">
-              เบอร์ภายใน 881511
-            </a>
-            {/* <a href="tel:0613561012" className="contact-phone secondary">
+                <div className="contact-actions">
+                  <a href="tel:881511" className="contact-phone">
+                    เบอร์ภายใน 881511
+                  </a>
+                  {/* <a href="tel:0613561012" className="contact-phone secondary">
               เบอร์ส่วนตัว 061-356-1012
             </a> */}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-
-       
       </div>
-    </div>
-  </div>
 
+      <div
+        className="modal fade"
+        id="ContactModal1"
+        tabIndex="-1"
+        role="dialog"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog-centered" role="document">
+          <div className="modal-content contact-modal">
+            <div type="button" className="close" data-dismiss="modal">
+              <span>&times;</span>
+            </div>
 
-</div>
+            <div className="modal-header">
+             <h5 className="modal-title">
+                <TiBusinessCard fontSize={18} />  ดาวน์โหลดโปรแกรมอ่านบัตรประชาชน
+              </h5>
+              <button type="button" className="close" data-dismiss="modal">
+                <span>&times;</span>
+              </button>
+            </div>
 
+            <div className="modal-body" style={{ width: "80%"}}>
+              <table className="table" >
+                <thead style={{ background: "#FFC107" }}>
+                  <tr>
+                    <th style={{ width: "80px", textAlign: "center" }}>
+                      ลำดับ
+                    </th>
+                    <th>ไฟล์ดาวน์โหลด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td align="center">1</td>
+                    <td>
+                      <a href="https://www.sakerp.org/file_downloadprograms/id_card_reader_sakerp_windows_10_64_1.0.1_setup.exe">
+                        ⬇ windows 10, 11 (64 bit)
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center">2</td>
+                    <td>
+                      <a href="https://www.sakerp.org/file_downloadprograms/id_card_reader_sakerp_windows_10_86_1.0.0_setup.exe">
+                        ⬇ windows 10 (32 bit)
+                      </a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center">3</td>
+                    <td>
+                      <a href="https://www.sakerp.org/file_downloadprograms/id_card_reader_sakerp_windows_7_64_1.0.1_setup.exe">
+                        ⬇ windows 7 (64 bit)
+                      </a>
+                    </td>
+                  </tr>
+                  <tr className="table-active">
+                    <td align="center">4</td>
+                    <td>
+                      <a href="https://www.sakerp.org/file_downloadprograms/id_card_reader_sakerp_windows_7_86_1.0.1_setup.exe">
+                        ⬇ windows 7 (32 bit)
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

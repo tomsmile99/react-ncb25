@@ -78,7 +78,7 @@ const convertToThaiDate1 = (dateString) => {
   return `${day} ${month} ${year}`;
 };
 
-const SalepersonView_Examination = () => {
+const SalepersonView_Examination = () => { 
   const getstore = useRecoilValue(userToken);
   const _PerWP = Base64.decode(getstore.PerWP);
 
@@ -590,10 +590,10 @@ const SalepersonView_Examination = () => {
                             สาขา/หน่วย: {item.CTM_branch || "-"}
                           </div>
                           <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                            เขต: {item.belong || "-"}
+                            เขต: {item.CTM_branch || "-"}
                           </div>
                           <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                            ภาค: {item.region || "-"}
+                             {item.CTM_business_region || "-"}
                           </div>
                         </td>
                         <td>{convertToThaiDate(item.CTM_created_at)}</td>
@@ -903,7 +903,7 @@ const SalepersonView_Examination = () => {
                     <div className="">
                       <strong>ประเภทสินเชื่อที่ลูกค้าสมัคร : </strong>
                       <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.LTN_Name || "-"}
+                        {getDataShow?.LTNL_Name || "-"} 
                       </span>
                     </div>
 
@@ -1016,7 +1016,7 @@ const SalepersonView_Examination = () => {
                     </label>
 
                     <div className="radio-group">
-                      <label className="radio-option mr-3">
+                      <label className="radio-option mr-3" style={{fontSize :"14px"}}>
                         <input
                           type="radio"
                           name="approval"
@@ -1029,7 +1029,7 @@ const SalepersonView_Examination = () => {
                         ผ่านการอนุมัติ
                       </label>
 
-                      <label className="radio-option">
+                      <label className="radio-option" style={{fontSize :"14px"}}>
                         <input
                           type="radio"
                           name="approval"
@@ -1054,7 +1054,7 @@ const SalepersonView_Examination = () => {
                         width: "fit-content",
                       }}
                     >
-                      <p style={{ marginBottom: "6px", fontWeight: 600 }}>
+                      <p style={{ marginBottom: "6px", fontWeight: 600 ,color:'red'}}>
                         โปรดเลือกเหตุผลที่ไม่ผ่าน * :
                       </p>
 
@@ -1103,7 +1103,8 @@ const SalepersonView_Examination = () => {
                           4. เนื่องจากรายงาน ERROR / รายการไม่ถูกต้อง
                         </span>
                       </label>
-                    </div>
+              
+                    </div> 
                   )}
 
                   {/* ✅ ตรวจสอบผลลัพธ์ */}
@@ -1137,17 +1138,23 @@ const SalepersonView_Examination = () => {
                             </span>
                           </label>
 
-                          <input
-                            className={`input-normal ${
-                              contractError ? "input-error" : ""
-                            }`}
-                            value={contractNumber}
-                            onChange={(e) => {
-                              setContractNumber(e.target.value);
-                              setContractError(false); // ✅ พอพิมพ์แล้วล้าง error
-                            }}
-                            placeholder="กรอกเลขที่สัญญา"
-                          />
+                         <input
+                          className={`input-normal ${contractError ? "input-error" : ""}`}
+                          value={contractNumber}
+                          onChange={(e) => {
+                            // ✅ เอาเฉพาะตัวเลข และจำกัดไม่เกิน 10 หลัก
+const value = e.target.value
+  .replace(/[^a-zA-Z0-9]/g, "") // ❌ ตัดอักขระพิเศษ
+  .slice(0, 10);                // จำกัด 10 ตัว
+
+                            setContractNumber(value);
+                            setContractError(false); // พอพิมพ์แล้วล้าง error
+                          }}
+                          placeholder="กรอกเลขที่สัญญา (10 หลัก)"
+                          inputMode="numeric"
+                          maxLength={10}
+                        />
+
 
                           {contractError && (
                             <small style={{ color: "#e5533d" }}>
@@ -1478,7 +1485,7 @@ const SalepersonView_Examination = () => {
         </div>
 
         <div
-          className="row mb-2 pt-4"
+          className="row mb-2 pt-4 print-text"
           style={{
             fontFamily: "THSarabunPSK",
             textAlign: "justify", // ✅ Justify

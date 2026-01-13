@@ -533,12 +533,12 @@ const SalepersonView_Examination_Cancel = () => {
                         <div style={{ fontSize: "12px", color: "#6c757d" }}>
                           สาขา/หน่วย: {item.CTM_business_zone || "-"}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          เขต: {item.belong || "-"}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          ภาค: {item.region || "-"}
-                        </div>
+                         <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เขต: {item.CTM_branch || "-"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                             {item.CTM_business_region || "-"}
+                          </div>
                       </td>
 
                       <td>{convertToThaiDate(item.CTM_created_at)}</td>

@@ -203,12 +203,19 @@ const SalepersonView_addData = ({ idForm }) => {
       let witness1ToSend = witness1;
 
       // ✅ ถ้านามสกุลลูกค้า ≠ พนักงาน → เอาพนักงานเป็นพยาน 1 อัตโนมัติ
-      if (customerLastname !== employeeLastname) {
-        const [fname, lname] = FullNameTitle.split(" ");
-        witness1ToSend = { firstname: fname, lastname: lname };
-        setWitness1(witness1ToSend);
-      }
+      // if (customerLastname !== employeeLastname) {
+      //   const [fname, lname] = FullNameTitle.split(" ");
+      //   witness1ToSend = { firstname: fname, lastname: lname };
+      //   setWitness1(witness1ToSend);
+      // }
+     if (customerLastname !== employeeLastname) {
+  const parts = FullNameTitle.trim().split(/\s+/);
+  const fname = parts[0];
+  const lname = parts.slice(1).join(" ");
 
+  witness1ToSend = { firstname: fname, lastname: lname };
+  setWitness1(witness1ToSend);
+}
       // ✅ ถ้ายังไม่กรอกพยาน 2 → เปิด popup ก่อน
       if (!witness2?.firstname || !witness2?.lastname) {
         setShowWitnessPopup(true);
@@ -281,7 +288,10 @@ const SalepersonView_addData = ({ idForm }) => {
       if (witness1.firstname && witness1.lastname) {
         witnessToSend = witness1;
       } else {
-        const [fname, lname] = FullNameTitle.split(" ");
+        const parts = FullNameTitle.trim().split(/\s+/);
+        const fname = parts[0];
+        const lname = parts.slice(1).join(" ");
+
         witnessToSend = { firstname: fname, lastname: lname };
       }
 
@@ -347,6 +357,20 @@ const SalepersonView_addData = ({ idForm }) => {
         icon: "warning",
         title: "กรุณากรอกหมายเลขบัตรประชาชน",
         text: "ต้องระบุหมายเลขบัตรประชาชน",
+        confirmButtonText: "ตกลง",
+      });
+      return;
+    }
+
+    // 🔴 ต้องเป็นตัวเลข 13 หลักเท่านั้น
+    const citizenId = formData.CTM_citizen_id.replace(/\D/g, "");
+
+    if (citizenId.length !== 13) {
+      setPhoneError(true);
+      Swal.fire({
+        icon: "warning",
+        title: "หมายเลขบัตรประชาชนไม่ถูกต้อง",
+        text: "หมายเลขบัตรประชาชนต้องเป็นตัวเลข 13 หลัก",
         confirmButtonText: "ตกลง",
       });
       return;

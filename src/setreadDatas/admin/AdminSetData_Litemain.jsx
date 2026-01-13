@@ -18,7 +18,7 @@ import { userToken } from "../../recoilstore/userStores";
 import { useRecoilValue } from "recoil";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { FaRegIdCard } from "react-icons/fa";
-
+import { LuLoader } from "react-icons/lu";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import {
   AiOutlineFileSearch,
@@ -108,7 +108,8 @@ const AdminSetData_Litemain = () => {
 
   const [searchQuery, setSearchQuery] = useState(""); //ค้นหา
 
-  //คำนวณคะแนน
+      //คำนวณคะแนน
+    const allowPerD = ["003792", "000274", "002743", "004187"]; //พนักงานที่สามารถแก้ไขสัญญาได้
 
   // ✅ ฟังก์ชันแปลงคะแนนเครดิตเป็นระดับและความเสี่ยง
   const handleScoreChange = (e) => {
@@ -237,6 +238,7 @@ const AdminSetData_Litemain = () => {
 
     // console.log(params);
     // return
+    setLoading(true); // ⭐ เริ่มโหลดทันที
 
     try {
       const { data } = await apiClient.get(
@@ -272,9 +274,15 @@ const AdminSetData_Litemain = () => {
         if (activeTab === "cancel") {
           setDataCancel(sqlDataCustomers);
         }
+
+        if (activeTab === "approved") {
+          setDataCancel(sqlDataCustomers);
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
+    } finally {
+      setLoading(false); // ⭐ โหลดเสร็จแน่นอน (success / error)
     }
   };
 
@@ -414,6 +422,7 @@ const AdminSetData_Litemain = () => {
   const closePopup = () => {
     setShowPopup(false);
     setSelectedItem(null);
+    resetForm(); //ล้างฟอร์ม
   };
 
   const [approval, setApproval] = useState(""); // Object to group by section ID
@@ -426,6 +435,56 @@ const AdminSetData_Litemain = () => {
 
   const [submitted, setSubmitted] = useState(false);
   const [reportDateError, setReportDateError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const [showModal, setShowModal] = useState(false);
+  const [contractNumber, setContractNumber] = useState("");
+  const [contractIdForm, setContractIdForm] = useState("");
+  const [currentItem, setCurrentItem] = useState(null);
+
+  const openContractModal = (item) => {
+    setCurrentItem(item);
+    setContractNumber(item.Form_Contract_number || "");
+    setContractIdForm(item.CTM_form_number || "");
+
+    setShowModal(true);
+  };
+
+  const resetForm = () => {
+    // สถานะหลัก
+    setApproval("");
+    setJoinProject("");
+    setValueCredit("");
+    setBankrupt("");
+    setReportDate("");
+
+    // คะแนนเครดิต
+    setScore("");
+    setLevel("");
+    setProbabilityInput("");
+    setProbabilityPercent("");
+    setResult("");
+    setRisk("");
+
+    // textarea
+    setDescription("");
+
+    // accounts (อย่างน้อย 1 แถว)
+    setAccounts([
+      {
+        status: "",
+        amount: "",
+      },
+    ]);
+
+    // reasons (อย่างน้อย 1 แถว)
+    setReasons([
+      {
+        reason: "",
+        isNew: false,
+      },
+    ]);
+  };
 
   const handleSubmit = async (e) => {
     try {
@@ -531,13 +590,18 @@ const AdminSetData_Litemain = () => {
         // 1️⃣ ปิด popup ก่อน
         setShowPopup(false);
         getEmployeeDB_Admin();
+
         // 2️⃣ แสดง SweetAlert แบบรอให้ผู้ใช้กด OK
+
         await Swal.fire({
           icon: "success",
           title: "บันทึกสำเร็จ",
           text: "ข้อมูลถูกบันทึกเรียบร้อยแล้ว",
           confirmButtonText: "ตกลง",
         });
+
+        // 3️⃣ ล้างค่าฟอร์มทั้งหมด ✅
+        resetForm();
 
         return;
       } else {
@@ -796,25 +860,41 @@ const AdminSetData_Litemain = () => {
     }
   };
 
+  //นิวแทบข้างๆ เก่า
+
+  // const openFileInNewTab = (relativePath) => {
+  //   const base = import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB;
+  //   window.open(`${base}/${relativePath}`, "_blank");
+  // };
+
+  //ออกมาใหม่เลยข้าง
   const openFileInNewTab = (relativePath) => {
     const base = import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB;
-    window.open(`${base}/${relativePath}`, "_blank");
+
+    window.open(
+      `${base}/${relativePath}`,
+      "_blank",
+      "noopener,noreferrer,width=1200,height=800,left=100,top=100"
+    );
   };
 
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     setNow(new Date());
-  //   }, 1000);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+    }, 1000);
 
-  //   return () => clearInterval(timer);
-  // }, []);
+    return () => clearInterval(timer);
+  }, []);
 
   //รวมฟังก์ชันนับจำนวน
 
   const [contDataMenuChkCD1, setContDataMenuChkCD1] = useState(""); // ฟังก์ชัน
   const [contDataMenuChkCD2, setContDataMenuChkCD2] = useState(""); // Object to group by section ID
+
   const [contDataMenuChkCD3, setContDataMenuChkCD3] = useState(""); // Object to group by section ID
   const [contDataMenuChkCD4, setContDataMenuChkCD4] = useState(""); // Object to group by section ID
+
+  const [contDataMenuChkCD5, setContDataMenuChkCD5] = useState(""); // Object to group by section ID ผ่านการตรวจสอบ
 
   // 🔔 จำนวนรายการตรวจข้อมูลเครดิต
 
@@ -876,9 +956,47 @@ const AdminSetData_Litemain = () => {
     }
   };
 
+  const loadUserNotification5 = async () => {
+    //Cancel
+    try {
+      const { data } = await apiClient.get(
+        "/api/insurances/datacustomers_Admin_countPass"
+      );
+
+      if (data?.status) {
+        setContDataMenuChkCD5(data.sqlDataCustomers); // 🔔 จำนวนงานตรวจสอบ
+      }
+    } catch (err) {
+      console.error("Error fetching notification:", err);
+    }
+  };
+
   // เปลี่ยนหน้า (Pagination)
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
+  };
+
+  //ฟังก์ชันคัดลอกเลขขบัตรตัดค่าว่างออก
+  const [copied, setCopied] = useState(false);
+
+  const formatCitizenId = (id) => {
+    if (!id) return "-";
+    return id.replace(/^(\d)(\d{4})(\d{5})(\d{2})(\d)$/, "$1 $2 $3 $4 $5");
+  };
+
+  const handleCopyCitizenId = (id) => {
+    if (!id) return;
+
+    const raw = id.replace(/\s/g, ""); // ❌ เอาวรรคออก
+    navigator.clipboard.writeText(raw);
+
+    setCopied(true); // ✅ เปลี่ยนชื่อปุ่ม
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 500); // ⏱ 3 วินาที
+    // optional
+    // Swal.fire({ icon: "success", title: "คัดลอกแล้ว", timer: 1200, showConfirmButton: false });
   };
 
   // 🔁 เปลี่ยน tab → รีเซ็ตหน้า + โหลด notification
@@ -904,11 +1022,13 @@ const AdminSetData_Litemain = () => {
   // }, [currentPage, activeTab]);
 
   // 🔔 notification โหลดครั้งเดียว
+
   useEffect(() => {
     loadUserNotification1();
     loadUserNotification2();
     loadUserNotification3();
     loadUserNotification4();
+    loadUserNotification5();
   }, []);
 
   // 🔁 reset page เมื่อเปลี่ยน tab
@@ -936,15 +1056,128 @@ const AdminSetData_Litemain = () => {
     setSearchQuery(value);
     setCurrentPage(1); // 🔑 ค้นแล้วกลับหน้าแรก
   };
+  const formatPhoneTH = (phone) => {
+    if (!phone) return "-";
+    const p = phone.toString();
+    if (p.length === 10) {
+      return `${p.slice(0, 3)} ${p.slice(3, 6)} ${p.slice(6)}`;
+    }
+    return p;
+  };
+
+  const [saving, setSaving] = useState(false);
+
+ const handleSaveContract = async () => {
+  if (contractNumber.length !== 10) {
+    Swal.fire({
+      icon: "warning",
+      title: "ข้อมูลไม่ถูกต้อง",
+      text: "เลขที่สัญญาต้องมี 10 หลัก",
+    });
+    return;
+  }
+
+  try {
+    setSaving(true);
+
+    const payload = {
+      idForm: contractIdForm,
+      contractNumber,
+    };
+
+    const { data } = await apiClient.post(
+      "/api/insurances/datacustomers/updateData_contractNumber",
+      payload
+    );
+
+ const {status,dataSet} = data;
+    // ✅ สำเร็จ
+    if (status === 200) {
+
+
+    // console.log(dataSet)
+
+
+
+  // 1️⃣ ปิด modal ก่อน
+  setShowModal(false);
+  // 3️⃣ รีเฟรชข้อมูล
+  getEmployeeDB_Admin();
+
+  // 4️⃣ เปลี่ยนแท็บ
+  setActiveTab("approved");
+  // 2️⃣ แสดงแจ้งเตือน (รอให้แสดงจบ)
+  await Swal.fire({
+    icon: "success",
+    title: "บันทึกสำเร็จ",
+    text: data.message || "อัปเดตข้อมูลเรียบร้อยแล้ว",
+    timer: 2000,
+    showConfirmButton: false,
+    timerProgressBar: true,
+  });
+
+
+
+      return;
+    }
+
+    // ❌ เลขสัญญาไม่ถูกต้อง
+    if (data.status === 422) {
+      Swal.fire({
+        icon: "warning",
+        title: "เลขที่สัญญาไม่ถูกต้อง",
+        text: data.message,
+      });
+      return;
+    }
+
+    // ❌ เลขสัญญาซ้ำ
+    if (data.status === 409) {
+      Swal.fire({
+        icon: "error",
+        title: "เลขที่สัญญาซ้ำ",
+        text: data.message,
+      });
+      return;
+    }
+
+    // ❌ ไม่พบข้อมูลฟอร์ม
+    if (data.status === 404) {
+      Swal.fire({
+        icon: "error",
+        title: "ไม่พบข้อมูล",
+        text: data.message,
+      });
+      return;
+    }
+
+    // ❌ error อื่น
+    Swal.fire({
+      icon: "error",
+      title: "เกิดข้อผิดพลาด",
+      text: data.message || "ไม่สามารถบันทึกข้อมูลได้",
+    });
+
+  } catch (err) {
+    Swal.fire({
+      icon: "error",
+      title: "ระบบขัดข้อง",
+      text: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้",
+    });
+  } finally {
+    setSaving(false);
+  }
+};
+
 
   return (
     <div>
       <div className="row g-3">
         {/* รอตรวจสอบ */}
-        <div className="col-md-3 col-sm-12">
+        <div className="col-md-2 col-sm-12">
           <div
             className={`card-dashboard p-3 shadow-sm d-flex align-items-center 
-        ${activeTab === "wait" ? "active-card" : ""}`}
+            ${activeTab === "wait" ? "active-card" : ""}`}
             style={{ backgroundColor: "#F5F7FF", cursor: "pointer" }}
             onClick={() => setActiveTab("wait")}
           >
@@ -953,7 +1186,7 @@ const AdminSetData_Litemain = () => {
               // src={`${
               //   import.meta.env.VITE_REACT_APP_PHOTO
               // }/Checklist-amico.png`}
-              style={{ height: 80 }}
+              style={{ height: 50 }}
             />
             <div style={{ marginLeft: 12 }}>
               <p className="title">รอตรวจสอบ</p>
@@ -971,11 +1204,11 @@ const AdminSetData_Litemain = () => {
             onClick={() => setActiveTab("pass")}
           >
             <img
-              src="/Insurance-amico (1).png"
+              src="/Good team-pana.png"
               // src={`${
               //   import.meta.env.VITE_REACT_APP_PHOTO
               // }/Insurance-amico (1).png`}
-              style={{ height: 80 }}
+              style={{ height: 50 }}
             />
             <div style={{ marginLeft: 12 }}>
               <p className="title">ตรวจสอบแล้ว</p>
@@ -984,22 +1217,24 @@ const AdminSetData_Litemain = () => {
           </div>
         </div>
 
-        {/* ยกเลิก */}
-        <div className="col-md-3 col-sm-12">
+        {/* ผ่านการอนุมัติ */}
+        <div className="col-md-2 col-sm-12">
           <div
             className={`card-dashboard p-3 shadow-sm d-flex align-items-center
-            ${activeTab === "cancel" ? "active-card" : ""}`}
+        ${activeTab === "approved" ? "active-card" : ""}`}
             style={{ backgroundColor: "#F5F7FF", cursor: "pointer" }}
-            onClick={() => setActiveTab("cancel")}
+            onClick={() => setActiveTab("approved")}
           >
             <img
-              // src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Cancel-bro.png`}
-              src="/Cancel-bro.png"
-              style={{ height: 80 }}
+              src="/Insurance-amico (1).png"
+              // src={`${
+              //   import.meta.env.VITE_REACT_APP_PHOTO
+              // }/Insurance-amico (1).png`}
+              style={{ height: 50 }}
             />
             <div style={{ marginLeft: 12 }}>
-              <p className="title">ยกเลิกรายการตรวจสอบ</p>
-              <p className="value">ทั้งหมด {contDataMenuChkCD3} รายการ</p>
+              <p className="title">ผ่านการอนุมัติ</p>
+              <p className="value">ทั้งหมด {contDataMenuChkCD5} รายการ</p>
             </div>
           </div>
         </div>
@@ -1012,13 +1247,32 @@ const AdminSetData_Litemain = () => {
             onClick={() => setActiveTab("fail")}
           >
             <img
-              src="/Cancel-bro.png"
+              src="/No data-pana.png"
               // src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Cancel-bro.png`}
-              style={{ height: 80 }}
+              style={{ height: 50 }}
             />
             <div style={{ marginLeft: 12 }}>
-              <p className="title">รายการไม่ผ่านการอนุมัติสินเชื่อ</p>
+              <p className="title">ไม่ผ่านการอนุมัติสินเชื่อ</p>
               <p className="value">ทั้งหมด {contDataMenuChkCD4} รายการ</p>
+            </div>
+          </div>
+        </div>
+        {/* ยกเลิก */}
+        <div className="col-md-2 col-sm-12">
+          <div
+            className={`card-dashboard p-3 shadow-sm d-flex align-items-center
+            ${activeTab === "cancel" ? "active-card" : ""}`}
+            style={{ backgroundColor: "#F5F7FF", cursor: "pointer" }}
+            onClick={() => setActiveTab("cancel")}
+          >
+            <img
+              // src={`${import.meta.env.VITE_REACT_APP_PHOTO}/Cancel-bro.png`}
+              src="/Cancel-bro.png"
+              style={{ height: 50 }}
+            />
+            <div style={{ marginLeft: 12 }}>
+              <p className="title">ยกเลิกการตรวจสอบ</p>
+              <p className="value">ทั้งหมด {contDataMenuChkCD3} รายการ</p>
             </div>
           </div>
         </div>
@@ -1155,7 +1409,20 @@ const AdminSetData_Litemain = () => {
                         {item.CTM_title_name}
                         {item.CTM_firstname} {item.CTM_lastname}
                       </td>
-                      <td>{item.CTM_citizen_id}</td>
+                      <td>
+                        <center>
+                          <div className="citizen-cell">
+                            {item.CTM_Old_status === "1" ? (
+                              <span className="citizen-badge-old">
+                                {item.CTM_citizen_id}
+                              </span>
+                            ) : (
+                              <span>{item.CTM_citizen_id}</span>
+                            )}
+                          </div>
+                        </center>
+                      </td>
+
                       <td>
                         {item.CTM_recorder_fullname}
                         <div style={{ fontSize: "10px" }}>
@@ -1164,7 +1431,7 @@ const AdminSetData_Litemain = () => {
                       </td>
 
                       <td>{item.CTM_business_zone}</td>
-                      <td>{item.belong}</td>
+                      <td>{item.CTM_branch}</td>
                       <td>{item.CTM_business_region}</td>
                       <td className="text">
                         <button
@@ -1213,7 +1480,7 @@ const AdminSetData_Litemain = () => {
                           }}
                         >
                           {/* วันที่สร้าง */}
-                          <span>{convertToThaiDate(item.CTM_created_at)}</span>
+                          <span>{convertToThaiDate(item.date_upEvidence)}</span>
 
                           {/* เคยแก้ไข */}
 
@@ -1245,9 +1512,14 @@ const AdminSetData_Litemain = () => {
                         style={{ verticalAlign: "middle" }}
                       >
                         {(() => {
-                          // const waitStatus = getWaitingStatus(
-                          //   item.date_upEvidence
-                          // );
+                          const status = getWaitingStatus(item.date_upEvidence);
+                          const waitStatus = getWaitingStatus(
+                            item.date_upEvidence
+                          );
+                          const { minutes, seconds } = getDiffTime(
+                            item.date_upEvidence,
+                            now
+                          );
 
                           return (
                             <div
@@ -1264,14 +1536,14 @@ const AdminSetData_Litemain = () => {
                                   // onClick={() =>
                                   //   handleStatusClick(item.CTM_form_number)
                                   // }
-                                  style={{
+                                 style={{
                                     border: "none",
                                     borderRadius: "999px",
                                     padding: "6px 18px",
                                     fontSize: "12px",
                                     fontWeight: 600,
-                                    backgroundColor: "#f6b72ff5",
-                                       color: "#5a3103ff",
+                                    backgroundColor: waitStatus.color,
+                                    color: waitStatus.textColor,
                                     cursor: "pointer",
                                     minWidth: "120px",
                                     boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
@@ -1287,14 +1559,14 @@ const AdminSetData_Litemain = () => {
                                       onClick={() =>
                                         handleStatusClick(item.CTM_form_number)
                                       }
-                                      style={{
+                                        style={{
                                         border: "none",
                                         borderRadius: "999px",
                                         padding: "6px 18px",
                                         fontSize: "12px",
                                         fontWeight: 600,
-                                        backgroundColor: "#039201ff",
-                                        color: "#f6f6f6ff",
+                                        backgroundColor: waitStatus.color,
+                                        color: waitStatus.textColor,
                                         cursor: "pointer",
                                         minWidth: "120px",
                                         boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
@@ -1332,6 +1604,17 @@ const AdminSetData_Litemain = () => {
                                   )}
                                 </>
                               )}
+                               {/* เวลาเดิน */}
+                              <div
+                                style={{
+                                  fontSize: "11px",
+                                  color: "#6c757d",
+                                  fontVariantNumeric: "tabular-nums",
+                                }}
+                              >
+                                ⏱ {minutes}:
+                                {seconds.toString().padStart(2, "0")}
+                              </div>
 
                               {/* สถานะเวลา */}
 
@@ -1364,10 +1647,10 @@ const AdminSetData_Litemain = () => {
                                   color: "#6c757d",
                                   fontVariantNumeric: "tabular-nums",
                                 }}
-                              > */}
-                              {/* ⏱ {minutes}:
-                                {seconds.toString().padStart(2, "0")} */}
-                              {/* </div> */}
+                              >
+                              ⏱ {minutes}:
+                                {seconds.toString().padStart(2, "0")}
+                              </div> */}
                             </div>
                           );
                         })()}
@@ -1486,129 +1769,113 @@ const AdminSetData_Litemain = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody>
-                  {probationaryEmployees.map((item, index) => (
-                    <tr key={item.CTM_form_number}>
-                      <td className="text-center">
-                        {(currentPage - 1) * limit + (index + 1)}
-                      </td>
+                {loading ? (
+                  <tr>
+                    <td colSpan={14} className="text-center py-4">
+                      กำลังโหลดข้อมูล...
+                    </td>
+                  </tr>
+                ) : (
+                  <tbody>
+                    {probationaryEmployees.map((item, index) => (
+                      <tr key={item.CTM_form_number}>
+                        <td className="text-center">
+                          {(currentPage - 1) * limit + (index + 1)}
+                        </td>
 
-                      <td>{item.CTM_form_number}</td>
-                      <td>
-                        <div style={{ fontWeight: 600, color: "#0f3d78" }}>
-                          {item.CTM_title_name}
-                          {item.CTM_firstname} {item.CTM_lastname}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
-                        </div>
-                      </td>
-
-                      <td>
-                        <div>{item.CTM_recorder_fullname}</div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          ตำแหน่ง: {item.CTM_position || "-"}
-                        </div>
-                      </td>
-                      <td> {item.CTM_business_zone || "-"}</td>
-                      <td> {item.belong || "-"}</td>
-                      <td> {item.region || "-"}</td>
-                      <td className="text">
-                        <button
-                          className="doc-btn doc-consent mr-1"
-                          onClick={() =>
-                            openFileInNewTab(
-                              `img/consent/${item.Form_consent_document}`
-                            )
-                          }
-                          title="หนังสือยินยอมเปิดเผยข้อมูล"
-                        >
-                          <BsFiletypeDoc />
-                        </button>
-
-                        <button
-                          className="doc-btn doc-application mr-1"
-                          onClick={() =>
-                            openFileInNewTab(
-                              `img/application/${item.Form_application_document}`
-                            )
-                          }
-                          title="แบบฟอร์มคำขอ"
-                        >
-                          <IoDocumentTextOutline />
-                        </button>
-
-                        <button
-                          className="doc-btn doc-idcard mr-2 mt-1"
-                          onClick={() =>
-                            openFileInNewTab(
-                              `img/idcard/${item.Form_idcard_photo}`
-                            )
-                          }
-                          title="รูปบัตรประชาชน"
-                        >
-                          <FaRegIdCard />
-                        </button>
-                      </td>
-                      <td>{convertToThaiDate(item.CTM_created_at)}</td>
-
-                      <td>{item.Form_Name_Inspector}</td>
-                      <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
-                      <td className="text">
-                        <center>
-                          <div>
-                            <button
-                              className="btn-icon"
-                              onClick={() => handleView(item)}
-                              title="รายงานผล"
-                            >
-                              <AiOutlineFileSearch />
-                            </button>
+                        <td>{item.CTM_form_number}</td>
+                        <td>
+                          <div style={{ fontWeight: 600, color: "#0f3d78" }}>
+                            {item.CTM_title_name}
+                            {item.CTM_firstname} {item.CTM_lastname}
                           </div>
-                        </center>
-                      </td>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
+                          </div>
+                        </td>
 
-                      <td className="text">
-                        {item.Form_verification_status === "Lv0" && (
-                          <span
-                            className="status-badge status-wait"
+                        <td>
+                          <div>{item.CTM_recorder_fullname}</div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            ตำแหน่ง: {item.CTM_position || "-"}
+                          </div>
+                        </td>
+                        <td> {item.CTM_business_zone || "-"}</td>
+                        <td> {item.CTM_branch || "-"}</td>
+                        <td> {item.CTM_business_region || "-"}</td>
+                        <td className="text">
+                          <button
+                            className="doc-btn doc-consent mr-1"
                             onClick={() =>
-                              handleStatusClick(item.CTM_form_number)
+                              openFileInNewTab(
+                                `img/consent/${item.Form_consent_document}`
+                              )
                             }
-                            style={{ cursor: "pointer" }}
+                            title="หนังสือยินยอมเปิดเผยข้อมูล"
                           >
-                            0w - รอตรวจสอบข้อมูล
-                          </span>
-                        )}
-                        {item.Form_verification_status >= "Lv1" &&
-                          item.Form_verification_status != "Lv1N" && (
-                            <center>
-                              <span
-                                className="status-badge status-pass"
-                                // onClick={() =>
-                                //   handleStatusClick(item.CTM_form_number)
-                                // }
-                                style={{ cursor: "pointer" }}
+                            <BsFiletypeDoc />
+                          </button>
+
+                          <button
+                            className="doc-btn doc-application mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/application/${item.Form_application_document}`
+                              )
+                            }
+                            title="แบบฟอร์มคำขอ"
+                          >
+                            <IoDocumentTextOutline />
+                          </button>
+
+                          <button
+                            className="doc-btn doc-idcard mr-2 mt-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/idcard/${item.Form_idcard_photo}`
+                              )
+                            }
+                            title="รูปบัตรประชาชน"
+                          >
+                            <FaRegIdCard />
+                          </button>
+                        </td>
+                        <td>{convertToThaiDate(item.date_upEvidence)}</td>
+
+                        <td>{item.Form_Name_Inspector}</td>
+                        <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
+                        <td className="text">
+                          {/* {["rejected", "approved"].includes(item.Form_Approval_results) && ( */}
+                          <center>
+                            <div>
+                              <button
+                                className="btn-icon"
+                                onClick={() => handleView(item)}
+                                title="รายงานผล"
                               >
-                                ตรวจแล้ว
-                              </span>
-                            </center>
-                          )}
-                        {item.Form_verification_status === "Lv1N" && (
-                          <span
-                            className="status-badge status-cancel"
-                            onClick={() =>
-                              handleStatusClick(item.CTM_form_number)
-                            }
-                            style={{ cursor: "pointer" }}
-                          >
-                            1N ยกเลิกรายการตรวจสอบ
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+                                <AiOutlineFileSearch />
+                              </button>
+                            </div>
+                          </center>
+                        </td>
+
+                        <td className="text">
+                          <center>
+                            <span
+                              className="status-badge status-pass"
+                              // onClick={() =>
+                              //   handleStatusClick(item.CTM_form_number)
+                              // }
+                              style={{ cursor: "pointer" }}
+                            >
+                              ตรวจแล้ว
+                            </span>
+                          </center>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
               </table>
               {totalPages > 1 ? (
                 <div className="card-footer clearfix">
@@ -1676,75 +1943,82 @@ const AdminSetData_Litemain = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody>
-                  {probationaryEmployees.map((item, index) => (
-                    <tr key={item.CTM_form_number}>
-                      <td className="text-center">
-                        {(currentPage - 1) * limit + (index + 1)}
-                      </td>
+                {loading ? (
+                  <tr>
+                    <td colSpan={14} className="text-center py-4">
+                      กำลังโหลดข้อมูล...
+                    </td>
+                  </tr>
+                ) : (
+                  <tbody>
+                    {probationaryEmployees.map((item, index) => (
+                      <tr key={item.CTM_form_number}>
+                        <td className="text-center">
+                          {(currentPage - 1) * limit + (index + 1)}
+                        </td>
 
-                      <td>{item.CTM_form_number}</td>
-                      <td>
-                        <div style={{ fontWeight: 600, color: "#0f3d78" }}>
-                          {item.CTM_title_name}
-                          {item.CTM_firstname} {item.CTM_lastname}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
-                        </div>
-                      </td>
+                        <td>{item.CTM_form_number}</td>
+                        <td>
+                          <div style={{ fontWeight: 600, color: "#0f3d78" }}>
+                            {item.CTM_title_name}
+                            {item.CTM_firstname} {item.CTM_lastname}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
+                          </div>
+                        </td>
 
-                      <td>
-                        <div>{item.CTM_recorder_fullname}</div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          ตำแหน่ง: {item.CTM_position || "-"}
-                        </div>
-                      </td>
-                      <td> {item.CTM_business_zone || "-"}</td>
-                      <td> {item.belong || "-"}</td>
-                      <td> {item.region || "-"}</td>
-                      <td className="text">
-                        <button
-                          className="doc-btn doc-consent mr-1"
-                          onClick={() =>
-                            openFileInNewTab(
-                              `img/consent/${item.Form_consent_document}`
-                            )
-                          }
-                          title="หนังสือยินยอมเปิดเผยข้อมูล"
-                        >
-                          <BsFiletypeDoc />
-                        </button>
+                        <td>
+                          <div>{item.CTM_recorder_fullname}</div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            ตำแหน่ง: {item.CTM_position || "-"}
+                          </div>
+                        </td>
+                        <td> {item.CTM_business_zone || "-"}</td>
+                        <td> {item.CTM_branch || "-"}</td>
+                        <td> {item.CTM_business_region || "-"}</td>
+                        <td className="text">
+                          <button
+                            className="doc-btn doc-consent mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/consent/${item.Form_consent_document}`
+                              )
+                            }
+                            title="หนังสือยินยอมเปิดเผยข้อมูล"
+                          >
+                            <BsFiletypeDoc />
+                          </button>
 
-                        <button
-                          className="doc-btn doc-application mr-1"
-                          onClick={() =>
-                            openFileInNewTab(
-                              `img/application/${item.Form_application_document}`
-                            )
-                          }
-                          title="แบบฟอร์มคำขอ"
-                        >
-                          <IoDocumentTextOutline />
-                        </button>
+                          <button
+                            className="doc-btn doc-application mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/application/${item.Form_application_document}`
+                              )
+                            }
+                            title="แบบฟอร์มคำขอ"
+                          >
+                            <IoDocumentTextOutline />
+                          </button>
 
-                        <button
-                          className="doc-btn doc-idcard mr-2 mt-1"
-                          onClick={() =>
-                            openFileInNewTab(
-                              `img/idcard/${item.Form_idcard_photo}`
-                            )
-                          }
-                          title="รูปบัตรประชาชน"
-                        >
-                          <FaRegIdCard />
-                        </button>
-                      </td>
-                      <td>{convertToThaiDate(item.CTM_created_at)}</td>
+                          <button
+                            className="doc-btn doc-idcard mr-2 mt-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/idcard/${item.Form_idcard_photo}`
+                              )
+                            }
+                            title="รูปบัตรประชาชน"
+                          >
+                            <FaRegIdCard />
+                          </button>
+                        </td>
+                        <td>{convertToThaiDate(item.date_upEvidence)}</td>
 
-                      <td>{item.Form_Name_Inspector}</td>
-                      <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
-                      {/* <td className="text">
+                        <td>{item.Form_Name_Inspector}</td>
+                        <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
+                        {/* <td className="text">
                         <center>
                           <div className="">
                             <button
@@ -1757,47 +2031,48 @@ const AdminSetData_Litemain = () => {
                         </center>
                       </td> */}
 
-                      <td className="text">
-                        {item.Form_verification_status === "Lv0" && (
-                          <span
-                            className="status-badge status-wait"
-                            onClick={() =>
-                              handleStatusClick(item.CTM_form_number)
-                            }
-                            style={{ cursor: "pointer" }}
-                          >
-                            0w - รอตรวจสอบข้อมูล
-                          </span>
-                        )}
-                        {item.Form_verification_status >= "Lv1" &&
-                          item.Form_verification_status != "Lv1N" && (
-                            <center>
-                              <span
-                                className="status-badge status-pass"
-                                onClick={() =>
-                                  handleStatusClick(item.CTM_form_number)
-                                }
-                                style={{ cursor: "pointer" }}
-                              >
-                                ตรวจแล้ว
-                              </span>
-                            </center>
+                        <td className="text">
+                          {item.Form_verification_status === "Lv0" && (
+                            <span
+                              className="status-badge status-wait"
+                              onClick={() =>
+                                handleStatusClick(item.CTM_form_number)
+                              }
+                              style={{ cursor: "pointer" }}
+                            >
+                              0w - รอตรวจสอบข้อมูล
+                            </span>
                           )}
-                        {item.Form_verification_status === "Lv1N" && (
-                          <span
-                            className="status-badge status-cancel"
-                            // onClick={() =>
-                            //   handleStatusClick(item.CTM_form_number)
-                            // }
-                            style={{ cursor: "pointer" }}
-                          >
-                            1N ยกเลิกรายการตรวจสอบ
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+                          {item.Form_verification_status >= "Lv1" &&
+                            item.Form_verification_status != "Lv1N" && (
+                              <center>
+                                <span
+                                  className="status-badge status-pass"
+                                  onClick={() =>
+                                    handleStatusClick(item.CTM_form_number)
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  ตรวจแล้ว
+                                </span>
+                              </center>
+                            )}
+                          {item.Form_verification_status === "Lv1N" && (
+                            <span
+                              className="status-badge status-cancel"
+                              // onClick={() =>
+                              //   handleStatusClick(item.CTM_form_number)
+                              // }
+                              style={{ cursor: "pointer" }}
+                            >
+                              1N ยกเลิกรายการตรวจสอบ
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
               </table>
               {totalPages > 1 ? (
                 <div className="card-footer clearfix">
@@ -1859,134 +2134,351 @@ const AdminSetData_Litemain = () => {
                     <th>หมายเหตุ</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {probationaryEmployees.map((item, index) => (
-                    <tr key={item.CTM_form_number}>
-                      <td className="text-center">
-                        {" "}
-                        {(currentPage - 1) * limit + (index + 1)}
-                      </td>
-                      <td>{item.CTM_form_number}</td>
-                      <td>
-                        <div style={{ fontWeight: 600, color: "#0f3d78" }}>
-                          {item.CTM_title_name}
-                          {item.CTM_firstname} {item.CTM_lastname}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          วัน/เดือน/ปี เกิด:{" "}
-                          {convertToThaiDate1(item.CTM_birthdate)}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          เบอร์โทร : {item.CTM_phone || "-"}
-                        </div>
-                      </td>
-
-                      <td>
-                        <div>{item.CTM_recorder_fullname}</div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          ตำแหน่ง: {item.CTM_position || "-"}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          สาขา/หน่วย: {item.CTM_business_zone || "-"}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          เขต: {item.belong || "-"}
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                          ภาค: {item.region || "-"}
-                        </div>
-                      </td>
-                      <td>{convertToThaiDate(item.CTM_created_at)}</td>
-                      <td className="text">
-                        <button
-                          className="doc-btn doc-consent mr-1"
-                          onClick={() =>
-                            openFileInNewTab(
-                              `img/consent/${item.Form_consent_document}`
-                            )
-                          }
-                          title="หนังสือยินยอมเปิดเผยข้อมูล"
-                        >
-                          <BsFiletypeDoc />
-                        </button>
-
-                        <button
-                          className="doc-btn doc-application mr-1"
-                          onClick={() =>
-                            openFileInNewTab(
-                              `img/application/${item.Form_application_document}`
-                            )
-                          }
-                          title="แบบฟอร์มคำขอ"
-                        >
-                          <IoDocumentTextOutline />
-                        </button>
-
-                        <button
-                          className="doc-btn doc-idcard mr-2 mt-1"
-                          onClick={() =>
-                            openFileInNewTab(
-                              `img/idcard/${item.Form_idcard_photo}`
-                            )
-                          }
-                          title="รูปบัตรประชาชน"
-                        >
-                          <FaRegIdCard />
-                        </button>
-                      </td>
-                      <td className="text">
-                        <center>
-                          <div>
-                            <button
-                              className="btn-icon"
-                              onClick={() => handleView(item)}
-                            >
-                              <AiOutlineFileSearch />
-                            </button>
+                {loading ? (
+                  <tr>
+                    <td colSpan={14} className="text-center py-4">
+                      กำลังโหลดข้อมูล...
+                    </td>
+                  </tr>
+                ) : (
+                  <tbody>
+                    {probationaryEmployees.map((item, index) => (
+                      <tr key={item.CTM_form_number}>
+                        <td className="text-center">
+                          {" "}
+                          {(currentPage - 1) * limit + (index + 1)}
+                        </td>
+                        <td>{item.CTM_form_number}</td>
+                        <td>
+                          <div style={{ fontWeight: 600, color: "#0f3d78" }}>
+                            {item.CTM_title_name}
+                            {item.CTM_firstname} {item.CTM_lastname}
                           </div>
-                        </center>
-                      </td>
-                      <td>{item.Form_Name_Inspector}</td>
-                      <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
-                      {/* <td>{item.Form_Inspector}</td> */}
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            วัน/เดือน/ปี เกิด:{" "}
+                            {convertToThaiDate1(item.CTM_birthdate)}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เบอร์โทร : {item.CTM_phone || "-"}
+                          </div>
+                        </td>
 
-                      <td className="text-center">
-                        <center>
-                          {item.Form_Approval_results === "rejected" && (
-                            <span className="status-badge status-fail">
-                              2N-ไม่ผ่านการอนุมัติ
-                            </span>
-                          )}
-                        </center>
-                      </td>
-                      <td className="text-center">
-                        {item.Form_status_SMS === "OK" ? (
-                          <>
-                            <AiOutlineCheckCircle
-                              style={{ color: "#16a34a", fontSize: "18px" }}
-                            />{" "}
-                            <div style={{ fontSize: "12px" }}>
-                              รหัสอ้างอิง {item.Form_id_SMS}
+                        <td>
+                          <div>{item.CTM_recorder_fullname}</div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            ตำแหน่ง: {item.CTM_position || "-"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            สาขา/หน่วย: {item.CTM_business_zone || "-"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เขต: {item.CTM_branch || "-"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            ภาค: {item.CTM_business_region || "-"}
+                          </div>
+                        </td>
+                        <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
+                        <td className="text">
+                          <button
+                            className="doc-btn doc-consent mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/consent/${item.Form_consent_document}`
+                              )
+                            }
+                            title="หนังสือยินยอมเปิดเผยข้อมูล"
+                          >
+                            <BsFiletypeDoc />
+                          </button>
+
+                          <button
+                            className="doc-btn doc-application mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/application/${item.Form_application_document}`
+                              )
+                            }
+                            title="แบบฟอร์มคำขอ"
+                          >
+                            <IoDocumentTextOutline />
+                          </button>
+
+                          <button
+                            className="doc-btn doc-idcard mr-2 mt-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/idcard/${item.Form_idcard_photo}`
+                              )
+                            }
+                            title="รูปบัตรประชาชน"
+                          >
+                            <FaRegIdCard />
+                          </button>
+                        </td>
+                        <td className="text">
+                          <center>
+                            <div>
+                              <button
+                                className="btn-icon"
+                                onClick={() => handleView(item)}
+                              >
+                                <AiOutlineFileSearch />
+                              </button>
                             </div>
-                          </>
-                        ) : item.Form_status_SMS === "ERROR" ? (
-                          <AiOutlineCloseCircle
-                            style={{ color: "#dc2626", fontSize: "18px" }}
-                          />
-                        ) : (
-                          "-"
-                        )}
-                      </td>
-                      <td style={{ color: "#161616ff", fontSize: "14px" }}>
-                        {" "}
-                        {item.Form_note_approval}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+                          </center>
+                        </td>
+                        <td>{item.Form_Name_Inspector}</td>
+                        <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
+                        {/* <td>{item.Form_Inspector}</td> */}
+
+                        <td className="text-center">
+                          <center>
+                            {item.Form_Approval_results === "rejected" && (
+                              <span className="status-badge status-fail">
+                                2N-ไม่ผ่านการอนุมัติ
+                              </span>
+                            )}
+                          </center>
+                        </td>
+                        <td className="text-center">
+                          {item.Form_status_SMS === "OK" ? (
+                            <>
+                              <AiOutlineCheckCircle
+                                style={{ color: "#16a34a", fontSize: "18px" }}
+                              />{" "}
+                              <div style={{ fontSize: "12px" }}>
+                                รหัสอ้างอิง {item.Form_id_SMS}
+                              </div>
+                            </>
+                          ) : item.Form_status_SMS === "ERROR" ? (
+                            <AiOutlineCloseCircle
+                              style={{ color: "#dc2626", fontSize: "18px" }}
+                            />
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                        <td style={{ color: "#161616ff", fontSize: "14px" }}>
+                          {" "}
+                          {item.Form_note_approval}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
+              </table>
+              {totalPages > 1 ? (
+                <div className="card-footer clearfix">
+                  <Pagination
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              ) : (
+                <div style={{ height: "500px" }}></div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "approved" && (
+            <div className="table-responsive pt-2">
+              <table className="table table-hover table-sm">
+                <thead className="custom-buttonTBs">
+                  <tr>
+                    <th className="text-center" style={{ width: "2%" }}>
+                      ลำดับ
+                    </th>
+                    <th className="text" style={{ width: "8%" }}>
+                      เลขที่แบบฟอร์ม
+                    </th>
+                    <th className="text" style={{ width: "13%" }}>
+                      ชื่อ-นาม สกุลลูกค้า
+                    </th>
+
+                    <th className="text" style={{ width: "16%" }}>
+                      ผู้บันทึกข้อมูล
+                    </th>
+
+                    <th className="text" style={{ width: "10%" }}>
+                      วัน/เวลา ที่บันทึก
+                    </th>
+
+                    <th className="text" style={{ width: "10%" }}>
+                      เอกสารประกอบ
+                    </th>
+                    <th className="text" style={{ width: "5%" }}>
+                      รายงานผล
+                    </th>
+                    <th className="text" style={{ width: "11%" }}>
+                      ผู้รายงานผลตรวจ
+                    </th>
+
+                    <th className="text" style={{ width: "5%" }}>
+                      วัน/เวลา ที่รายงานผลตรวจ
+                    </th>
+
+                    <th className="text-center" style={{ width: "10%" }}>
+                      สถานะ
+                    </th>
+                    <th className="text-center" style={{ width: "15%" }}>
+                      เลขที่สัญญา
+                    </th>
+                    {/* <th>หมายเหตุ</th> */}
+                  </tr>
+                </thead>
+                {loading ? (
+                  <tr>
+                    <td colSpan={14} className="text-center py-4 pt-10">
+                      กำลังโหลดข้อมูล...
+                    </td>
+                  </tr>
+                ) : (
+                  <tbody>
+                    {probationaryEmployees.map((item, index) => (
+                      <tr key={item.CTM_form_number}>
+                        <td className="text-center">
+                          {" "}
+                          {(currentPage - 1) * limit + (index + 1)}
+                        </td>
+                        <td>{item.CTM_form_number}</td>
+                        <td>
+                          <div style={{ fontWeight: 600, color: "#0f3d78" }}>
+                            {item.CTM_title_name}
+                            {item.CTM_firstname} {item.CTM_lastname}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            วัน/เดือน/ปี เกิด:{" "}
+                            {convertToThaiDate1(item.CTM_birthdate)}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เบอร์โทร : {item.CTM_phone || "-"}
+                          </div>
+                        </td>
+
+                        <td>
+                          <div>{item.CTM_recorder_fullname}</div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            ตำแหน่ง: {item.CTM_position || "-"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            สาขา/หน่วย: {item.CTM_business_zone || "-"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เขต: {item.CTM_branch || "-"}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            ภาค: {item.CTM_business_region || "-"}
+                          </div>
+                        </td>
+                        <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
+                        <td className="text">
+                          <button
+                            className="doc-btn doc-consent mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/consent/${item.Form_consent_document}`
+                              )
+                            }
+                            title="หนังสือยินยอมเปิดเผยข้อมูล"
+                          >
+                            <BsFiletypeDoc />
+                          </button>
+
+                          <button
+                            className="doc-btn doc-application mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/application/${item.Form_application_document}`
+                              )
+                            }
+                            title="แบบฟอร์มคำขอ"
+                          >
+                            <IoDocumentTextOutline />
+                          </button>
+
+                          <button
+                            className="doc-btn doc-idcard mr-2 mt-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/idcard/${item.Form_idcard_photo}`
+                              )
+                            }
+                            title="รูปบัตรประชาชน"
+                          >
+                            <FaRegIdCard />
+                          </button>
+                        </td>
+                        <td className="text">
+                          <center>
+                            <div>
+                              <button
+                                className="btn-icon"
+                                onClick={() => handleView(item)}
+                              >
+                                <AiOutlineFileSearch />
+                              </button>
+                            </div>
+                          </center>
+                        </td>
+                        <td>{item.Form_Name_Inspector}</td>
+                        <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
+                        {/* <td>{item.Form_Inspector}</td> */}
+
+                        <td className="text-center">
+                          <center>
+                            {item.Form_Approval_results === "approved" && (
+                              <span className="status-badge status-pass">
+                                2Y-ผ่านการอนุมัติ
+                              </span>
+                            )}
+                          </center>
+                        </td>
+
+                        <td
+                          style={{
+                            color: "#161616ff",
+                            fontSize: "14px",
+                            textAlign: "center",
+                          }}
+                        >
+        <div>{item.Form_Contract_number}</div>
+                         {allowPerD.includes(PerD) && (
+  <>
+    {item.Form_Contract_number ? (
+      <>
+
+        <button
+          className="btn-link-edit"
+          onClick={() => openContractModal(item)}
+        >
+          แก้ไข
+        </button>
+      </>
+    ) : (
+      <button
+        className="btn-add-contract"
+        onClick={() => openContractModal(item)}
+      >
+        + เพิ่มเลขที่สัญญา
+      </button>
+    )}
+  </>
+)}
+
+
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
               </table>
               {totalPages > 1 ? (
                 <div className="card-footer clearfix">
@@ -2006,7 +2498,7 @@ const AdminSetData_Litemain = () => {
 
       {/* 🔹 Popup แสดงข้อมูล */}
       {showPopup && selectedItem && (
-        <div className="modal-overlay3">
+        <div className="modal-overlay3 sarabun-modal">
           <div className="modal-content3">
             {/* 🔹 หัวเรื่อง */}
             <h3
@@ -2021,17 +2513,13 @@ const AdminSetData_Litemain = () => {
                 marginBottom: "10px",
               }}
             >
-              <FaFileSignature
-                style={{ color: "#023672ff", fontSize: "20px" }}
-              />
+              <FaFileSignature style={{ color: "#023672ff" }} />
               สรุปผลการอนุมัติสินเชื่อ
             </h3>
 
             {/* 🔹 ส่วนที่ 1 */}
             <div className="card recorder-card full-width">
-              <div className="card-title1" style={{ fontSize: "18px" }}>
-                รายละเอียดผู้ขอสืบค้น
-              </div>
+              <div className="card-title1">รายละเอียดผู้ขอสืบค้น</div>
 
               <div className="rec-grid2">
                 <div>
@@ -2051,7 +2539,7 @@ const AdminSetData_Litemain = () => {
                 </div>
                 <div>
                   <strong>วัน/เวลาที่ยื่นขอสืบค้น :</strong>{" "}
-                  {convertToThaiDate(getDataShow?.CTM_created_at) || "-"}
+                  {convertToThaiDate(getDataShow?.date_upEvidence) || "-"}
                 </div>
                 <div style={{ marginTop: "8px" }}>
                   <strong>เอกสารประกอบ </strong>{" "}
@@ -2110,27 +2598,41 @@ const AdminSetData_Litemain = () => {
 
             {/* 🔹 ส่วนที่ 2 */}
             <div className="card recorder-card full-width">
-              <div className="card-title2" style={{ fontSize: "18px" }}>
-                ข้อมูลลูกค้า
-              </div>
+              <div className="card-title2">ข้อมูลลูกค้า</div>
 
-              <div className="rec-grid2">
+              <div className="rec-grid3"> 
+                {" "}
                 <div>
                   <strong>ชื่อ - นามสกุลลูกค้า :</strong>{" "}
                   {getDataShow?.CTM_title_name}
-                  {getDataShow?.CTM_firstname} {getDataShow?.CTM_lastname}
+                  {getDataShow?.CTM_firstname} {getDataShow?.CTM_lastname}{" "}
                 </div>
-                <div>
-                  <strong>วัน/เดือน/ปีเกิด :</strong>{" "}
-                  {convertToThaiDate1(getDataShow?.CTM_birthdate) || "-"}
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  <strong>หมายเลขบัตรประชาชน :</strong>
+
+                  <span style={{ letterSpacing: "1px" }}>
+                    {formatCitizenId(getDataShow?.CTM_citizen_id)}
+                  </span>
+
+                  <button
+                    type="button"
+                    className={`copy-btn ${copied ? "copied" : ""}`}
+                    onClick={() =>
+                      handleCopyCitizenId(getDataShow?.CTM_citizen_id)
+                    }
+                  >
+                    {copied ? "คัดลอกแล้ว" : "คัดลอก"}
+                  </button>
                 </div>
-                <div>
-                  <strong>หมายเลขบัตรประชาชน :</strong>{" "}
-                  {getDataShow?.CTM_citizen_id || "-"}
+                  <div>
+                  <strong>วันเดือนปีเกิด :</strong>{" "}
+                  {convertToThaiDate1(getDataShow?.CTM_birthdate || "-")}
                 </div>
                 <div>
                   <strong>หมายเลขโทรศัพท์ :</strong>{" "}
-                  {getDataShow?.CTM_phone || "-"}
+                  {formatPhoneTH(getDataShow?.CTM_phone)}
                 </div>
                 <div>
                   <strong>ประเภทสินเชื่อที่ลูกค้าสมัคร :</strong>{" "}
@@ -2144,19 +2646,17 @@ const AdminSetData_Litemain = () => {
                     : "-"}{" "}
                   บาท
                 </div>
-
                 <div>
                   <strong>ประเภทลูกค้า :</strong>{" "}
                   {getDataShow?.CMTN_Name || "-"}
                 </div>
+                {/* <br/> */}
               </div>
             </div>
 
             {/* 🔹 ส่วนที่ 3 */}
             <div className="card recorder-card full-width">
-              <div className="card-title4" style={{ fontSize: "18px" }}>
-                รายงานผลการตรวจสอบข้อมูลเครดิต
-              </div>
+              <div className="card-title4">รายงานผลการตรวจสอบข้อมูลเครดิต</div>
 
               <form className="approval-form">
                 <div className="form-group">
@@ -2210,19 +2710,12 @@ const AdminSetData_Litemain = () => {
 
                 {/* 🔹 แสดงฟอร์มตามสถานะ */}
                 {approval === "approved" && (
-                  <div className="credit-form">
+                  <div className="credit-form sarabun-modal">
                     <div className="section-block">
                       <div className="credit-row">
                         {/* 🔹 เข้าร่วมโครงการ */}
-                        <div className="form-group">
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "16px",
-                              fontSize: "18px",
-                            }}
-                          >
+                        <div className="form-group radio-group">
+                          <div>
                             <label>
                               ลูกค้าเข้าร่วมโครงการ{" "}
                               <span
@@ -2271,18 +2764,12 @@ const AdminSetData_Litemain = () => {
                             className="input-normal"
                             value={valueCredit}
                             onChange={(e) => setValueCredit(e.target.value)}
-                            style={{
-                              height: "35px", // 🔽 ลดความสูง
-                              padding: "2px 6px", // 🔽 ลดช่องว่างใน
-                              lineHeight: "1.2",
-                              fontSize: "14px",
-                            }}
                           />
                         </label>
                         <label className="mr-1 ml-3">
                           แห่ง{" "}
                           <span style={{ color: "red" }}>
-                            (ไม่นับรวมของ SAKSIAM)
+                            ( ไม่นับรวมของ SAKSIAM )
                           </span>
                         </label>
                       </label>
@@ -2347,101 +2834,104 @@ const AdminSetData_Litemain = () => {
                       </div>
                       {/* 🔹 คะแนนเครดิต */}
                       {/* <div className="credit-form"> */}
-                      3.คะแนนเครดิต <span className="required">*</span>
-                      {/* 🔹 ฟอร์มหลัก (แถวเดียว) */}
-                      <div className="credit-row-main">
-                        <div className="form-group">
-                          <label>
-                            คะแนนเครดิต <span className="required">*</span>
-                          </label>
-                          <input
-                            type="number"
-                            className="input-normal"
-                            placeholder="กรอกคะแนนเครดิต"
-                            value={score}
-                            onChange={handleScoreChange}
-                          />
-                        </div>
+                      <label className="form-label-inline">
+                        3.คะแนนเครดิต <span className="required">*</span>
+                        {/* 🔹 ฟอร์มหลัก (แถวเดียว) */}
+                        <div className="credit-row-main">
+                          <div className="form-group">
+                            <h5>
+                              คะแนนเครดิต <span className="required">*</span>
+                            </h5>
+                            <input
+                              type="number"
+                              className="input-normal"
+                              placeholder="กรอกคะแนนเครดิต"
+                              value={score}
+                              onChange={handleScoreChange}
+                            />
+                          </div>
 
-                        <div className="form-group">
-                          <label>
-                            ระดับคะแนนเครดิต <span className="required">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            className="input-normal"
-                            value={level}
-                            disabled
-                            readOnly
-                            placeholder="ระดับคะแนนเครดิตจะแสดงอัตโนมัติ"
-                          />
-                        </div>
+                          <div className="form-group">
+                            <h5>
+                              ระดับคะแนนเครดิต{" "}
+                              <span className="required">*</span>
+                            </h5>
+                            <input
+                              type="text"
+                              className="input-normal"
+                              value={level}
+                              disabled
+                              readOnly
+                              placeholder="ระดับคะแนนเครดิตจะแสดงอัตโนมัติ"
+                            />
+                          </div>
 
-                        {/* 🔹 ความน่าจะเป็นในการชำระหนี้คืน */}
-                        <div className="form-group">
-                          <label>
-                            ความน่าจะเป็นในการชำระหนี้คืน{" "}
-                            <span className="required">*</span>
-                          </label>
-                          <input
-                            type="number"
-                            className="input-normal"
-                            placeholder="กรอกตัวเลข (0-10000)"
-                            value={probabilityInput}
-                            onChange={handleProbabilityChange}
-                          />
-                          <input
-                            type="text"
-                            className="input-normal"
-                            style={{ marginTop: "6px" }}
-                            value={probabilityPercent}
-                            readOnly
-                            placeholder="% จะแสดงอัตโนมัติ"
-                          />
-                        </div>
+                          {/* 🔹 ความน่าจะเป็นในการชำระหนี้คืน */}
+                          <div className="form-group">
+                            <h5>
+                              ความน่าจะเป็นในการชำระหนี้คืน{" "}
+                              <span className="required">*</span>
+                            </h5>
+                            <input
+                              type="number"
+                              className="input-normal"
+                              placeholder="กรอกตัวเลข (0-10000)"
+                              value={probabilityInput}
+                              onChange={handleProbabilityChange}
+                            />
+                            <input
+                              type="text"
+                              className="input-normal"
+                              style={{ marginTop: "6px" }}
+                              value={probabilityPercent}
+                              readOnly
+                              placeholder="% จะแสดงอัตโนมัติ"
+                            />
+                          </div>
 
-                        {/* 🔹 ผลการตรวจสอบข้อมูลเครดิต */}
-                        {/* 🔹 ผลการตรวจสอบข้อมูลเครดิต */}
-                        <div className="form-group">
-                          <label>
-                            ผลการตรวจสอบข้อมูลเครดิต{" "}
-                            <span className="required">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            className="input-normal"
-                            value={result}
-                            readOnly
-                            style={{
-                              color:
-                                result === "ผ่าน"
-                                  ? "#0f8f2d" // สีเขียว
-                                  : result === "ไม่ผ่าน"
-                                  ? "#c91414" // สีแดง
-                                  : "black",
-                              fontWeight: "bold",
-                            }}
-                            placeholder="ผลตรวจสอบข้อมูลเครดิตจะแสดงอัตโนมัติ"
-                          />
-                          <p
-                            className="risk-note"
-                            style={{
-                              color:
-                                risk === "ความเสี่ยงต่ำ"
-                                  ? "#0f8f2d" // เขียว
-                                  : risk === "ความเสี่ยงปานกลาง"
-                                  ? "#f0ad00" // เหลือง
-                                  : risk === "ความเสี่ยงสูง"
-                                  ? "#c91414" // แดง
-                                  : "black",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            ระดับความเสี่ยง :{" "}
-                            <strong>{risk || "แสดงอัตโนมัติ"}</strong>
-                          </p>
+                          {/* 🔹 ผลการตรวจสอบข้อมูลเครดิต */}
+                          {/* 🔹 ผลการตรวจสอบข้อมูลเครดิต */}
+                          <div className="form-group">
+                            <h5>
+                              ผลการตรวจสอบข้อมูลเครดิต{" "}
+                              <span className="required">*</span>
+                            </h5>
+                            <input
+                              type="text"
+                              className="input-normal"
+                              value={result}
+                              readOnly
+                              style={{
+                                color:
+                                  result === "ผ่าน"
+                                    ? "#0f8f2d" // สีเขียว
+                                    : result === "ไม่ผ่าน"
+                                    ? "#c91414" // สีแดง
+                                    : "black",
+                                fontWeight: "bold",
+                              }}
+                              placeholder="ผลตรวจสอบข้อมูลเครดิตจะแสดงอัตโนมัติ"
+                            />
+                            <p
+                              className="risk-note"
+                              style={{
+                                color:
+                                  risk === "ความเสี่ยงต่ำ"
+                                    ? "#0f8f2d" // เขียว
+                                    : risk === "ความเสี่ยงปานกลาง"
+                                    ? "#f0ad00" // เหลือง
+                                    : risk === "ความเสี่ยงสูง"
+                                    ? "#c91414" // แดง
+                                    : "black",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ระดับความเสี่ยง :{" "}
+                              <strong>{risk || "แสดงอัตโนมัติ"}</strong>
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      </label>
                       {/* </div> */}
                     </div>
                     <hr />
@@ -2457,12 +2947,12 @@ const AdminSetData_Litemain = () => {
                         <div
                           key={index}
                           className="credit-row"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                            marginTop: "8px",
-                          }}
+                          // style={{
+                          //   display: "flex",
+                          //   alignItems: "center",
+                          //   gap: "10px",
+                          //   marginTop: "8px",
+                          // }}
                         >
                           {/* 🔹 ช่องสถานะบัญชี */}
                           <select
@@ -2670,20 +3160,11 @@ const AdminSetData_Litemain = () => {
                       <div className="">3.2 เหตุผลประกอบคะแนนเครดิต</div>
 
                       {reasons.map((r, index) => (
-                        <div
-                          key={index}
-                          className="credit-row"
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                            marginTop: "8px",
-                          }}
-                        >
+                        <div key={index} className="credit-row">
                           {/* 🔹 แสดง select ถ้าไม่ใช่รายการใหม่ */}
                           {!r.isNew ? (
                             <select
-                              className="input-normal"
+                              className="select-account-status2"
                               value={r.reason}
                               onChange={(e) =>
                                 handleChangeReason(index, e.target.value)
@@ -2830,7 +3311,7 @@ const AdminSetData_Litemain = () => {
                           ) : (
                             // 🔹 input text ถ้าเป็นแถวที่เพิ่มใหม่
                             <select
-                              className="input-normal"
+                              className="select-account-status2"
                               value={r.reason}
                               onChange={(e) =>
                                 handleChangeReason(index, e.target.value)
@@ -3017,7 +3498,7 @@ const AdminSetData_Litemain = () => {
 
                     <hr />
                     <div className="form-group">
-                      <label>คำอธิบายเพิ่มเติม : </label>
+                      <h5>คำอธิบายเพิ่มเติม </h5>
                       <textarea
                         className="input-normal"
                         value={description}
@@ -3031,7 +3512,7 @@ const AdminSetData_Litemain = () => {
                   <div className="form-sub">
                     <div className="section-block">
                       <div className="form-group">
-                        <label>คำอธิบายเพิ่มเติม : </label>
+                        <h5>คำอธิบายเพิ่มเติม </h5>
                         <textarea
                           className="input-normal"
                           value={description}
@@ -3045,7 +3526,7 @@ const AdminSetData_Litemain = () => {
                 {approval === "pending" && (
                   <div className="form-sub">
                     <div className="form-group">
-                      <label>หมายเหตุ</label>
+                      <h5>หมายเหตุ</h5>
                       <textarea
                         className="input-normal"
                         value={description}
@@ -3135,6 +3616,49 @@ const AdminSetData_Litemain = () => {
                 }}
               >
                 ปิด
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showModal && (
+        <div className="modal-overlay3">
+          <div className="modal-content3" style={{ width: "360px" }}>
+            <h4 style={{ marginBottom: "10px" }}>
+              {contractNumber ? "แก้ไขเลขที่สัญญา" : "เพิ่มเลขที่สัญญา"}
+            </h4>
+
+            <span>รหัสฟอร์ม : {contractIdForm}</span>
+
+            <input
+              className="input-normal"
+              value={contractNumber}
+              maxLength={10}
+              placeholder="กรอกเลขที่สัญญา (10 หลัก)"
+              onChange={(e) => setContractNumber(e.target.value)}
+            />
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "8px",
+                marginTop: "14px",
+              }}
+            >
+              <button
+                className="btn-cancel"
+                onClick={() => setShowModal(false)}
+              >
+                ยกเลิก
+              </button>
+              <button
+                className="btn-submit"
+                disabled={contractNumber.length !== 10}
+                onClick={() => handleSaveContract()}
+              >
+                บันทึก
               </button>
             </div>
           </div>

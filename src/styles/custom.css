@@ -860,6 +860,7 @@ tbody tr {
   animation: blinkSmooth 1s infinite ease-in-out;
 }
 
+
 @keyframes blinkSmooth {
   0% {
     opacity: 1;
@@ -871,6 +872,16 @@ tbody tr {
     opacity: 1;
   }
 }
+
+
+
+@media print {
+  .print-text {
+    font-weight: 600 !important; /* 🔥 สำคัญ */
+    letter-spacing: 0 !important;
+  }
+}
+
 
 .pdf-page {
   page-break-after: always; /* บังคับขึ้นหน้ากระดาษใหม่ */
@@ -1069,7 +1080,7 @@ tbody tr {
 }
 
 .card-title1 {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 18px;
@@ -1078,7 +1089,7 @@ tbody tr {
 }
 
 .card-title2 {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 18px;
@@ -1096,7 +1107,7 @@ tbody tr {
 }
 
 .card-title4 {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 18px;
@@ -1587,8 +1598,8 @@ tbody tr {
 
 .input-normal {
   border-radius: 9px;
-  padding: 10px 14px;
-  font-size: 14px;
+  padding: 10px 10px;
+  font-size: 21px;
   background: #f9fbfd;
   transition: border 0.25s;
   
@@ -1885,11 +1896,26 @@ input[type="date"]:focus {
   grid-template-columns: repeat(2, 1fr); /* สองคอลัมน์ในแถวเดียว */
   gap: 8px 20px;
   margin-top: 8px;
-  font-size: 13px;
+  font-size: 20px;
   color: #333;
 }
 
 .rec-grid2 div {
+  border-bottom: 1px dashed #e0e0e0;
+  padding-bottom: 4px;
+}
+
+.rec-grid3 {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr); /* สองคอลัมน์ในแถวเดียว */
+  gap: 8px 20px;
+  margin-top: 8px;
+  font-size: 23px;
+  font-weight: 500;
+  color: #333;
+}
+
+.rec-grid3 div {
   border-bottom: 1px dashed #e0e0e0;
   padding-bottom: 4px;
 }
@@ -1937,11 +1963,13 @@ input[type="date"]:focus {
 
 .form-group {
   margin-bottom: 10px;
+
 }
 
 .radio-group label {
   margin-right: 16px;
   cursor: pointer;
+  font-size: 20px;
 }
 
 .input-normal {
@@ -2006,6 +2034,7 @@ input[type="date"]:focus {
   gap: 20px;
   align-items: flex-start;
   margin-bottom: 20px;
+  font-size: 20px;
 }
 
 .form-group {
@@ -2013,14 +2042,32 @@ input[type="date"]:focus {
   min-width: 220px;
   display: flex;
   flex-direction: column;
+
 }
+.copy-btn {
+  border: 1px solid #198754;
+  background: #f8f9fa;
+  color: #198754;
+  border-radius: 6px;
+  padding: 1px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.copy-btn.copied {
+  background: #198754;
+  color: #ffffff;
+}
+
 
 .input-normal {
   width: 100%;
-  padding: 8px 12px;
+  padding: 2px 12px;
   border: 2px solid #bbb;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .required {
@@ -2037,6 +2084,7 @@ input[type="date"]:focus {
   display: flex;
   gap: 10px;
   margin-bottom: 8px;
+  
 }
 .credit-row1 {
   display: flex;
@@ -2064,7 +2112,7 @@ input[type="date"]:focus {
 
 .risk-note {
   color: #d22;
-  font-size: 13px;
+  font-size: 18px;
   margin-top: 4px;
 }
 
@@ -2471,7 +2519,21 @@ input[type="date"]:focus {
 
   border-radius: 6px;
   border: 1px solid #ced4da;
-  font-size: 14px;
+  font-size: 16px;
+}
+
+.select-account-status2 {
+  width: 100%; /* 🔥 กำหนดความกว้างคงที่ */
+  max-width: 100%;
+  padding: 6px 10px;
+  height: 42px;
+  white-space: nowrap; /* ❌ ไม่ให้ขึ้นบรรทัดใหม่ */
+  overflow: hidden; /* ❌ ซ่อนส่วนที่เกิน */
+  text-overflow: ellipsis; /* … ตัดข้อความ */
+
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  font-size: 16px;
 }
 .reason-content {
   margin-left: 20px; /* 👈 เยื้องจากหัวข้อ */
@@ -3174,6 +3236,55 @@ input[type="date"]:focus {
   gap: 20px;
   width: 100%;
 }
+.citizen-cell {
+  display: flex;
+  align-items: center;
+}
+
+/* ลูกค้าเก่า */
+.citizen-badge-old {
+  background-color: #f8384c; /* แดง */
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 25px; /* pill */
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.btn-add-contract {
+  background: #0d3b7a;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.btn-link-edit {
+  margin-top: 4px;
+  background: #bfbfbf;
+  border-radius: 20px;
+  padding: 2px 20px;
+  border: none;
+
+  color: #f7f7f7;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+
+.status-error {
+  background-color: #fde2e2;
+  color: #b02a37;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
 
 .upload-group {
   display: flex;
@@ -3237,4 +3348,10 @@ input[type="date"]:focus {
 
 .btn-submit.btn-secondary:hover {
   background-color: #7f858b;
+}
+
+.sarabun-modal {
+  font-family: "THSarabunPSK", sans-serif;
+  font-size: 20px;       /* ขนาดหลัก */
+  line-height: 1.6;      /* อ่านง่าย */
 }
