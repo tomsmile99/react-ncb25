@@ -108,8 +108,8 @@ const AdminSetData_Litemain = () => {
 
   const [searchQuery, setSearchQuery] = useState(""); //ค้นหา
 
-      //คำนวณคะแนน
-    const allowPerD = ["003792", "000274", "002743", "004187"]; //พนักงานที่สามารถแก้ไขสัญญาได้
+  //คำนวณคะแนน
+  const allowPerD = ["003792", "000274", "002743", "004187"]; //พนักงานที่สามารถแก้ไขสัญญาได้
 
   // ✅ ฟังก์ชันแปลงคะแนนเครดิตเป็นระดับและความเสี่ยง
   const handleScoreChange = (e) => {
@@ -384,10 +384,76 @@ const AdminSetData_Litemain = () => {
 
   // ✅ อัปเดตค่าช่อง
   const handleChange = (index, field, value) => {
-    const updated = [...accounts];
-    updated[index][field] = value;
-    setAccounts(updated);
+    setAccounts((prev) =>
+      prev.map((acc, i) => (i === index ? { ...acc, [field]: value } : acc))
+    );
   };
+
+  const ACCOUNT_STATUS_MAP = {
+    10: "มีสถานะบัญชี (10) - ปกติ (ไม่มีหนี้ค้างชำระหรือไม่เกิน 90 วัน)",
+    11: "มีสถานะบัญชี (11) - ปิดบัญชี",
+    12: "มีสถานะบัญชี (12) - พักชำระหนี้ตามนโยบายของสมาชิก",
+    13: "มีสถานะบัญชี (13) - พักชำระหนี้ตามนโยบายของรัฐ",
+    14: "มีสถานะบัญชี (14) - พักชำระหนี้เกษตรกรตามนโยบายของรัฐ",
+    15: "มีสถานะบัญชี (15) - อยู่ระหว่างชำระหนี้ในกระบวนการไกล่เกลี่ยก่อนฟ้อง",
+    16: "มีสถานะบัญชี (16) - ปกติ โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพ",
+    20: "มีสถานะบัญชี (20) - หนี้ค้างชำระเกิน 90 วัน",
+    21: "มีสถานะบัญชี (21) - หนี้ค้างชำระเกิน 90 วันเนื่องจากได้รับผลกระทบจากสถานการณ์ไม่ปกติ",
+    26: "มีสถานะบัญชี (26) - หนี้ค้างชำระเกิน 90 วัน โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพ",
+
+    30: "มีสถานะบัญชี (30) - อยู่ในกระบวนการทางกฎหมาย",
+    31: "มีสถานะบัญชี (31) - อยู่ระหว่างชำระหนี้ตามคำพิพากษาตามยอม",
+    32: "มีสถานะบัญชี (32) - ศาลพิพากษายกฟ้องเนื่องจากขาดอายุความหรือเหตุอื่นฯ",
+    33: "มีสถานะบัญชี (33) - ปิดบัญชีเนื่องจากตัดหนี้สูญ",
+    36: "มีสถานะบัญชี (36) - ปกติ โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพและอยู่ในกระบวนการทางกฎหมาย",
+    
+    40: "มีสถานะบัญชี (40) - อยู่ระหว่างชำระสินเชื่อเพื่อปิดบัญชี",
+    41: "มีสถานะบัญชี (41) - อยู่ระหว่างตรวจสอบรายการ",
+    42: "มีสถานะบัญชี (42) - โอนหรือขายหนี้ที่ไม่เป็นสถานะบัญชีปกติ",
+    43: "มีสถานะบัญชี (43) - โอนหรือขายหนี้และชำระหนี้เสร็จสิ้น",
+    44: "มีสถานะบัญชี (44) - โอนหรือขายหนี้ที่เป็นสถานะบัญชีปกติ",
+    51: "มีสถานะบัญชี (51) - หยุดนำส่งข้อมูล เนื่องจากมีการบอกเลิกสัญญา",
+    52: "มีสถานะบัญชี (52) - หนี้ค้างชำระเกิน 90 วัน โดยยังไม่ได้ยื่นฟ้อง และหยุดนำส่งข้อมูล",
+    53: "มีสถานะบัญชี (53) - หนี้ค้างชำระเกิน 90 วันโดยอยู่ในกระบวนการทางกฎหมาย และหยุดนำส่งข้อมูล",
+  };
+
+  const CREDIT_REASON_MAP = {
+    "00":  "00 : ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)",
+    "011": "011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง ",
+    "012": "012 : ไม่ได้ใช้งาน",
+    "013": "013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง",
+    "014": "014 : ยอดหนี้รวมคงค้าง ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง",
+    "015": "015 : ประวัติข้อมูลเครดิตที่ดี ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด",
+    "016": "016 : ไม่ได้ใช้งาน",
+    "017": "017 : ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ ที่ปรากฏในรายงานข้อมูลเครดิต",
+    "018": "018 : วงเงินคงเหลือ ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย ",
+    "019": "019 : ประวัติข้อมูลเครดิต ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด ",
+    "020": "020 : ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต",
+    "021": "021 : ประวัติสินเชื่อที่ดี ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น",
+    "022": "022 : ยอดหนี้ที่ค้างชำระ ที่ปรากฏในรายงานข้อมูลเครดิต",
+    "023": "023 : ประวัติการค้างชำระ ที่ปรากฏในรายงานข้อมูลเครดิต ",
+    "024": "024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร ที่ปรากฏในรายงานข้อมูลเครดิต",
+
+    "025": "025 : ความหลากหลายของประเภทสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิตน้อย",
+    "026": "026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสูง",
+    "027": "027 : ไม่ได้ใช้งาน",
+    "028": "028 : การสืบค้นล่าสุด ที่ปรากฏในรายงานข้อมูลเครดิต ",
+    "029": "029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต",
+    "030": "030 : จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ ที่ปรากฏในรายงานข้อมูลเครดิต",
+    "031": "031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด ที่ปรากฏในรายงานข้อมูลเครดิต",
+    "032": "032 : ไม่ได้ใช้งาน",
+
+    "TT": "TT : ปัจจุบันค้างชำระเกิน 90 วัน  หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย ",
+    "VV": "VV : บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล",
+    "WW": "WW : บัญชีมีการโต้แย้ง หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล",
+    "XX": "XX : ไม่มีบัญชี แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่  มากกว่า หรือเท่ากับ 5 ครั้ง",
+    "YY": "YY : ไม่มีบัญชี แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่  น้อยกว่า 5 ครั้ง",
+    "ZZ": " ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต",
+
+};
+
+
+
 
   // ✅ ลบแถว
   const handleRemoveAccount = (index) => {
@@ -508,6 +574,17 @@ const AdminSetData_Litemain = () => {
 
       const filteredReasons = reasons.filter((r) => r.reason.trim() !== "");
 
+      const mappedAccounts = filteredAccounts.map((acc) => ({
+        ...acc,
+        status_code: acc.status,
+        status_text: ACCOUNT_STATUS_MAP[acc.status] || "",
+      }));
+
+      const mappedReasons = filteredReasons.map(r => ({
+        reason_code: r.reason,
+        reason_text: CREDIT_REASON_MAP[r.reason] || ""
+      }));
+
       // -----------------------------
       // 2) สร้าง payload ตาม approval
       // -----------------------------
@@ -529,8 +606,8 @@ const AdminSetData_Litemain = () => {
           result,
           risk,
 
-          accounts: filteredAccounts,
-          reasons: filteredReasons,
+          accounts: mappedAccounts,
+          reasons: mappedReasons,
           description,
 
           PerD,
@@ -556,7 +633,7 @@ const AdminSetData_Litemain = () => {
           ChkStatusEdit: ChkDataEdit,
         };
 
-        console.log(payload);
+        // console.log(payload);
       } else if (approval === "pending") {
         payload = {
           ctmId: selectedItem,
@@ -576,8 +653,8 @@ const AdminSetData_Litemain = () => {
         return;
       }
 
-      // console.log("payload:", payload);
-
+      //       console.log("payload:", payload);
+      // return
       // -----------------------------
       // 3) ส่งข้อมูลไป API
       // -----------------------------
@@ -1067,108 +1144,100 @@ const AdminSetData_Litemain = () => {
 
   const [saving, setSaving] = useState(false);
 
- const handleSaveContract = async () => {
-  if (contractNumber.length !== 10) {
-    Swal.fire({
-      icon: "warning",
-      title: "ข้อมูลไม่ถูกต้อง",
-      text: "เลขที่สัญญาต้องมี 10 หลัก",
-    });
-    return;
-  }
-
-  try {
-    setSaving(true);
-
-    const payload = {
-      idForm: contractIdForm,
-      contractNumber,
-    };
-
-    const { data } = await apiClient.post(
-      "/api/insurances/datacustomers/updateData_contractNumber",
-      payload
-    );
-
- const {status,dataSet} = data;
-    // ✅ สำเร็จ
-    if (status === 200) {
-
-
-    // console.log(dataSet)
-
-
-
-  // 1️⃣ ปิด modal ก่อน
-  setShowModal(false);
-  // 3️⃣ รีเฟรชข้อมูล
-  getEmployeeDB_Admin();
-
-  // 4️⃣ เปลี่ยนแท็บ
-  setActiveTab("approved");
-  // 2️⃣ แสดงแจ้งเตือน (รอให้แสดงจบ)
-  await Swal.fire({
-    icon: "success",
-    title: "บันทึกสำเร็จ",
-    text: data.message || "อัปเดตข้อมูลเรียบร้อยแล้ว",
-    timer: 2000,
-    showConfirmButton: false,
-    timerProgressBar: true,
-  });
-
-
-
-      return;
-    }
-
-    // ❌ เลขสัญญาไม่ถูกต้อง
-    if (data.status === 422) {
+  const handleSaveContract = async () => {
+    if (contractNumber.length !== 10) {
       Swal.fire({
         icon: "warning",
-        title: "เลขที่สัญญาไม่ถูกต้อง",
-        text: data.message,
+        title: "ข้อมูลไม่ถูกต้อง",
+        text: "เลขที่สัญญาต้องมี 10 หลัก",
       });
       return;
     }
 
-    // ❌ เลขสัญญาซ้ำ
-    if (data.status === 409) {
+    try {
+      setSaving(true);
+
+      const payload = {
+        idForm: contractIdForm,
+        contractNumber,
+      };
+
+      const { data } = await apiClient.post(
+        "/api/insurances/datacustomers/updateData_contractNumber",
+        payload
+      );
+
+      const { status, dataSet } = data;
+      // ✅ สำเร็จ
+      if (status === 200) {
+        // console.log(dataSet)
+
+        // 1️⃣ ปิด modal ก่อน
+        setShowModal(false);
+        // 3️⃣ รีเฟรชข้อมูล
+        getEmployeeDB_Admin();
+
+        // 4️⃣ เปลี่ยนแท็บ
+        setActiveTab("approved");
+        // 2️⃣ แสดงแจ้งเตือน (รอให้แสดงจบ)
+        await Swal.fire({
+          icon: "success",
+          title: "บันทึกสำเร็จ",
+          text: data.message || "อัปเดตข้อมูลเรียบร้อยแล้ว",
+          timer: 2000,
+          showConfirmButton: false,
+          timerProgressBar: true,
+        });
+
+        return;
+      }
+
+      // ❌ เลขสัญญาไม่ถูกต้อง
+      if (data.status === 422) {
+        Swal.fire({
+          icon: "warning",
+          title: "เลขที่สัญญาไม่ถูกต้อง",
+          text: data.message,
+        });
+        return;
+      }
+
+      // ❌ เลขสัญญาซ้ำ
+      if (data.status === 409) {
+        Swal.fire({
+          icon: "error",
+          title: "เลขที่สัญญาซ้ำ",
+          text: data.message,
+        });
+        return;
+      }
+
+      // ❌ ไม่พบข้อมูลฟอร์ม
+      if (data.status === 404) {
+        Swal.fire({
+          icon: "error",
+          title: "ไม่พบข้อมูล",
+          text: data.message,
+        });
+        return;
+      }
+
+      // ❌ error อื่น
       Swal.fire({
         icon: "error",
-        title: "เลขที่สัญญาซ้ำ",
-        text: data.message,
+        title: "เกิดข้อผิดพลาด",
+        text: data.message || "ไม่สามารถบันทึกข้อมูลได้",
       });
-      return;
-    }
-
-    // ❌ ไม่พบข้อมูลฟอร์ม
-    if (data.status === 404) {
+    } catch (err) {
       Swal.fire({
         icon: "error",
-        title: "ไม่พบข้อมูล",
-        text: data.message,
+        title: "ระบบขัดข้อง",
+        text: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้",
       });
-      return;
+    } finally {
+      setSaving(false);
     }
-
-    // ❌ error อื่น
-    Swal.fire({
-      icon: "error",
-      title: "เกิดข้อผิดพลาด",
-      text: data.message || "ไม่สามารถบันทึกข้อมูลได้",
-    });
-
-  } catch (err) {
-    Swal.fire({
-      icon: "error",
-      title: "ระบบขัดข้อง",
-      text: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้",
-    });
-  } finally {
-    setSaving(false);
-  }
-};
-
+  };
 
   return (
     <div>
@@ -1199,7 +1268,7 @@ const AdminSetData_Litemain = () => {
         <div className="col-md-3 col-sm-12">
           <div
             className={`card-dashboard p-3 shadow-sm d-flex align-items-center
-        ${activeTab === "pass" ? "active-card" : ""}`}
+            ${activeTab === "pass" ? "active-card" : ""}`}
             style={{ backgroundColor: "#F5F7FF", cursor: "pointer" }}
             onClick={() => setActiveTab("pass")}
           >
@@ -1536,7 +1605,7 @@ const AdminSetData_Litemain = () => {
                                   // onClick={() =>
                                   //   handleStatusClick(item.CTM_form_number)
                                   // }
-                                 style={{
+                                  style={{
                                     border: "none",
                                     borderRadius: "999px",
                                     padding: "6px 18px",
@@ -1559,7 +1628,7 @@ const AdminSetData_Litemain = () => {
                                       onClick={() =>
                                         handleStatusClick(item.CTM_form_number)
                                       }
-                                        style={{
+                                      style={{
                                         border: "none",
                                         borderRadius: "999px",
                                         padding: "6px 18px",
@@ -1604,7 +1673,7 @@ const AdminSetData_Litemain = () => {
                                   )}
                                 </>
                               )}
-                               {/* เวลาเดิน */}
+                              {/* เวลาเดิน */}
                               <div
                                 style={{
                                   fontSize: "11px",
@@ -1769,6 +1838,7 @@ const AdminSetData_Litemain = () => {
                     </th>
                   </tr>
                 </thead>
+
                 {loading ? (
                   <tr>
                     <td colSpan={14} className="text-center py-4">
@@ -1778,7 +1848,7 @@ const AdminSetData_Litemain = () => {
                 ) : (
                   <tbody>
                     {probationaryEmployees.map((item, index) => (
-                      <tr key={item.CTM_form_number}>
+                      <tr key={index}>
                         <td className="text-center">
                           {(currentPage - 1) * limit + (index + 1)}
                         </td>
@@ -1952,7 +2022,7 @@ const AdminSetData_Litemain = () => {
                 ) : (
                   <tbody>
                     {probationaryEmployees.map((item, index) => (
-                      <tr key={item.CTM_form_number}>
+                      <tr key={index}>
                         <td className="text-center">
                           {(currentPage - 1) * limit + (index + 1)}
                         </td>
@@ -2143,7 +2213,7 @@ const AdminSetData_Litemain = () => {
                 ) : (
                   <tbody>
                     {probationaryEmployees.map((item, index) => (
-                      <tr key={item.CTM_form_number}>
+                      <tr key={index}>
                         <td className="text-center">
                           {" "}
                           {(currentPage - 1) * limit + (index + 1)}
@@ -2340,7 +2410,7 @@ const AdminSetData_Litemain = () => {
                 ) : (
                   <tbody>
                     {probationaryEmployees.map((item, index) => (
-                      <tr key={item.CTM_form_number}>
+                      <tr key={index}>
                         <td className="text-center">
                           {" "}
                           {(currentPage - 1) * limit + (index + 1)}
@@ -2449,31 +2519,28 @@ const AdminSetData_Litemain = () => {
                             textAlign: "center",
                           }}
                         >
-        <div>{item.Form_Contract_number}</div>
-                         {allowPerD.includes(PerD) && (
-  <>
-    {item.Form_Contract_number ? (
-      <>
-
-        <button
-          className="btn-link-edit"
-          onClick={() => openContractModal(item)}
-        >
-          แก้ไข
-        </button>
-      </>
-    ) : (
-      <button
-        className="btn-add-contract"
-        onClick={() => openContractModal(item)}
-      >
-        + เพิ่มเลขที่สัญญา
-      </button>
-    )}
-  </>
-)}
-
-
+                          <div>{item.Form_Contract_number}</div>
+                          {allowPerD.includes(PerD) && (
+                            <>
+                              {item.Form_Contract_number ? (
+                                <>
+                                  <button
+                                    className="btn-link-edit"
+                                    onClick={() => openContractModal(item)}
+                                  >
+                                    แก้ไข
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  className="btn-add-contract"
+                                  onClick={() => openContractModal(item)}
+                                >
+                                  + เพิ่มเลขที่สัญญา
+                                </button>
+                              )}
+                            </>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -2600,7 +2667,7 @@ const AdminSetData_Litemain = () => {
             <div className="card recorder-card full-width">
               <div className="card-title2">ข้อมูลลูกค้า</div>
 
-              <div className="rec-grid3"> 
+              <div className="rec-grid3">
                 {" "}
                 <div>
                   <strong>ชื่อ - นามสกุลลูกค้า :</strong>{" "}
@@ -2626,7 +2693,7 @@ const AdminSetData_Litemain = () => {
                     {copied ? "คัดลอกแล้ว" : "คัดลอก"}
                   </button>
                 </div>
-                  <div>
+                <div>
                   <strong>วันเดือนปีเกิด :</strong>{" "}
                   {convertToThaiDate1(getDataShow?.CTM_birthdate || "-")}
                 </div>
@@ -2844,7 +2911,7 @@ const AdminSetData_Litemain = () => {
                             </h5>
                             <input
                               type="number"
-                              className="input-normal"
+                              className="input-normal2"
                               placeholder="กรอกคะแนนเครดิต"
                               value={score}
                               onChange={handleScoreChange}
@@ -2858,7 +2925,7 @@ const AdminSetData_Litemain = () => {
                             </h5>
                             <input
                               type="text"
-                              className="input-normal"
+                              className="input-normal2"
                               value={level}
                               disabled
                               readOnly
@@ -2874,14 +2941,14 @@ const AdminSetData_Litemain = () => {
                             </h5>
                             <input
                               type="number"
-                              className="input-normal"
+                              className="input-normal2"
                               placeholder="กรอกตัวเลข (0-10000)"
                               value={probabilityInput}
                               onChange={handleProbabilityChange}
                             />
                             <input
                               type="text"
-                              className="input-normal"
+                              className="input-normal2"
                               style={{ marginTop: "6px" }}
                               value={probabilityPercent}
                               readOnly
@@ -2898,7 +2965,7 @@ const AdminSetData_Litemain = () => {
                             </h5>
                             <input
                               type="text"
-                              className="input-normal"
+                              className="input-normal2"
                               value={result}
                               readOnly
                               style={{
@@ -2966,139 +3033,105 @@ const AdminSetData_Litemain = () => {
                               - เลือกสถานะบัญชี ({index + 1}) -
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (10) - ปกติ
-                              (ไม่มีหนี้ค้างชำระหรือมีหนี้ค้างชำระไม่เกิน 90
-                              วัน)"
-                            >
+                            <option value="10">
                               มีสถานะบัญชี (10) - ปกติ
                               (ไม่มีหนี้ค้างชำระหรือมีหนี้ค้างชำระไม่เกิน 90
                               วัน)
                             </option>
 
-                            <option value="มีสถานะบัญชี (11) - ปิดบัญชี">
+                            <option value="11">
                               มีสถานะบัญชี (11) - ปิดบัญชี
                             </option>
 
-                            <option value="มีสถานะบัญชี (12) - พักชำระหนี้ตามนโยบายของสมาชิก">
+                            <option value="12">
                               มีสถานะบัญชี (12) - พักชำระหนี้ตามนโยบายของสมาชิก
                             </option>
 
-                            <option value="มีสถานะบัญชี (13) - พักชำระหนี้ตามนโยบายของรัฐ">
+                            <option value="13">
                               มีสถานะบัญชี (13) - พักชำระหนี้ตามนโยบายของรัฐ
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (14) -
-                              พักชำระหนี้เกษตรกรตามนโยบายของรัฐ"
-                            >
+                            <option value="14">
                               มีสถานะบัญชี (14) -
                               พักชำระหนี้เกษตรกรตามนโยบายของรัฐ
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (15) - ปกติ
-                              (ไม่มีหนี้ค้างชำระหรือมีหนี้ค้างชำระไม่เกิน 90 วัน
-                              ตามข้อตกลงหรือสัญญาประนีประนอมยอมความ)"
-                            >
-                              มีสถานะบัญชี (15) - ปกติ
-                              (ไม่มีหนี้ค้างชำระหรือมีหนี้ค้างชำระไม่เกิน 90 วัน
-                              ตามข้อตกลงหรือสัญญาประนีประนอมยอมความ)
+                            <option value="15">
+                              มีสถานะบัญชี (15) - อยู่ระหว่างชำระหนี้ในกระบวนการไกล่เกลี่ยก่อนฟ้อง
+                            </option>
+                            <option value="16">
+                             มีสถานะบัญชี (16) - ปกติ โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพ
                             </option>
 
-                            <option value="มีสถานะบัญชี (20) - หนี้ค้างชำระเกิน 90 วัน">
+                            <option value="20">
                               มีสถานะบัญชี (20) - หนี้ค้างชำระเกิน 90 วัน
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (21) - หนี้ค้างชำระเกิน 90 วัน
-                              จากเหตุการณ์ไม่ปกติ"
-                            >
-                              มีสถานะบัญชี (21)-หนี้ค้างชำระเกิน 90 วัน
+                            <option value="21">
+                              มีสถานะบัญชี (21) - หนี้ค้างชำระเกิน 90 วัน
                               เนื่องจากได้รับผลกระทบจากสถานการณ์ไม่ปกติ
                             </option>
+                              <option value="26">
+                               มีสถานะบัญชี (26) - หนี้ค้างชำระเกิน 90 วัน โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพ
+                            </option>
 
-                            <option value="มีสถานะบัญชี (30) - อยู่ในกระบวนการทางกฎหมาย">
+                            <option value="30">
                               มีสถานะบัญชี (30) - อยู่ในกระบวนการทางกฎหมาย
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (31) -
-                              อยู่ระหว่างชำระหนี้ตามคำพิพากษาตามยอม"
-                            >
+                            <option value="31">
                               มีสถานะบัญชี (31) -
                               อยู่ระหว่างชำระหนี้ตามคำพิพากษาตามยอม
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (32) - ศาลพิพากษายกฟ้อง
-                              (ขาดอายุความหรือเหตุอื่น)"
-                            >
-                              มีสถานะบัญชี (32)-ศาลพิพากษายกฟ้อง
+                            <option value="32">
+                              มีสถานะบัญชี (32) - ศาลพิพากษายกฟ้อง
                               เนื่องจากขาดอายุความหรือเหตุอื่นฯ
                             </option>
 
-                            <option value="มีสถานะบัญชี (33) - ปิดบัญชีเนื่องจากตัดหนี้สูญ">
+                            <option value="33">
                               มีสถานะบัญชี (33) - ปิดบัญชีเนื่องจากตัดหนี้สูญ
                             </option>
+                             <option value="36">
+                              มีสถานะบัญชี (36) - ปกติ โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพและอยู่ในกระบวนการทางกฎหมาย
+                            </option>
+                            
 
-                            <option
-                              value="มีสถานะบัญชี (40) -
-                              อยู่ระหว่างชำระสินเชื่อเพื่อปิดบัญชี"
-                            >
+                            <option value="40">
                               มีสถานะบัญชี (40) -
                               อยู่ระหว่างชำระสินเชื่อเพื่อปิดบัญชี
                             </option>
 
-                            <option value="มีสถานะบัญชี (41) - อยู่ระหว่างตรวจสอบรายการ">
+                            <option value="41">
                               มีสถานะบัญชี (41) - อยู่ระหว่างตรวจสอบรายการ
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (42) - โอนหรือขายหนี้ที่ค้างชำระเกิน
-                              90 วัน"
-                            >
-                              มีสถานะบัญชี (42) - โอนหรือขายหนี้ที่ค้างชำระเกิน
-                              90 วัน
+                            <option value="42">
+                              มีสถานะบัญชี (42) - โอนหรือขายหนี้ที่ไม่เป็นสถานะบัญชีปกติ
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (43) -
-                              โอนหรือขายหนี้และชำระหนี้เสร็จสิ้น"
-                            >
+                            <option value="43">
                               มีสถานะบัญชี (43) -
                               โอนหรือขายหนี้และชำระหนี้เสร็จสิ้น
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (44) -
-                              โอนหรือขายหนี้ที่เป็นสถานะบัญชีปกติ"
-                            >
+                            <option value="44">
                               มีสถานะบัญชี (44) -
                               โอนหรือขายหนี้ที่เป็นสถานะบัญชีปกติ
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (51) - หยุดนำส่งข้อมูล
-                              เนื่องจากมีการบอกเลิกสัญญา"
-                            >
+                            <option value="51">
                               มีสถานะบัญชี (51) - หยุดนำส่งข้อมูล
                               เนื่องจากมีการบอกเลิกสัญญา
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (52) - หนี้ค้างชำระเกิน 90 วัน
-                              โดยยังไม่ได้ยื่นฟ้อง และหยุดนำส่งข้อมูล"
-                            >
+                            <option value="52">
                               มีสถานะบัญชี (52) - หนี้ค้างชำระเกิน 90 วัน
                               โดยยังไม่ได้ยื่นฟ้อง และหยุดนำส่งข้อมูล
                             </option>
 
-                            <option
-                              value="มีสถานะบัญชี (53) - หนี้ค้างชำระเกิน 90 วัน
-                              อยู่ในกระบวนการทางกฎหมาย และหยุดนำส่งข้อมูล"
-                            >
-                              มีสถานะบัญชี (53)-หนี้ค้างชำระเกิน 90 วัน
+                            <option value="53">
+                              มีสถานะบัญชี (53) - หนี้ค้างชำระเกิน 90 วัน
                               โดยอยู่ในกระบวนการทางกฎหมาย และหยุดนำส่งข้อมูล
                             </option>
                           </select>
@@ -3161,8 +3194,8 @@ const AdminSetData_Litemain = () => {
 
                       {reasons.map((r, index) => (
                         <div key={index} className="credit-row">
-                          {/* 🔹 แสดง select ถ้าไม่ใช่รายการใหม่ */}
-                          {!r.isNew ? (
+                         
+                           
                             <select
                               className="select-account-status2"
                               value={r.reason}
@@ -3173,289 +3206,39 @@ const AdminSetData_Litemain = () => {
                               <option>
                                 - เลือกเหตุผลประกอบคะแนนเครดิต ({index + 1}) -
                               </option>
-                              <option>
-                                00 :
-                                ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต
-                                (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)
-                              </option>
-                              <option>
-                                {" "}
-                                011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
-                              </option>
-                              <option>012 : ไม่ได้ใช้งาน</option>
-                              <option>
-                                {" "}
-                                013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
-                              </option>
-                              <option>
-                                {" "}
-                                014 : ยอดหนี้รวมคงค้าง
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
-                              </option>
-                              <option>
-                                {" "}
-                                015 : ประวัติข้อมูลเครดิตที่ดี
-                                ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด
-                              </option>
-                              <option>016 : ไม่ได้ใช้งาน</option>
-                              <option>
-                                {" "}
-                                017 :
-                                ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                018 : วงเงินคงเหลือ
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย
-                              </option>
-                              <option>
-                                {" "}
-                                019 : ประวัติข้อมูลเครดิต
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด
-                              </option>
-                              <option>
-                                {" "}
-                                020 :
-                                ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                021 : ประวัติสินเชื่อที่ดี
-                                ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น
-                              </option>
-                              <option>
-                                {" "}
-                                022 : ยอดหนี้ที่ค้างชำระ
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                023 : ประวัติการค้างชำระ
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
+                              <option value="00"> 00 :ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)</option>
+                              <option value="011"> 011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง </option>
+                              <option value="012"> 012 : ไม่ได้ใช้งาน</option>
+                              <option value="013"> 013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง </option>
+                              <option value="014"> 014 : ยอดหนี้รวมคงค้าง ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง </option>
+                              <option value="015"> 015 : ประวัติข้อมูลเครดิตที่ดี ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด </option>
+                              <option value="016"> 016 : ไม่ได้ใช้งาน</option>
+                              <option value="017"> 017 : ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ ที่ปรากฏในรายงานข้อมูลเครดิต </option>
+                              <option value="018"> 018 : วงเงินคงเหลือ ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย  </option>
+                              <option value="019"> 019 : ประวัติข้อมูลเครดิต ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด </option>
+                              <option value="020"> 020 : ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต </option>
+                              <option value="021"> 021 : ประวัติสินเชื่อที่ดี ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น </option>
+                              <option value="022"> 022 : ยอดหนี้ที่ค้างชำระ ที่ปรากฏในรายงานข้อมูลเครดิต  </option>
+                              <option value="023"> 023 : ประวัติการค้างชำระ ที่ปรากฏในรายงานข้อมูลเครดิต </option>
+                              <option value="024"> 024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร ที่ปรากฏในรายงานข้อมูลเครดิต </option>
 
-                              <option>
-                                {" "}
-                                025 : ความหลากหลายของประเภทสินเชื่อ
-                                ที่ปรากฏในรายงานข้อมูลเครดิตน้อย
-                              </option>
-                              <option>
-                                {" "}
-                                026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต
-                                ค่อนข้างสูง
-                              </option>
-                              <option>027 : ไม่ได้ใช้งาน</option>
-                              <option>
-                                {" "}
-                                028 : การสืบค้นล่าสุด
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                              </option>
-                              <option>
-                                {" "}
-                                030 :
-                                จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>032 : ไม่ได้ใช้งาน</option>
+                              <option value="025"> 025 : ความหลากหลายของประเภทสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิตน้อย </option>
+                              <option value="026"> 026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสูง </option>
+                              <option value="027"> 027 : ไม่ได้ใช้งาน</option>
+                              <option value="028"> 028 : การสืบค้นล่าสุด ที่ปรากฏในรายงานข้อมูลเครดิต </option>
+                              <option value="029"> 029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต </option>
+                              <option value="030"> 030 : จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ ที่ปรากฏในรายงานข้อมูลเครดิต </option>
+                              <option value="031"> 031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด ที่ปรากฏในรายงานข้อมูลเครดิต </option>
+                              <option value="032"> 032 : ไม่ได้ใช้งาน</option>
 
-                              <option>
-                                {" "}
-                                TT : ปัจจุบันค้างชำระเกิน 90 วัน
-                                หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย
-                              </option>
-                              <option>
-                                {" "}
-                                VV :
-                                บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล
-                              </option>
-                              <option>
-                                {" "}
-                                WW : บัญชีมีการโต้แย้ง
-                                หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล
-                              </option>
-                              <option>
-                                {" "}
-                                XX : ไม่มีบัญชี
-                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
-                                มากกว่า หรือเท่ากับ 5 ครั้ง{" "}
-                              </option>
-                              <option>
-                                {" "}
-                                YY : ไม่มีบัญชี
-                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
-                                น้อยกว่า 5 ครั้ง{" "}
-                              </option>
-
-                              <option>
-                                {" "}
-                                ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต{" "}
-                              </option>
+                              <option value="TT"> TT : ปัจจุบันค้างชำระเกิน 90 วัน  หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย </option>
+                              <option value="VV"> VV : บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล </option>
+                              <option value="WW"> WW : บัญชีมีการโต้แย้ง หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล  </option>
+                              <option value="XX"> XX : ไม่มีบัญชี แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่  มากกว่า หรือเท่ากับ 5 ครั้ง{" "}</option >
+                              <option value="YY"> YY : ไม่มีบัญชี แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่  น้อยกว่า 5 ครั้ง{" "}  </option>
+                              <option value="ZZ"> ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต</option>
                             </select>
-                          ) : (
-                            // 🔹 input text ถ้าเป็นแถวที่เพิ่มใหม่
-                            <select
-                              className="select-account-status2"
-                              value={r.reason}
-                              onChange={(e) =>
-                                handleChangeReason(index, e.target.value)
-                              }
-                            >
-                              <option>
-                                - เลือกเหตุผลประกอบคะแนนเครดิต ({index + 1}) -
-                              </option>
-                              <option>
-                                00 :
-                                ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต
-                                (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)
-                              </option>
-                              <option>
-                                {" "}
-                                011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
-                              </option>
-                              <option>012 : ไม่ได้ใช้งาน</option>
-                              <option>
-                                {" "}
-                                013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
-                              </option>
-                              <option>
-                                {" "}
-                                014 : ยอดหนี้รวมคงค้าง
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
-                              </option>
-                              <option>
-                                {" "}
-                                015 : ประวัติข้อมูลเครดิตที่ดี
-                                ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด
-                              </option>
-                              <option>016 : ไม่ได้ใช้งาน</option>
-                              <option>
-                                {" "}
-                                017 :
-                                ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                018 : วงเงินคงเหลือ
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย
-                              </option>
-                              <option>
-                                {" "}
-                                019 : ประวัติข้อมูลเครดิต
-                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด
-                              </option>
-                              <option>
-                                {" "}
-                                020 :
-                                ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                021 : ประวัติสินเชื่อที่ดี
-                                ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น
-                              </option>
-                              <option>
-                                {" "}
-                                022 : ยอดหนี้ที่ค้างชำระ
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                023 : ประวัติการค้างชำระ
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-
-                              <option>
-                                {" "}
-                                025 : ความหลากหลายของประเภทสินเชื่อ
-                                ที่ปรากฏในรายงานข้อมูลเครดิตน้อย
-                              </option>
-                              <option>
-                                {" "}
-                                026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต
-                                ค่อนข้างสูง
-                              </option>
-                              <option>027 : ไม่ได้ใช้งาน</option>
-                              <option>
-                                {" "}
-                                028 : การสืบค้นล่าสุด
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                              </option>
-                              <option>
-                                {" "}
-                                030 :
-                                จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>
-                                {" "}
-                                031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด
-                                ที่ปรากฏในรายงานข้อมูลเครดิต
-                              </option>
-                              <option>032 : ไม่ได้ใช้งาน</option>
-
-                              <option>
-                                {" "}
-                                TT : ปัจจุบันค้างชำระเกิน 90 วัน
-                                หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย
-                              </option>
-                              <option>
-                                {" "}
-                                VV :
-                                บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล
-                              </option>
-                              <option>
-                                {" "}
-                                WW : บัญชีมีการโต้แย้ง
-                                หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล
-                              </option>
-                              <option>
-                                {" "}
-                                XX : ไม่มีบัญชี
-                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
-                                มากกว่า หรือเท่ากับ 5 ครั้ง{" "}
-                              </option>
-                              <option>
-                                {" "}
-                                YY : ไม่มีบัญชี
-                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
-                                น้อยกว่า 5 ครั้ง{" "}
-                              </option>
-
-                              <option>
-                                {" "}
-                                ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต{" "}
-                              </option>
-                            </select>
-                          )}
+                        
 
                           {/* 🔹 ปุ่มลบ — ห้ามแสดงบนแถวแรก */}
                           {index !== 0 && (

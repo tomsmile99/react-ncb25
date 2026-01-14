@@ -1893,7 +1893,7 @@ input[type="date"]:focus {
 /* ข้อมูลภายในการ์ด */
 .rec-grid2 {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* สองคอลัมน์ในแถวเดียว */
+  grid-template-columns: repeat(2, 1fr); /* สองคอลัมน์ในแถวเดียว */ 
   gap: 8px 20px;
   margin-top: 8px;
   font-size: 20px;
@@ -2065,10 +2065,21 @@ input[type="date"]:focus {
 .input-normal {
   width: 100%;
   padding: 2px 12px;
-  border: 2px solid #bbb;
+  /* border: 2px solid #bbb; */
+  color: #000;
   border-radius: 8px;
   font-size: 16px;
 }
+
+.input-normal2 {
+  width: 100%;
+  padding: 2px 12px;
+  /* border: 2px solid #bbb; */
+  color: #000;
+  border-radius: 8px;
+  font-size: 22px;
+}
+
 
 .required {
   color: red;
@@ -2519,7 +2530,7 @@ input[type="date"]:focus {
 
   border-radius: 6px;
   border: 1px solid #ced4da;
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .select-account-status2 {
@@ -2533,7 +2544,7 @@ input[type="date"]:focus {
 
   border-radius: 6px;
   border: 1px solid #ced4da;
-  font-size: 16px;
+  font-size: 20px;
 }
 .reason-content {
   margin-left: 20px; /* 👈 เยื้องจากหัวข้อ */
