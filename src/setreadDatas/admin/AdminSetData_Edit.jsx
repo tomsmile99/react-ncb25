@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import apiClient from "../../recoilstore/userStores";
 import html2pdf from "html2pdf.js";
 import { FaSearch, FaSyncAlt, FaDownload, FaCalendarAlt } from "react-icons/fa";
-import { InputGroup } from "react-bootstrap";
+import { InputGroup ,Form} from "react-bootstrap";
 import { FiSearch } from "react-icons/fi";
 import { FaFileSignature } from "react-icons/fa";
 import { BsSend } from "react-icons/bs";
@@ -91,6 +91,13 @@ const AdminSetData_Edit = () => {
 
   const [probabilityInput, setProbabilityInput] = useState("");
   const [probabilityPercent, setProbabilityPercent] = useState("");
+
+    //ค้นหา
+  const [searchType, setSearchType] = useState(""); // name | citizen | form
+  const [searchQuerySub, setSearchQuerySub] = useState(""); //ค้นหา  //คำนวณคะแนน
+    const [searchKeyword, setSearchKeyword] = useState(""); // ค่าที่กดค้นหาจริง
+  
+
 
   const [accounts, setAccounts] = useState([
     { status: "", amount: "", isNew: false },
@@ -199,10 +206,20 @@ const AdminSetData_Edit = () => {
 
   const [probationaryEmployees, setProbationaryEmployees] = useState([]); // Object to group by section ID
 
-  const getEmployeeDB_Admin = async (page) => {
+  
+  const getEmployeeDB_Admin = async (
+
+    page,
+    searchQuerySub = "",
+    searchType = "",
+
+  ) => {
+
     const params = {
-      _page: page,
+     _page: page,
       _limit: limit,
+      search: searchQuerySub, // ⭐ ส่ง keyword
+      searchKeyword: searchType, // ✅ ใช้ตัวนี้เท่านั้น
     };
 
     try {
@@ -222,7 +239,7 @@ const AdminSetData_Edit = () => {
       } = data;
 
       if (status) {
-        console.log(data);
+        // console.log(data);
         setProbationaryEmployees(sqlDataCustomers);
         setTotalPages(totalPages);
 
@@ -483,83 +500,106 @@ const AdminSetData_Edit = () => {
               width: "100%",
             }}
           >
-            {/* ซ้าย: ไอคอน + ข้อความ */}
-            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-              {/* ไอคอนกลม */}
-              {/* <img
-            src="/SAKCreditScoring/Insurance-amico.png"
-            alt="approval-report"
-            style={{
-              height: "110px",
-              width: "auto",
-              // marginBottom: "10px",
-              transition: "transform 0.4s ease",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.transform = "scale(1.05)")
-            }
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          /> */}
-              <div>
-                {/* <div style={{ fontSize: 18, fontWeight: 700, color: "#0b3b73" }}>
-              กำหนดพี่เลี้ยง
-            </div> */}
-                <div style={{ fontSize: 13, color: "#5b6b82", marginTop: 4 }}>
-                  ค้นหาข้อมูลที่ต้องการ
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                </div>
-                <div className="pt-1">
-                  <InputGroup>
-                    <InputGroup.Text
-                      style={{
-                        background: "white",
-                        border: "1px solid #e0e0e0",
-                        borderRight: "none",
-                        borderRadius: "7px 0 0 7px",
-                      }}
-                    >
-                      <FiSearch style={{ color: "#888", fontSize: "16px" }} />
-                    </InputGroup.Text>
-                    <FormControl
-                      type="search"
-                      placeholder="- เลือกประเภทการค้นหา -"
-                      aria-label="Search"
-                      // value={query}
-                      // onChange={handleInputChange}
-                      style={{
-                        borderRadius: "0 7px 7px 0",
-                        fontSize: "13px",
-                        border: "1px solid #e0e0e0",
-                        borderLeft: "none",
-                        boxShadow: "none",
-                      }}
-                    />
-                  </InputGroup>
-                </div>
-              </div>
-            </div>
+          
 
-            {/* ขวาสุด: ปุ่ม action */}
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <Button
-                // onClick={handleRefresh}
-                style={{
-                  background:
-                    "linear-gradient(to right,rgba(22, 60, 93, 1), #002b57)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "8px 12px",
+               <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
+              {/* --- เลือกประเภท --- */}
+              <div>
+                <div
+                  style={{ fontSize: 13, color: "#5b6b82", marginBottom: 4 }}
+                >
+                  เลือกประเภทการค้นหา
+                </div>
+
+                <Form.Select
+                  value={searchType}
+                  onChange={(e) => {
+                    setSearchType(e.target.value);
+                    setSearchQuerySub("");
+                  }}
+                  style={{ fontSize: 13, width: 180,height:38 }}
+                >
+                  <option value=""> - เลือกประเภท - </option>
+                  <option value="name">ชื่อลูกค้า</option>
+                  <option value="citizen">เลขบัตรประชาชน</option>
+                  <option value="form">เลขที่แบบฟอร์ม</option>
+                  <option value="branch">สาขา / หน่วย</option>
+                </Form.Select>
+              </div>
+
+              {/* --- คำค้น --- */}
+              <div>
+                <div
+                  style={{ fontSize: 13, color: "#5b6b82", marginBottom: 4 }}
+                >
+                  คำค้นหา
+                </div>
+
+                <InputGroup>
+                  <InputGroup.Text
+                    style={{
+                      background: "white",
+                      border: "1px solid #e0e0e0",
+                      borderRight: "none",
+                      borderRadius: "7px 0 0 7px",
+                    }}
+                  >
+                    <FiSearch style={{ color: "#888", fontSize: 16  }} />
+                  </InputGroup.Text>
+
+                  <FormControl
+                    type="search"
+                    disabled={!searchType}
+                    placeholder={
+                      !searchType
+                        ? "กรุณาเลือกประเภทการค้นหา"
+                        : searchType === "name"
+                          ? "ค้นหาชื่อลูกค้า"
+                          : searchType === "citizen"
+                            ? "ค้นหาเลขบัตรประชาชน"
+                            : "ค้นหาเลขที่แบบฟอร์ม"
+                    }
+                    value={searchQuerySub}
+                    onChange={(e) => setSearchQuerySub(e.target.value)}
+                    style={{
+                      borderRadius: "0 7px 7px 0",
+                      fontSize: 13,
+                      border: "1px solid #e0e0e0",
+                      borderLeft: "none",
+                      boxShadow: "none",
+                      width: 320,
+                    }}
+                  />
+                </InputGroup>
+              </div>
+
+              {/* --- ปุ่มค้นหา --- */}
+              <button
+                className="btn btn-primary"
+                disabled={!searchType || !searchQuerySub}
+                onClick={() => {
+                  getEmployeeDB_Admin(1, searchQuerySub, searchType); // ✅ ส่งตรง
                 }}
               >
-                <FaSyncAlt /> รีเฟรช
-              </Button>
+                ค้นหา
+              </button>
+
+              {/* --- ✅ ปุ่มล้าง --- */}
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setSearchType("");
+                  setSearchQuerySub("");
+                  setSearchKeyword("");
+                  getEmployeeDB_Admin(1); // โหลดข้อมูลทั้งหมดกลับมา
+                }}
+              >
+                ล้าง
+              </button>
             </div>
+
+
+            
           </div>
 
           <div className="table-responsive pt-2">
@@ -728,7 +768,7 @@ const AdminSetData_Edit = () => {
                     {/* <td>{convertToThaiDate(item.Form_date_inspertor)}</td> */}
                     <td className="cell-highlight">
                       {" "}
-                      {item.SCORE_additional_fee}
+                      {item.SCORE_additional_fee_Edit}
                     </td>
                   </tr>
                 ))}

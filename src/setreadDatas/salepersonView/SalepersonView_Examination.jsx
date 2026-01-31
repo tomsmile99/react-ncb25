@@ -165,7 +165,7 @@ const SalepersonView_Examination = () => {
       console.error("Error fetching data:", error.message);
     }
   };
-
+ 
   const handleStatusClick = async (idForm) => {
     setSelectedItem(idForm);
 
@@ -587,7 +587,7 @@ const SalepersonView_Examination = () => {
                             ตำแหน่ง: {item.CTM_position || "-"}
                           </div>
                           <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                            สาขา/หน่วย: {item.CTM_branch || "-"}
+                            สาขา/หน่วย: {item.CTM_business_zone || "-"}
                           </div>
                           <div style={{ fontSize: "12px", color: "#6c757d" }}>
                             เขต: {item.CTM_branch || "-"}
@@ -596,7 +596,7 @@ const SalepersonView_Examination = () => {
                              {item.CTM_business_region || "-"}
                           </div>
                         </td>
-                        <td>{convertToThaiDate(item.CTM_created_at)}</td>
+                        <td>{convertToThaiDate(item.date_upEvidence)}</td>
                         <td className="text">
                           <button
                             className="doc-btn doc-consent mr-1"

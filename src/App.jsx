@@ -31,6 +31,8 @@ import Admin_CheckCreditEdit from "./setDefaultPages/admin/Admin_CheckCreditEdit
 import AdminViewPage from "./setDefaultPages/admin/AdminViewPage";
 import Admin_CheckCredit from "./setDefaultPages/admin/Admin_CheckCredit";
 import Admin_ReportTableChkCredit from "./setDefaultPages/admin/Admin_ReportTableChkCredit";
+import Admin_Management from "./setDefaultPages/admin/Admin_Management";
+
 
 // รายงาน
 import ReportNCBLiteMain from "./setDefaultPages/reportNCBsList/reportNCBLiteMain";
@@ -139,6 +141,12 @@ const App = () => {
                   path="/ReportNCBLiteMainOut"
                   element={<ReportNCBLiteMainOut />}
                 /> */}
+                
+<Route
+                  path="/Admin_Management"
+                  element={<Admin_Management />}
+                />
+            
               </Route>
 
               {/* อื่นๆ */}

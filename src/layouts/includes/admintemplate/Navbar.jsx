@@ -21,6 +21,8 @@ import { AiOutlineFileProtect } from "react-icons/ai";
 import { TbDeviceIpadCancel } from "react-icons/tb";
 import { MdOutlineCancel } from "react-icons/md";
 import { RiTeamLine } from "react-icons/ri";
+import { MdEditDocument } from "react-icons/md";
+import { BiSolidEditLocation } from "react-icons/bi";
 // icons
 import {
   FcDownLeft,
@@ -55,6 +57,11 @@ const Navbar = ({
   const ifshowmenu = getcountidea;
   const [dateType, setDateType] = useState("");
 
+  // 🔒 รหัสที่อนุญาตให้เห็นเมนูนี้เท่านั้น
+  const allowManagementMenu = ["003792", "000274", "002743"]; // <-- เจ้าหน้าที่เห็นเมนูนีี้เฉพาะบางคน
+
+  const canSeeManagementMenu = allowManagementMenu.includes(String(PerD));
+
   const navClass = ({ isActive }) =>
     `nav-link minimal ${isActive ? "active" : ""}`;
 
@@ -64,9 +71,8 @@ const Navbar = ({
   return (
     <aside className="main-sidebar sidebar-light-primary sidebar-minimal">
       {/* Brand */}
-      <NavLink  className="brand-link brand-minimal" end>
+      <NavLink className="brand-link brand-minimal" end>
         <img
-         
           src={`${import.meta.env.VITE_REACT_APP_PHOTO}/SakERP.png`}
           className="brand-image"
           style={{ height: 30, width: "auto" }}
@@ -221,7 +227,6 @@ const Navbar = ({
               </NavLink>
             </li>
 
-       
             {/* เมนูแก้ไข */}
 
             <li
@@ -251,18 +256,21 @@ const Navbar = ({
 
             <li className="nav-item">
               <NavLink to="/reportNCBLiteMain" className={navClass}>
-                <RiFileExcel2Fill className="" style={{ color: "#06407aff" ,fontSize: "19px" }} />
+                <RiFileExcel2Fill
+                  className=""
+                  style={{ color: "#06407aff", fontSize: "19px" }}
+                />
                 <p>รายงานสรุปการยื่นขอสืบค้น</p>
                 {/* <Badge count={getemployee_contain_Counts} /> */}
               </NavLink>
             </li>
-{/* 
+            {/* 
             <li className="nav-item">
               <NavLink to="/ReportNCBLiteDSRMain" end className={navClass}>
                 <RiFileExcel2Fill className="" style={{ color: "#06407aff" }} />
                 <p>สรุปข้อมูลเครดิต (DSR)</p> */}
-                {/* <Badge count={getemployee_contain_Counts} /> */}
-              {/* </NavLink>
+            {/* <Badge count={getemployee_contain_Counts} /> */}
+            {/* </NavLink>
             </li> */}
 
             {/* <li className="nav-item">
@@ -275,6 +283,45 @@ const Navbar = ({
               
               </NavLink>
             </li>  */}
+            {canSeeManagementMenu && (
+              <>
+                <li
+                  className="nav-header header-minimal"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
+                    color: "#fff",
+                    padding: "8px 14px",
+                    borderRadius: "14px",
+                    marginBottom: "10px",
+                    fontWeight: "600",
+                    fontSize: "14px",
+                    boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
+                  }}
+                >
+                  <TbReportSearch
+                    style={{
+                      color: "#fff",
+                      fontSize: "20px",
+                      flexShrink: 0, // ป้องกันการบิดขนาด
+                      marginRight: "5",
+                    }}
+                  />
+                  <span>การจัดการข้อมูล</span>
+                </li>
+
+                <li className="nav-item">
+                  <NavLink to="/Admin_Management" className={navClass}>
+                    <BiSolidEditLocation
+                      className=""
+                      style={{ color: "#06407aff", fontSize: "19px" }}
+                    />
+                    <p>แก้ไขสถานะรายการผล</p>
+                    {/* <Badge count={getemployee_contain_Counts} /> */}
+                  </NavLink>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
       </div>

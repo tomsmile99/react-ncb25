@@ -39,12 +39,19 @@ const SalepersonView_addData = ({ idForm }) => {
   const PerBL_N = Base64.decode(getstore.PerBL_N);
   const PerRG_N = Base64.decode(getstore.PerRG_N);
 
+
+  const PerFuNasRaw = Base64.decode(getstore.PerFuNas); // ชื่อ
+    const PerTiNaRaw = Base64.decode(getstore.PerTiNa);  // คำนำหน้า
+    const PerFuNas = `${PerTiNaRaw}${PerFuNasRaw}`.trim();
+
+
+
   const _AgU = Base64.decode(getstore.AgU);
   const PerD = Base64.decode(getstore.PerD);
   const _PerWP = Base64.decode(getstore.PerWP);
   const _PerPhotoProfile_N = Base64.decode(getstore.PerPhotoProfile_N);
   const PerLV = Base64.decode(getstore.PerPST_LV);
-  const PerPST = Base64.decode(getstore.PerPST);
+  const PerPST = Base64.decode(getstore.PerPST); 
   const PerWPN = Base64.decode(getstore.PerWP_N);
   const PerBL = Base64.decode(getstore.PerBL);
   const PerWP = Base64.decode(getstore.PerWP);
@@ -52,6 +59,7 @@ const SalepersonView_addData = ({ idForm }) => {
 
   const [phoneError, setPhoneError] = useState(false);
   const [FullNameTitle, setFullNameTitle] = useState("");
+     const [IdcardError, setIdcardError] = useState(false);
 
   const GetDataTitle = async () => {
     try {
@@ -68,8 +76,8 @@ const SalepersonView_addData = ({ idForm }) => {
 
         setFullNameTitle(fullname);
 
-        console.log("✅ ดึงข้อมูลคำนำหน้าสำเร็จ", PerD);
-        console.log("📦 result:", result);
+        // console.log("✅ ดึงข้อมูลคำนำหน้าสำเร็จ", PerD);
+        // console.log("📦 result:", result);
       } else {
         console.warn("⚠️ status ไม่ใช่ 200 :", message);
       }
@@ -95,7 +103,7 @@ const SalepersonView_addData = ({ idForm }) => {
     CTM_province: "",
     CTM_postal_code: "",
     CTM_employee_code: PerD, //รหัสผู้บันทึก
-    CTM_recorder_fullname: PerFuNas_AgU, //รหัสผู้บันทึก
+    CTM_recorder_fullname: PerFuNas, //ผู้บันทึก
     CTM_position: PerPST_N, //รหัสผู้บันทึก
 
     CTM_branch: PerBL_N, //เขต
@@ -194,6 +202,8 @@ const SalepersonView_addData = ({ idForm }) => {
       return;
     }
 
+
+
     setShowSignMethod(false);
 
     // ============================
@@ -202,20 +212,35 @@ const SalepersonView_addData = ({ idForm }) => {
     if (signMethod === "finger") {
       let witness1ToSend = witness1;
 
-      // ✅ ถ้านามสกุลลูกค้า ≠ พนักงาน → เอาพนักงานเป็นพยาน 1 อัตโนมัติ
-      // if (customerLastname !== employeeLastname) {
-      //   const [fname, lname] = FullNameTitle.split(" ");
-      //   witness1ToSend = { firstname: fname, lastname: lname };
-      //   setWitness1(witness1ToSend);
-      // }
-     if (customerLastname !== employeeLastname) {
-  const parts = FullNameTitle.trim().split(/\s+/);
-  const fname = parts[0];
-  const lname = parts.slice(1).join(" ");
+      
+    // กันไม่ให้พยานตรงกับพนักงาน
+      // const w2Last = (witness2?.lastname  || "").trim();
+      // const cLast = (customerLastname || "").trim();
+      // const w1Last = (witness1?.lastname || "").trim();
 
-  witness1ToSend = { firstname: fname, lastname: lname };
-  setWitness1(witness1ToSend);
-}
+      // // ถ้ายังไม่กรอก ไม่ต้องเช็ค
+      // if (!w2Last) return true;
+
+      // // ❌ ห้ามซ้ำกับลูกค้า
+      // if (w2Last === cLast) {
+      //   setShowWarningPopup(true);
+      //   return false;
+      // }
+
+      // // ❌ ห้ามซ้ำกับพยาน 1
+      // if (w2Last === w1Last) {
+      //   setShowWarningPopup(true);
+      //   return false;
+      // }
+
+     if (customerLastname !== employeeLastname) {
+        const parts = FullNameTitle.trim().split(/\s+/);
+        const fname = parts[0];
+        const lname = parts.slice(1).join(" ");
+
+        witness1ToSend = { firstname: fname, lastname: lname };
+        setWitness1(witness1ToSend);
+      }
       // ✅ ถ้ายังไม่กรอกพยาน 2 → เปิด popup ก่อน
       if (!witness2?.firstname || !witness2?.lastname) {
         setShowWitnessPopup(true);
@@ -228,6 +253,27 @@ const SalepersonView_addData = ({ idForm }) => {
         alert("กรุณากรอกวันเดือนปีเกิดให้ครบ");
         return;
       }
+
+      
+    // กันไม่ให้พยานตรงกับพนักงาน
+      const w2Last = (witness2?.lastname  || "").trim();
+      const cLast = (customerLastname || "").trim();
+      const w1Last = (witness1?.lastname || "").trim();
+
+      // ถ้ายังไม่กรอก ไม่ต้องเช็ค
+      if (!w2Last) return true;
+
+      // ❌ ห้ามซ้ำกับลูกค้า
+      if (w2Last === cLast) {
+        setShowWarningPopup(true);
+        return false;
+      }
+
+      // // ❌ ห้ามซ้ำกับพยาน 1
+      // if (w2Last === w1Last) {
+      //   setShowWarningPopup(true);
+      //   return false;
+      // }
 
       // ✅ รวม payload ส่ง API (พยาน 1 + พยาน 2)
       const payload = {
@@ -351,6 +397,16 @@ const SalepersonView_addData = ({ idForm }) => {
       return;
     }
 
+      if (!formData.CTM_phone || formData.CTM_phone.length !== 10) {
+        Swal.fire({
+        icon: "warning",
+        title: "กรุณากรอกเบอร์โทรศัพท์ให้ครบ",
+        text: "ต้องระบุเบอร์โทรศัพท์ให้ครบ 10 หลักก่อนทำรายการ",
+        confirmButtonText: "ตกลง",
+      });
+    return;
+  }
+
     if (!formData?.CTM_citizen_id || formData.CTM_citizen_id.trim() === "") {
       setPhoneError(true);
       Swal.fire({
@@ -361,6 +417,18 @@ const SalepersonView_addData = ({ idForm }) => {
       });
       return;
     }
+     if (!formData.CTM_citizen_id || formData.CTM_citizen_id.length !== 13) {
+    
+        Swal.fire({
+        icon: "warning",
+        title: "กรุณากรอกเลขบัตรประชาชนให้ครบ 13 หลัก",
+        text: "ต้องระบุเลขบัตรประชาชนให้ครบ 13 หลักก่อนทำรายการ",
+        confirmButtonText: "ตกลง",
+      });
+    
+    return;
+  }
+
 
     // 🔴 ต้องเป็นตัวเลข 13 หลักเท่านั้น
     const citizenId = formData.CTM_citizen_id.replace(/\D/g, "");
@@ -548,6 +616,54 @@ const SalepersonView_addData = ({ idForm }) => {
       "0"
     )}`;
   };
+  const handlePhoneChange = (e) => {
+  const value = e.target.value
+    .replace(/\D/g, "") // ❌ ตัดทุกอย่างที่ไม่ใช่ตัวเลข
+    .slice(0, 10);      // ❌ ไม่เกิน 10 หลัก
+
+  setFormData((prev) => ({
+    ...prev,
+    CTM_phone: value,
+  }));
+};
+
+const handleCitizenIdChange = (e) => {
+  const value = e.target.value
+    .replace(/\D/g, "") // ❌ ตัดทุกอย่างที่ไม่ใช่ตัวเลข
+    .slice(0, 13);      // ❌ ไม่ให้เกิน 13 หลัก
+
+  setFormData((prev) => ({
+    ...prev,
+    CTM_citizen_id: value,
+  }));
+};
+
+
+// const validateWitness2Lastname = (lastname) => {
+//   const w2Last = (lastname || "").trim();
+//   const cLast = (customerLastname || "").trim();
+//   const w1Last = (witness1?.lastname || "").trim();
+
+//   // ถ้ายังไม่กรอก ไม่ต้องเช็ค
+//   if (!w2Last) return true;
+
+//   // ❌ ห้ามซ้ำกับลูกค้า
+//   if (w2Last === cLast) {
+//     setShowWarningPopup(true);
+//     return false;
+//   }
+
+//   // ❌ ห้ามซ้ำกับพยาน 1
+//   if (w2Last === w1Last) {
+//     setShowWarningPopup(true);
+//     return false;
+//   }
+
+//   return true;
+// };
+
+
+
 
   //คะแนนประเมินแต่ละรอบ
 
@@ -646,19 +762,27 @@ const SalepersonView_addData = ({ idForm }) => {
                 onChange={handleChange}
                 placeholder="นามสกุล"
               />
-            </div>
+            </div> 
 
-            <div className="form-group small">
+           <div className="form-group small">
               <label>หมายเลขบัตรประชาชน</label>
               <input
                 type="text"
                 name="CTM_citizen_id"
                 value={formData.CTM_citizen_id}
-                onChange={handleChange}
+                onChange={handleCitizenIdChange}
                 placeholder="x xxxx xxxxxx xx x"
                 maxLength={13}
               />
+
+              {formData.CTM_citizen_id &&
+                formData.CTM_citizen_id.length < 13 && (
+                  <small style={{ color: "red" }}>
+                    กรุณากรอกเลขบัตรประชาชนให้ครบ 13 หลัก
+                  </small>
+                )}
             </div>
+
 
             <div className="form-group small">
               <label>วันเดือนปีเกิด (พ.ศ.)</label>
@@ -714,22 +838,25 @@ const SalepersonView_addData = ({ idForm }) => {
               </div>
             </div>
 
-            <div className="form-group small">
-              <label>เบอร์โทรศัพท์</label>
-              <input
-                type="text"
-                name="CTM_phone"
-                value={formData.CTM_phone}
-                onChange={handleChange}
-                onKeyPress={(e) => {
-                  if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault();
-                  }
-                }}
-                placeholder="กรุณากรอกเบอร์โทรศัพท์"
-                maxLength={10}
-              />
-            </div>
+          <div className="form-group small">
+  <label>เบอร์โทรศัพท์</label>
+  <input
+    type="text"
+    name="CTM_phone"
+    value={formData.CTM_phone}
+    onChange={handlePhoneChange}
+    placeholder="กรุณากรอกเบอร์โทรศัพท์"
+    maxLength={10}
+  />
+
+  {/* แจ้งเตือนถ้ายังไม่ครบ 10 หลัก */}
+  {formData.CTM_phone &&
+    formData.CTM_phone.length < 10 && (
+      <small style={{ color: "red" }}>
+        กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก
+      </small>
+    )}
+</div>
 
             {/* <div className="form-group full">
               <h3 className="card-title mt-2">ที่อยู่ตามทะเบียนบ้าน</h3>
@@ -1108,14 +1235,21 @@ const SalepersonView_addData = ({ idForm }) => {
 
             <div className="form-group">
               <label>นามสกุล</label>
-              <input
-                className="input-normal"
-                value={witness2.lastname}
-                placeholder="ตัวอย่าง: สุขใจ"
-                onChange={(e) =>
-                  setWitness2({ ...witness2, lastname: e.target.value })
-                }
-              />
+             <input
+  className="input-normal"
+  value={witness2.lastname}
+  placeholder="ตัวอย่าง: สุขใจ"
+  onChange={(e) => {
+    const value = e.target.value;
+
+    // เซ็ตค่าก่อน
+    setWitness2((prev) => ({ ...prev, lastname: value }));
+
+    // ตรวจสอบทันที
+    // validateWitness2Lastname(value);
+  }}
+/>
+
             </div>
 
             <div className="modal-actions minimal-actions">

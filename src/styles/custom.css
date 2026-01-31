@@ -1412,14 +1412,22 @@ tbody tr {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
-  animation: fadeInUp 0.25s ease-out;
   align-items: center;
   z-index: 2000;
-  cursor: zoom-out;
+
+  /* 🔒 ป้องกัน scroll ทะลุ */
+  overscroll-behavior: contain;
 }
+
+.modal-content3 {
+  max-height: 85vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 
 .modal-content {
   max-width: 90%;
@@ -1610,6 +1618,27 @@ tbody tr {
   background: #ffffff;
 }
 
+
+.input-normalE {
+  border: 0.01;           /* ✅ ปิดเส้นขอบ */
+ 
+  box-shadow: none;       /* ✅ ปิดเงา */
+  border-radius: 9px;
+  padding: 5px 5px;
+  font-size: 14px;
+  background: #f9fbfd;
+  transition: 0.25s;
+}
+
+.input-normalE:focus {
+  border: none;           /* ✅ ไม่ให้ขึ้นเส้นตอน focus */
+
+  box-shadow: none;
+  background: #ffffff;
+}
+
+
+
 .minimal-actions {
   display: flex;
   justify-content: space-between;
@@ -1739,12 +1768,12 @@ tbody tr {
 }
 
 .btn-submit-modern {
-  background: #1565c0;
+  background: #272f9e;
   color: #fff;
   border: none;
   border-radius: 8px;
   padding: 6px 18px;
-  font-size: 14px;
+  font-size: 20px;
   font-weight: 500;
   transition: all 0.2s ease;
 }
@@ -2078,8 +2107,16 @@ input[type="date"]:focus {
   color: #000;
   border-radius: 8px;
   font-size: 22px;
+  font-weight: 800;
 }
 
+.swal2-container {
+  z-index: 999999 !important;
+}
+
+.swal2-toast-front {
+  z-index: 999999 !important;
+}
 
 .required {
   color: red;
@@ -2174,7 +2211,7 @@ input[type="date"]:focus {
   justify-content: center;
   align-items: center; /* ทำให้ modal อยู่กลางจอเสถียรที่สุด */
   z-index: 2000;
-  backdrop-filter: blur(3px);
+  /* backdrop-filter: blur(3px); */
 
   overflow: hidden; /* ❗ ไม่ให้ overlay scroll → ป้องกันกระพริบ */
 }

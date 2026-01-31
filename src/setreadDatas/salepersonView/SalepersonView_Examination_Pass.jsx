@@ -618,7 +618,7 @@ const SalepersonView_Examination_Pass = () => {
                           </div>
                       </td>
 
-                      <td>{convertToThaiDate(item.CTM_created_at)}</td>
+                      <td>{convertToThaiDate(item.date_upEvidence)}</td>
 
                       <td className="text">
                         <button

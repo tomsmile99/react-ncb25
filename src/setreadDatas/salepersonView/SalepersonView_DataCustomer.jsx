@@ -116,6 +116,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
   const [openConsentModal, setOpenConsentModal] = useState(false);
 
   const [consentError, setConsentError] = useState(false);
+   const [IdcardError, setIdcardError] = useState(false);
 
   const chksentFileRef = useRef(2);
 
@@ -142,7 +143,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
 
         const data = result[0];
 
-        // console.log(data);
+        console.log(data);
         setgetDataShow(data); // ถ้ายังต้องใช้โชว์ที่อื่น Form_verification_status
         setgetDataEditReport(resultEdit[0]);
         setFormData({
@@ -204,38 +205,84 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
     }
   };
 
-  const handleUpdateCustomer = async () => {
-    try {
-      const formDataUpload = new FormData();
+  const handleUpdateCustomer = async () => {  
+      try {
+        const formDataUpload = new FormData();
 
-        // ⭐ แปลงวันเกิด พ.ศ. → ค.ศ.
-    const birthdayCE = convertBirthdayToCE(birthdayTH);
+          // ⭐ แปลงวันเกิด พ.ศ. → ค.ศ.
+        const birthdayCE = convertBirthdayToCE(birthdayTH);
 
-    if (!birthdayCE) {
-      Swal.fire({
-        icon: "warning",
-        title: "ข้อมูลไม่ครบ",
-        text: "กรุณากรอกวันเดือนปีเกิดให้ครบ",
-      });
-      return;
-    }
+        if (!birthdayCE) {
+          Swal.fire({
+            icon: "warning",
+            title: "ข้อมูลไม่ครบ",
+            text: "กรุณากรอกวันเดือนปีเกิดให้ครบ",
+          });
+          return;
+
+        }
+
+
+
+        if (!formData?.CTM_phone || formData.CTM_phone.trim() === "") {
+              setPhoneError(true);
+              Swal.fire({
+                icon: "warning",
+                title: "กรุณากรอกเบอร์โทรศัพท์",
+                text: "ต้องระบุเบอร์โทรศัพท์ก่อนทำรายการ",
+                confirmButtonText: "ตกลง",
+              });
+              return;
+            }
+        
+              if (!formData.CTM_phone || formData.CTM_phone.length !== 10) {
+                Swal.fire({
+                icon: "warning",
+                title: "กรุณากรอกเบอร์โทรศัพท์ให้ครบ",
+                text: "ต้องระบุเบอร์โทรศัพท์ให้ครบ 10 หลักก่อนทำรายการ",
+                confirmButtonText: "ตกลง",
+              });
+            return;
+          }
+
+         if (!formData?.CTM_citizen_id || formData.CTM_citizen_id.trim() === "") { 
+              setIdcardError(true);
+              Swal.fire({
+                icon: "warning",
+                title: "กรุณากรอกหมายเลขบัตรประชาชน",
+                text: "ต้องระบุหมายเลขบัตรประชาชน",
+                confirmButtonText: "ตกลง",
+              });
+              return;
+            }
+             if (!formData.CTM_citizen_id || formData.CTM_citizen_id.length !== 13) {
+            
+                Swal.fire({
+                icon: "warning",
+                title: "กรุณากรอกเลขบัตรประชาชนให้ครบ 13 หลัก",
+                text: "ต้องระบุเลขบัตรประชาชนให้ครบ 13 หลักก่อนทำรายการ",
+                confirmButtonText: "ตกลง",
+              });
+            
+            return;
+          }
+
+          /* ===============================
+          🧾 ข้อมูลฟอร์ม (JSON)
+        =============================== */
+          const payload = {
+            ...formData,
+            ...formData2,
+            idForm: idForm,
+            LvChk: getDataLvChk,
+            CTM_birthdate: birthdayCE,
+          };
+
+          formDataUpload.append("payload", JSON.stringify(payload));
 
       /* ===============================
-      🧾 ข้อมูลฟอร์ม (JSON)
-    =============================== */
-      const payload = {
-        ...formData,
-        ...formData2,
-        idForm: idForm,
-        LvChk: getDataLvChk,
-         CTM_birthdate: birthdayCE,
-      };
-
-      formDataUpload.append("payload", JSON.stringify(payload));
-
-      /* ===============================
-      🖼 แนบไฟล์ (เฉพาะไฟล์ที่เปลี่ยน)
-    =============================== */
+            🖼 แนบไฟล์ (เฉพาะไฟล์ที่เปลี่ยน)
+        =============================== */
       if (images.img1 instanceof File) {
         formDataUpload.append("img1", images.img1);
       }
@@ -440,6 +487,30 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
     return `${ceYear}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   };
 
+const handlePhoneChange = (e) => {
+  const value = e.target.value
+    .replace(/\D/g, "") // ❌ ตัดทุกอย่างที่ไม่ใช่ตัวเลข
+    .slice(0, 10);      // ❌ ไม่เกิน 10 หลัก
+
+  setFormData((prev) => ({
+    ...prev,
+    CTM_phone: value,
+  }));
+};
+
+const handleCitizenIdChange = (e) => {
+  const value = e.target.value
+    .replace(/\D/g, "") // ❌ ตัดทุกอย่างที่ไม่ใช่ตัวเลข
+    .slice(0, 13);      // ❌ ไม่ให้เกิน 13 หลัก
+
+  setFormData((prev) => ({
+    ...prev,
+    CTM_citizen_id: value,
+  }));
+};
+
+
+
   useEffect(() => {
     handleDownloadPDF(idForm);
   }, []);
@@ -463,7 +534,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
 
   return (
     <div>
-      {getDataEditReport?.SCORE_additional_fee && (
+      {getDataEditReport?.SCORE_additional_fee_Edit && (
         <div className="edit-alert-card">
           <div className="edit-alert-icon">⚠️</div>
 
@@ -471,7 +542,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
             <div className="edit-alert-title">แจ้งเตือนการแก้ไขข้อมูล</div>
 
             <div className="edit-alert-text">
-              {getDataEditReport.SCORE_additional_fee}
+              {getDataEditReport.SCORE_additional_fee_Edit}
             </div>
           </div>
         </div>
@@ -568,17 +639,25 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
               />
             </div>
 
-            <div className="form-group small">
-              <label>หมายเลขบัตรประชาชน</label>
-              <input
-                type="text"
-                name="CTM_citizen_id"
-                value={formData.CTM_citizen_id}
-                onChange={handleChange}
-                placeholder="x xxxx xxxxxx xx x"
-                maxLength={13}
-              />
-            </div>
+              <div className="form-group small">
+  <label>หมายเลขบัตรประชาชน</label>
+  <input
+    type="text"
+    name="CTM_citizen_id"
+    value={formData.CTM_citizen_id}
+    onChange={handleCitizenIdChange}
+    placeholder="x xxxx xxxxxx xx x"
+    maxLength={13}
+  />
+
+  {formData.CTM_citizen_id &&
+    formData.CTM_citizen_id.length < 13 && (
+      <small style={{ color: "red" }}>
+        กรุณากรอกเลขบัตรประชาชนให้ครบ 13 หลัก
+      </small>
+    )}
+</div>
+
 
             {/* <div className="form-group small">
               <label>วันเดือนปีเกิด</label>
@@ -639,17 +718,26 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
               </div>
             </div>
 
-            <div className="form-group small">
-              <label>เบอร์โทรศัพท์</label>
-              <input
-                type="text"
-                name="CTM_phone"
-                value={formData.CTM_phone}
-                onChange={handleChange}
-                placeholder="091-123-5678"
-                maxLength={10}
-              />
-            </div>
+             <div className="form-group small">
+  <label>เบอร์โทรศัพท์</label>
+  <input
+    type="text"
+    name="CTM_phone"
+    value={formData.CTM_phone}
+    onChange={handlePhoneChange}
+    placeholder="กรุณากรอกเบอร์โทรศัพท์"
+    maxLength={10}
+  />
+
+  {/* แจ้งเตือนถ้ายังไม่ครบ 10 หลัก */}
+  {formData.CTM_phone &&
+    formData.CTM_phone.length < 10 && (
+      <small style={{ color: "red" }}>
+        กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก
+      </small>
+    )}
+</div>
+
             {/* <div className="form-group full">
               <label>ที่อยู่ตามทะเบียนบ้าน</label>
 

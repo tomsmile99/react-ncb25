@@ -332,8 +332,8 @@ const reportNCBLite = () => {
         วงเงินขอสินเชื่อ: item.Form_loan_amount ?? "-",
         คะแนนเครดิต: item.SCORE_credit_score ?? "-",
         "คุณสู้ เราช่วย": item.SCORE_project_status === "y" ? "เข้าร่วม" : "ไม่เข้าร่วม",
-        ผลการพิจารณา: item.SCORE_project_status === "y" ? "เป็น" : "ไม่เป็น",
-       ผลการพิจารณาการให้สินเชื่อ : renderApprovalResult(item),
+        บุคคลล้มละลาย: item.SCORE_project_status === "yes" ? "เป็น" : "ไม่เป็น",
+        ผลการพิจารณาการให้สินเชื่อ : renderApprovalResult(item),
         ระดับคะแนนเครดิต: item.SCORE_credit_level ?? "-",
         ความน่าจะเป็นในการชำระหนี้: item.SCORE_payment_behavior ?? "-",
         เปอร์เซ็นต์การชำระหนี้: item.SCORE_percent_behavior ?? "-",
@@ -341,9 +341,13 @@ const reportNCBLite = () => {
         ระดับความเสี่ยง: item.SCORE_Risk ?? "-",
         เลขที่สัญญา: item.Form_Contract_number ?? "-",
         การแก้ไขข้อมูล: item.Form_status_Edit === "1" ? "มี" : "",
+        รายละเอียดการแก้ไข: item.SCORE_additional_fee_Edit ?? "-",
+
         หมายเหตุ: item.SCORE_additional_fee ?? "-",
         หมายเหตุการขอยกเลิก :item.Form_note_approval ?? "-",
         "สถานะการส่ง SMS" :item.Form_status_SMS ?? "-",
+        "วันที่รายงานผล" :formatThaiDateTime(item.Form_verification_date) ?? "-",
+
         "เลขอ้างอิง SMS"  :item.Form_id_SMS ?? "-",
       }));
 
@@ -448,7 +452,7 @@ const reportNCBLite = () => {
           <select name="status" value={filters.status} onChange={handleChange}>
             <option value="">- เลือกสถานะ -</option>
             <option value="all">ทุกสถานะ</option>
-            <option value="LvN">0N - ยกเลิกรายการ</option>
+            <option value="Lv1N">0N - ยกเลิกรายการ</option>
             <option value="Lv2">01 - ตรวจสอบแล้ว</option>
             <option value="rejected">2N - ไม่ผ่านการอนุมัติ</option>
             <option value="approved">2Y - ผ่านการอนุมัติ</option>
@@ -573,7 +577,7 @@ const reportNCBLite = () => {
             {filters.startDate && filters.endDate && (
               <div className="report-title">
                 รายงานสรุปผลการตรวจสอบเครดิตลูกค้า ตั้งแต่วันที่{" "}
-                {formatThaiDateTime(filters.startDate)} ถึง{" "}
+                {formatThaiDate(filters.startDate)} ถึง{" "}
                 {formatThaiDate(filters.endDate)}
               </div>
             )}
@@ -647,7 +651,7 @@ const reportNCBLite = () => {
                   <tr key={index}>
                     <td className="text-center">{index + 1}</td>
                     <td>{item.CTM_form_number}</td>
-                    <td>{formatThaiDate(item.SCORE_Date_chk)}</td>
+                    <td>{formatThaiDate(item.date_upEvidence)}</td>
                     <td>
                       <div style={{ fontWeight: 600, color: "#0f3d78" }}>
                         {item.CTM_title_name}

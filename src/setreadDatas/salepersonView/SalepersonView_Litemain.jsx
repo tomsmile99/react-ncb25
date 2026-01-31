@@ -70,6 +70,7 @@ const SalepersonView_Litemain = () => {
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
+   
     }
   };
 
@@ -475,16 +476,16 @@ const SalepersonView_Litemain = () => {
 
                       {/* PDF */}
                      <td className="text-center">
-  {item.CTM_Idnumber && (
-    <button
-      className="btn-icon"
-      onClick={() => handleDownloadPDF(item.CTM_Idnumber)}
-      title="ฟอร์มหนังสือยินยอม"
-    >
-      <FaRegFilePdf />
-    </button>
-  )}
-</td>
+                      {item.CTM_Idnumber && (
+                        <button
+                          className="btn-icon"
+                          onClick={() => handleDownloadPDF(item.CTM_Idnumber)}
+                          title="ฟอร์มหนังสือยินยอม"
+                        >
+                          <FaRegFilePdf />
+                        </button>
+                      )}
+                    </td>
 
 
                       {/* สถานะเอกสาร */}
