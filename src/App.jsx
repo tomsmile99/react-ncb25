@@ -42,6 +42,10 @@ import ReportNCBLiteMainOutSum from "./setDefaultPages/reportNCBsList/reportNCBL
 
 import ViewReportDSR from "./setDefaultPages/admin/ViewReportDSR";
 import { NotificationProvider } from "../src/layouts/includes/NotificationContext";
+
+
+import Admin_ManagementUser from "./setDefaultPages/admin/Admin_ManagementUser";
+
 // -------------------------------------------------------------------
 // Theme
 // -------------------------------------------------------------------
@@ -141,14 +145,18 @@ const App = () => {
                   path="/ReportNCBLiteMainOut"
                   element={<ReportNCBLiteMainOut />}
                 /> */}
-                
-<Route
+              <Route
                   path="/Admin_Management"
                   element={<Admin_Management />}
                 />
-            
-              </Route>
 
+              <Route 
+                path="/Admin_ManagementUser"  
+                element={<Admin_ManagementUser />}  
+                />
+
+              </Route>
+              
               {/* อื่นๆ */}
               <Route
                 path="/DataSolarRoofTops/AddDataForm"

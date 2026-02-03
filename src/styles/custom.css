@@ -22,7 +22,8 @@ body {
 @font-face {
   font-family: "THSarabunPSK";
   src: url("/fonts/THSarabunPSK Bold.ttf") format("truetype");
-  font-weight: 500;
+  font-weight: 700;
+   font-style: normal;
 }
 
 @keyframes blink {
@@ -2237,10 +2238,15 @@ input[type="date"]:focus {
 .report-container {
   width: 90%;
   margin-top: 25px;
-  font-family: "TH Sarabun New", sans-serif;
-  font-size: 16px;
+  font-family: "THSarabunPSK", sans-serif;
+  font-size: px;
   color: #4a4a4a;
 }
+
+/* .report-container,
+.report-container * {
+  font-family: "THSarabunPSK", sans-serif !important;
+} */
 
 .header-section {
   display: flex;

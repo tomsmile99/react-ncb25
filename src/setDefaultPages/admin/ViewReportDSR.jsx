@@ -133,42 +133,42 @@ const ViewReportDSR = () => {
           <img src="/logo SAK เลขเสียภาษี.png" className="logo-img" />
         </div>
 
-        <div style={{ fontSize: "18px", fontWeight: 600 }}>
+        <div style={{ fontSize: "30px", fontWeight: 600 }}>
           <center>รายงานผลการตรวจสอบข้อมูลเครดิต</center>
         </div>
-        <div style={{ fontSize: "16px", textAlign: "right" }}>
+        <div style={{ fontSize: "22px", textAlign: "right" }}>
           เลขที่แบบฟอร์ม {getDataShow.CTM_form_number}
         </div>
         {/* INFO GRID */}
         <div className="info-table">
           <div>
-            <span style={{ fontSize: "16px" }}>
+            <span style={{ fontSize: "22px" }}>
               {" "}
               วันที่รายงานผล :{" "}
               {convertToThaiDateFull(getDataShow.SCORE_Date_chk)}
             </span>
           </div>
           <div>
-            <span style={{ fontSize: "16px", textAlign: "right" }}>
+            <span style={{ fontSize: "22px", textAlign: "right" }}>
               ชื่อ - นามสกุล ลูกค้า : {getDataShow.CTM_title_name}
               {getDataShow.CTM_firstname} {getDataShow.CTM_lastname}{" "}
             </span>
           </div>
           <div>
-            <span style={{ fontSize: "16px" }}>
+            <span style={{ fontSize: "22px" }}>
               สาขา/หน่วย : {getDataShow.CTM_business_zone}
             </span>
           </div>
           <div>
-            <span style={{ fontSize: "16px" }}>
+            <span style={{ fontSize: "22px" }}>
               เลขบัตรประชาชน : {getDataShow.CTM_citizen_id}
             </span>
           </div>
           <div>
-            {/* <span style={{ fontSize: "16px" }}>วงเงินขอสินเชื่อ : {getDataShow.Form_loan_amount}</span> */}
+            {/* <span style={{ fontSize: "22px" }}>วงเงินขอสินเชื่อ : {getDataShow.Form_loan_amount}</span> */}
           </div>
           <div>
-            <span style={{ fontSize: "16px" }}>
+            <span style={{ fontSize: "22px" }}>
               วงเงินขอสินเชื่อ :{" "}
               {Number(getDataShow?.Form_loan_amount || 0).toLocaleString(
                 "th-TH"
@@ -177,10 +177,10 @@ const ViewReportDSR = () => {
             </span>
           </div>
           <div>
-            {/* <span style={{ fontSize: "16px" }}>วงเงินขอสินเชื่อ : {getDataShow.Form_loan_amount}</span> */}
+            {/* <span style={{ fontSize: "22px" }}>วงเงินขอสินเชื่อ : {getDataShow.Form_loan_amount}</span> */}
           </div>
           <div>
-            <span style={{ fontSize: "16px" }}>
+            <span style={{ fontSize: "22px" }}>
               ประเภทสินเชื่อ : {getDataShow.LTNL_Name}
             </span>
           </div>
@@ -199,13 +199,13 @@ const ViewReportDSR = () => {
         <table className="section-table">
           <tbody>
             <tr>
-              <td>
-                <b>1. มีสินเชื่อส่วนบุคคลภายใต้การกำกับ จำนวน</b>{" "}
+              <td style={{ fontSize: "22px" }}>
+                <b >1. มีสินเชื่อส่วนบุคคลภายใต้การกำกับ จำนวน</b>{" "}
                 {getDataShow.SCORE_loan_amount} แห่ง
               </td>
             </tr>
             <tr>
-              <td>
+              <td style={{ fontSize: "22px" }}>
                 <b>2. สถานะการเป็นบุคคลล้มละลาย :</b>{" "}
                 {getDataShow.SCORE_bankrupt_status === "no"
                   ? "ไม่เป็น (อ้างอิงข้อมูลบุคคลล้มละลายจากกรมบังคับคดี)"
@@ -213,35 +213,35 @@ const ViewReportDSR = () => {
               </td>
             </tr>
             <tr>
-              <td>
-                <b style={{ fontSize: "18px" }}>3. คะแนนเครดิต</b>
+              <td style={{ fontSize: "22px" }}>
+                <b >3. คะแนนเครดิต</b>
                 <table className="section-table">
                   <thead>
                     <tr>
                       <th>
                         <center
-                          style={{ fontSize: "18px", fontWeight: "bold" }}
+                          style={{ fontSize: "30px", fontWeight: "bold" }}
                         >
                           คะแนนเครดิต
                         </center>
                       </th>
                       <th>
                         <center
-                          style={{ fontSize: "18px", fontWeight: "bold" }}
+                          style={{ fontSize: "30px", fontWeight: "bold" }}
                         >
                           ระดับคะแนนเครดิต
                         </center>
                       </th>
                       <th>
                         <center
-                          style={{ fontSize: "18px", fontWeight: "bold" }}
+                          style={{ fontSize: "30px", fontWeight: "bold" }}
                         >
                           ความน่าจะเป็นในการชำระหนี้คืน
                         </center>
                       </th>
                       <th>
                         <center
-                          style={{ fontSize: "18px", fontWeight: "bold" }}
+                          style={{ fontSize: "30px", fontWeight: "bold" }}
                         >
                           ผลการตรวจสอบข้อมูลเครดิต
                         </center>
@@ -250,9 +250,9 @@ const ViewReportDSR = () => {
                   </thead>
                   <tbody style={{ border: "none" }}>
                     <tr style={{ border: "none" }}>
-                      <td style={{ border: "none" }}>
+                      <td style={{ border: "none"  }}>
                         <center
-                          style={{ fontSize: "30px", fontWeight: "bold" }}
+                          style={{ fontSize: "50px", fontWeight: "bold" }}
                         >
                           {getDataShow.SCORE_credit_score}
                         </center>
@@ -260,7 +260,7 @@ const ViewReportDSR = () => {
 
                       <td style={{ border: "none" }}>
                         <center
-                          style={{ fontSize: "30px", fontWeight: "bold" }}
+                          style={{ fontSize: "50px", fontWeight: "bold" }}
                         >
                           {getDataShow.SCORE_credit_level}
                         </center>
@@ -268,7 +268,7 @@ const ViewReportDSR = () => {
 
                       <td style={{ border: "none" }}>
                         <center
-                          style={{ fontSize: "30px", fontWeight: "bold" }}
+                          style={{ fontSize: "50px", fontWeight: "bold" }}
                         >
                           {getDataShow.SCORE_percent_behavior}
                         </center>
@@ -283,11 +283,11 @@ const ViewReportDSR = () => {
                         }
                       >
                         <center>
-                          <span style={{ fontSize: "30px", fontWeight: 800 }}>
+                          <span style={{ fontSize: "50px", fontWeight: 800 }}>
                             {getDataShow.SCORE_credit_check_result}
                           </span>
                           <br />
-                          <span style={{ fontSize: "14px" }}>
+                          <span style={{ fontSize: "20px" }}>
                             ( {getDataShow.SCORE_Risk} )
                           </span>
                         </center>
@@ -299,10 +299,10 @@ const ViewReportDSR = () => {
                 <div className="reason-block">
                   <b style={{ color: "red" }}>3.1 เหตุผลประกอบเพิ่มเติม</b>
 
-                  <div className="reason-content">
+                  <div className="reason-content" >
                     {getDataReasons.length > 0 ? (
                       getDataReasons.map((item, index) => (
-                        <div key={index} className="reason-item">
+                        <div key={index} className="reason-item" style={{ fontSize: "22px" }}>
                           {item.account_status}
                           {item.account_total ? (
                             <> จำนวน {item.account_total} บัญชี</>
@@ -319,7 +319,7 @@ const ViewReportDSR = () => {
                   <div className="reason-content">
                     {getDataScore.length > 0 ? (
                       getDataScore.map((item, index) => (
-                        <div key={index} className="reason-item">
+                        <div key={index} className="reason-item" style={{ fontSize: "22px" }}>
                           {item.credit_reason}
                         </div>
                       ))
@@ -329,7 +329,7 @@ const ViewReportDSR = () => {
                   </div>
                 </div>
                 {/* FOOT NOTE */}
-                <div className="footer-date">
+                <div className="footer-date" style={{ fontSize: "22px" }}>
                   ข้อมูล ณ วันที่{" "}
                   {convertToThaiDateFull(getDataShow.SCORE_ncb_enddate)}
                 </div>
@@ -341,31 +341,31 @@ const ViewReportDSR = () => {
         {/* CREDIT SCORE TABLE */}
         <div className="notice-section">
           {/* ข้อความเตือน */}
-          <div className="notice-warning">
+          <div className="notice-warning" style={{ fontSize: "22px" }}>
             ห้ามเปิดเผยเอกสารฉบับนี้ให้กับผู้อื่นเพื่อวัตถุประสงค์อื่นที่ไม่เกี่ยวข้องกับการพิจารณาสินเชื่อโดยเด็ดขาด
             ตามกฎหมายว่าด้วยการคุ้มครองข้อมูลส่วนบุคคล
           </div>
 
           {/* หมายเหตุ */}
-          <div className="notice-title">หมายเหตุ :</div>
+          <div className="notice-title" style={{ fontSize: "22px" }}>หมายเหตุ :</div>
 
           {/* ข้อ 1 */}
           <div className="notice-row">
-            <span className="notice-no">1.</span>
-            <div className="notice-text">
+            <span className="notice-no" style={{ fontSize: "22px" }}>1.</span>
+            <div className="notice-text" style={{ fontSize: "22px" }}>
               {/* <span className="notice-bold"> */}
               คุณสมบัติผู้ขอสินเชื่อส่วนบุคคล รายได้ไม่เกิน 30,000 บาท/เดือน
               มีสินเชื่อส่วนบุคคลภายใต้การกำกับไม่เกิน 2 แห่ง
               {/* </span> */}
-              <span className="notice-bold">
+              <span className="notice-bold" style={{ fontSize: "22px" }}>
                 (ตามเรทพิจารณาการให้สินเชื่อส่วนบุคคลภายใต้การกำกับ)
               </span>
             </div>
           </div>
 
           {/* ข้อ 2 */}
-          <div className="notice-row">
-            <span className="notice-no">2.</span>
+          <div className="notice-row" style={{ fontSize: "22px" }}>
+            <span className="notice-no" >2.</span>
             <div className="notice-text">
               ลูกค้าใหม่ ที่มีสถานะเป็นบุคคลล้มละลาย ไม่ให้สินเชื่อ
               (ตามประกาศที่ 882/2556)
@@ -373,7 +373,7 @@ const ViewReportDSR = () => {
           </div>
 
           {/* ข้อ 3 */}
-          <div className="notice-row">
+          <div className="notice-row" style={{ fontSize: "22px" }}>
             <span className="notice-no">3.</span>
             <div className="notice-text">
               ผลการตรวจสอบข้อมูลเครดิต เป็นไปตามประกาศ
@@ -385,8 +385,8 @@ const ViewReportDSR = () => {
 
         <div
           style={{
-            fontFamily: "TH Sarabun New",
-            fontSize: "18px",
+          
+            fontSize: "22px",
             width: "100%",
             marginTop: "20px",
           }}
@@ -437,7 +437,7 @@ const ViewReportDSR = () => {
           >
             <div
               style={{
-                fontSize: "16px",
+                fontSize: "22px",
                 fontWeight: "bold",
                 marginBottom: "12px",
                 textAlign: "center",
@@ -446,16 +446,16 @@ const ViewReportDSR = () => {
               ผู้รายงานผลการตรวจสอบ
             </div>
 
-            <div style={{ fontSize: "14px" }}>
+            <div style={{ fontSize: "20px" }}>
               {" "}
               {getDataShow.Form_Name_Inspector}
             </div>
-            <div style={{ fontSize: "14px" }}>
+            <div style={{ fontSize: "20px" }}>
               {" "}
               {getDataShow.Form_Name_Positon}
             </div>
 
-            <div style={{ marginTop: "10px", fontSize: "16px" }}>
+            <div style={{ marginTop: "10px", fontSize: "20px" }}>
               วันที่{convertToThaiDate1(getDataShow.Form_date_inspertor)}
             </div>
           </div>
