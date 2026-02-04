@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useContext } from "react";
 import apiClient from "../../recoilstore/userStores";
 
-import { FormControl,Form } from "react-bootstrap";
+import { FormControl, Form } from "react-bootstrap";
 import { Base64 } from "js-base64";
 import { useRecoilValue } from "recoil";
 import { userToken } from "../../recoilstore/userStores";
@@ -81,11 +81,9 @@ const AdminManagement = () => {
   const [currentPage, setCurrentPage] = useState(1); // หน้าที่
   const [totalPages, setTotalPages] = useState(0); // มีทั้งหมด ... หน้า
 
-
   const [query, setQuery] = useState(""); // ค้นหาชื่อ
   const [searchType, setSearchType] = useState(""); // name | citizen | form
   const [searchQuerySub, setSearchQuerySub] = useState(""); //ค้นหา  //คำนวณคะแนน
-  
 
   const [approval, setApproval] = useState([]); // Object to group by section ID
   const [approvaltest, setApprovaltest] = useState([]); // Object to group by section ID
@@ -104,8 +102,7 @@ const AdminManagement = () => {
 
   const [hasSearched, setHasSearched] = useState(false);
 
-    const [searchKeyword, setSearchKeyword] = useState(""); // ค่าที่กดค้นหาจริง
-  
+  const [searchKeyword, setSearchKeyword] = useState(""); // ค่าที่กดค้นหาจริง
 
   const thaiMonths = [
     "มกราคม",
@@ -138,25 +135,23 @@ const AdminManagement = () => {
     searchQuerySub = "",
     searchType = "",
   ) => {
-
     const params = {
       _page: page,
       search: searchQuerySub, // ⭐ ส่ง keyword
       searchKeyword: searchType, // ✅ ใช้ตัวนี้เท่านั้น
     };
 
-     console.log(params);
+    console.log(params);
 
     try {
       const { data } = await apiClient.get(
         `/api/insurances/datacustomers_AdminManagementUser`,
-        { params }
+        { params },
       );
 
       const { status, sqlDataCustomers, totalPages } = data;
 
       if (status) {
-   
         setProbationaryEmployees(sqlDataCustomers);
         setHasSearched(true);
         // setTotalPages(totalPages || 0);
@@ -196,7 +191,7 @@ const AdminManagement = () => {
         "/api/insurances/datacustomers_AdminSingle",
         {
           params,
-        }
+        },
       );
 
       const { status, result, message } = data;
@@ -342,7 +337,7 @@ const AdminManagement = () => {
     try {
       const res = await apiClient.post(
         "/api/insurances/datacustomers/updateDataApproveAdmin",
-        { payload: JSON.stringify(payload) }
+        { payload: JSON.stringify(payload) },
       );
 
       const { status, message } = res.data;
@@ -406,112 +401,106 @@ const AdminManagement = () => {
     if (!hasSearched) return;
     getEmployeeDB_Admin(currentPage, query);
   }, [currentPage]);
+  
 
   return (
     <div>
       <div className="pt-2">
         <div className="cartcustom p-3 shadow-sm">
-             <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
-              {/* --- เลือกประเภท --- */}
-              <div>
-                <div
-                  style={{ fontSize: 13, color: "#5b6b82", marginBottom: 4 }}
-                >
-                  เลือกประเภทการค้นหา
-                </div>
-
-                <Form.Select
-                  value={searchType}
-                  onChange={(e) => {
-                    setSearchType(e.target.value);
-                    setSearchQuerySub("");
-                  }}
-                  style={{ fontSize: 13, width: 180,height:38 }}
-                >
-                  <option value=""> - เลือกประเภท - </option>
-                  <option value="name">ชื่อลูกค้า</option>
-                  <option value="citizen">เลขบัตรประชาชน</option>
-                  <option value="form">เลขที่แบบฟอร์ม</option>
-                  <option value="branch">สาขา / หน่วย</option>
-                </Form.Select>
+          <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
+            {/* --- เลือกประเภท --- */}
+            <div>
+              <div style={{ fontSize: 13, color: "#5b6b82", marginBottom: 4 }}>
+                เลือกประเภทการค้นหา
               </div>
 
-              {/* --- คำค้น --- */}
-              <div>
-                <div
-                  style={{ fontSize: 13, color: "#5b6b82", marginBottom: 4 }}
-                >
-                  คำค้นหา
-                </div>
-
-                <InputGroup>
-                  <InputGroup.Text
-                    style={{
-                      background: "white",
-                      border: "1px solid #e0e0e0",
-                      borderRight: "none",
-                      borderRadius: "7px 0 0 7px",
-                    }}
-                  >
-                    <FiSearch style={{ color: "#888", fontSize: 16  }} />
-                  </InputGroup.Text>
-
-                  <FormControl
-                    type="search"
-                    disabled={!searchType}
-                    placeholder={
-                      !searchType
-                        ? "กรุณาเลือกประเภทการค้นหา"
-                        : searchType === "name"
-                          ? "ค้นหาชื่อลูกค้า"
-                          : searchType === "citizen"
-                            ? "ค้นหาเลขบัตรประชาชน"
-                            : "ค้นหาเลขที่แบบฟอร์ม"
-                    }
-                    value={searchQuerySub}
-                    onChange={(e) => setSearchQuerySub(e.target.value)}
-                    style={{
-                      borderRadius: "0 7px 7px 0",
-                      fontSize: 13,
-                      border: "1px solid #e0e0e0",
-                      borderLeft: "none",
-                      boxShadow: "none",
-                      width: 320,
-                    }}
-                  />
-                </InputGroup>
-              </div>
-
-              {/* --- ปุ่มค้นหา --- */}
-              <button
-                className="btn btn-primary"
-                disabled={!searchType || !searchQuerySub}
-                onClick={() => {
-                  getEmployeeDB_Admin(1, searchQuerySub, searchType); // ✅ ส่งตรง
-                }}
-              >
-                ค้นหา
-              </button>
-
-              {/* --- ✅ ปุ่มล้าง --- */}
-              <button
-                className="btn btn-secondary"
-                onClick={() => {
-                  setSearchType("");
+              <Form.Select
+                value={searchType}
+                onChange={(e) => {
+                  setSearchType(e.target.value);
                   setSearchQuerySub("");
-                  setSearchKeyword("");
-                  getEmployeeDB_Admin(1); // โหลดข้อมูลทั้งหมดกลับมา
                 }}
+                style={{ fontSize: 13, width: 180, height: 38 }}
               >
-                ล้าง
-              </button>
+                <option value=""> - เลือกประเภท - </option>
+                <option value="name">ชื่อลูกค้า</option>
+                <option value="citizen">เลขบัตรประชาชน</option>
+                <option value="form">เลขที่แบบฟอร์ม</option>
+                <option value="branch">สาขา / หน่วย</option>
+              </Form.Select>
             </div>
 
+            {/* --- คำค้น --- */}
+            <div>
+              <div style={{ fontSize: 13, color: "#5b6b82", marginBottom: 4 }}>
+                คำค้นหา
+              </div>
+
+              <InputGroup>
+                <InputGroup.Text
+                  style={{
+                    background: "white",
+                    border: "1px solid #e0e0e0",
+                    borderRight: "none",
+                    borderRadius: "7px 0 0 7px",
+                  }}
+                >
+                  <FiSearch style={{ color: "#888", fontSize: 16 }} />
+                </InputGroup.Text>
+
+                <FormControl
+                  type="search"
+                  disabled={!searchType}
+                  placeholder={
+                    !searchType
+                      ? "กรุณาเลือกประเภทการค้นหา"
+                      : searchType === "name"
+                        ? "ค้นหาชื่อลูกค้า"
+                        : searchType === "citizen"
+                          ? "ค้นหาเลขบัตรประชาชน"
+                          : "ค้นหาเลขที่แบบฟอร์ม"
+                  }
+                  value={searchQuerySub}
+                  onChange={(e) => setSearchQuerySub(e.target.value)}
+                  style={{
+                    borderRadius: "0 7px 7px 0",
+                    fontSize: 13,
+                    border: "1px solid #e0e0e0",
+                    borderLeft: "none",
+                    boxShadow: "none",
+                    width: 320,
+                  }}
+                />
+              </InputGroup>
+            </div>
+
+            {/* --- ปุ่มค้นหา --- */}
+            <button
+              className="btn btn-primary"
+              disabled={!searchType || !searchQuerySub}
+              onClick={() => {
+                getEmployeeDB_Admin(1, searchQuerySub, searchType); // ✅ ส่งตรง
+              }}
+            >
+              ค้นหา
+            </button>
+
+            {/* --- ✅ ปุ่มล้าง --- */}
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                setSearchType("");
+                setSearchQuerySub("");
+                setSearchKeyword("");
+                getEmployeeDB_Admin(1); // โหลดข้อมูลทั้งหมดกลับมา
+              }}
+            >
+              ล้าง
+            </button>
+          </div>
+
           {!hasSearched ? (
-              <center>
-               
-          
-         
+            <center>
               <div
                 style={{
                   display: "flex",
@@ -536,9 +525,7 @@ const AdminManagement = () => {
                   กรุณากรอกข้อมูลในช่องค้นหา
                 </div>
               </div>
-        
-               </center>
-       
+            </center>
           ) : probationaryEmployees.length === 0 ? (
             <center>
               <div
@@ -578,16 +565,29 @@ const AdminManagement = () => {
                       <th className="text" style={{ width: "10%" }}>
                         เลขที่แบบฟอร์ม
                       </th>
-                      <th className="text" style={{ width: "15%" }}>
+                      <th className="text" style={{ width: "10%" }}>
                         ชื่อ-นาม สกุลลูกค้า
                       </th>
-                      <th className="text" style={{ width: "7%" }}>
-                        เบอร์โทรศัพท์
-                      </th>
 
-                      <th className="text" style={{ width: "15%" }}>
-                        ผู้บันทึกข้อมูล
+                      <th className="text" style={{ width: "8%" }}>
+                        เลขบัตรประชาชน
                       </th>
+                      <th className="text" style={{ width: "10%" }}>
+                        ผู้ขอสืบค้น
+                      </th>
+                        <th className="text" style={{ width: "7%" }}>
+                        วันที่ยื่นขอสืบค้น
+                      </th>
+                      <th className="text" style={{ width: "7%" }}>
+                        สาขา/หน่วย
+                      </th>
+                      <th className="text" style={{ width: "8%" }}>
+                        เขต
+                      </th>
+                      <th className="text" style={{ width: "4%" }}>
+                        ภาค
+                      </th>
+                    
 
                       <th className="text" style={{ width: "5%" }}>
                         วัน/เวลา ที่บันทึก
@@ -608,10 +608,9 @@ const AdminManagement = () => {
                         วันที่รายงานผลตรวจ
                       </th> */}
 
-                      <th className="text-center" style={{ width: "16%" }}>
+                      <th className="text-center" style={{ width: "10%" }}>
                         สถานะ
                       </th>
-                     
                     </tr>
                   </thead>
                   <tbody>
@@ -662,52 +661,61 @@ const AdminManagement = () => {
                                 {item.CTM_title_name}
                                 {item.CTM_firstname} {item.CTM_lastname}
                               </div>
-                              <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                            {item.CTM_Old_status === "1" ? (
-                              <span style={{ color: "red" }}>
-                                เลขบัตรประชาชน: {item.CTM_citizen_id}
-                              </span>
-                            ) : (
-                              <span>
-                                {" "}
-                                เลขบัตรประชาชน: {item.CTM_citizen_id}
-                              </span>
-                            )}
-                          </div>
                               <div
+                                style={{ fontSize: "12px", color: "#6c757d" }}
+                              >
+                                {item.CTM_phone
+                                  ? `${item.CTM_phone.slice(
+                                      0,
+                                      3,
+                                    )}-${item.CTM_phone.slice(3)}`
+                                  : "-"}
+                              </div>
+                              {/* <div
                                 style={{ fontSize: "12px", color: "#6c757d" }}
                               >
                                 วัน/เดือน/ปี เกิด:{" "}
                                 {convertToThaiDate(item.CTM_birthdate)}
+                              </div> */}
+                            </td>
+                            <td>
+                             <div className="citizen-cell">
+                            {item.CTM_Old_status === "1" ? (
+                              <span className="citizen-badge-old">
+                                {item.CTM_citizen_id}
+                              </span>
+                            ) : (
+                              <span>{item.CTM_citizen_id}</span>
+                            )}
+                          </div>
+                            </td>
+                            
+                            <td>
+                              <div>{item.CTM_recorder_fullname}</div>{" "}
+                               <div
+                                style={{ fontSize: "12px", color: "#6c757d" }}
+                              >
+                             {item.CTM_position || "-"}
+                              </div>
+                            </td>
+                            <td>{convertToThaiDate(item.date_upEvidence)}</td>
+                            <td>
+                              <div
+                              
+                              >
+                               {item.CTM_business_zone || "-"}
                               </div>
                             </td>
                             <td>
-                              {item.CTM_phone
-                                ? `${item.CTM_phone.slice(
-                                    0,
-                                    3
-                                  )}-${item.CTM_phone.slice(3)}`
-                                : "-"}
-                            </td>
+                              <div
+                              
+                              >
+                                {item.CTM_branch || "-"}
+                              </div>
+                            </td>{" "}
                             <td>
-                              <div>{item.CTM_recorder_fullname}</div>
                               <div
-                                style={{ fontSize: "12px", color: "#6c757d" }}
-                              >
-                                ตำแหน่ง: {item.CTM_position || "-"}
-                              </div>
-                              <div
-                                style={{ fontSize: "12px", color: "#6c757d" }}
-                              >
-                                สาขา/หน่วย: {item.CTM_business_zone || "-"}
-                              </div>
-                              <div
-                                style={{ fontSize: "12px", color: "#6c757d" }}
-                              >
-                                เขต: {item.CTM_branch || "-"}
-                              </div>
-                              <div
-                                style={{ fontSize: "12px", color: "#6c757d" }}
+                              
                               >
                                 {item.CTM_business_region || "-"}
                               </div>
@@ -718,7 +726,7 @@ const AdminManagement = () => {
                                 className="doc-btn doc-consent mr-1"
                                 onClick={() =>
                                   openFileInNewTab(
-                                    `img/consent/${item.Form_consent_document}`
+                                    `img/consent/${item.Form_consent_document}`,
                                   )
                                 }
                                 title="หนังสือยินยอมเปิดเผยข้อมูล"
@@ -730,7 +738,7 @@ const AdminManagement = () => {
                                 className="doc-btn doc-application mr-1"
                                 onClick={() =>
                                   openFileInNewTab(
-                                    `img/application/${item.Form_application_document}`
+                                    `img/application/${item.Form_application_document}`,
                                   )
                                 }
                                 title="แบบฟอร์มคำขอ"
@@ -742,7 +750,7 @@ const AdminManagement = () => {
                                 className="doc-btn doc-idcard mr-2 mt-1"
                                 onClick={() =>
                                   openFileInNewTab(
-                                    `img/idcard/${item.Form_idcard_photo}`
+                                    `img/idcard/${item.Form_idcard_photo}`,
                                   )
                                 }
                                 title="รูปบัตรประชาชน"
@@ -750,33 +758,53 @@ const AdminManagement = () => {
                                 <FaRegIdCard />
                               </button>
                             </td>
-
                             <td className="text-center">
                               <button
                                 className="btn-icon"
                                 title="รายงานผล"
                                 onClick={() => {
-                                  // if (item.Form_verification_status === "Lv2") {
-                                  //   Swal.fire({
-                                  //     icon: "info",
-                                  //     title: "อยู่ระหว่างการตรวจสอบ",
-                                  //     text: "ยังไม่ได้รับการตรวจสอบข้อมูลเครดิต",
-                                  //     confirmButtonText: "ตกลง",
-                                  //     confirmButtonColor: "#495057",
-                                  //   });
-                                  //   return;
-                                  // }
+                                  if (item.Form_verification_status === "Lv0" ) {
+                                    Swal.fire({
+                                      icon: "info",
+                                      title: "รายการนี้รอการตรวจสอบ",
+                                      text: "ยังไม่ได้รับการตรวจสอบข้อมูลเครดิต",
+                                      confirmButtonText: "ตกลง",
+                                      confirmButtonColor: "#495057",
+                                    });
+                                    return;
+                                  }
+
+                                  if (item.Form_verification_status === "Lv1E" ) {
+                                    Swal.fire({
+                                      icon: "info",
+                                      title: "อยู่ระหว่างการแก้ไข",
+                                      text: "ยังไม่ได้รับการตรวจสอบข้อมูลเครดิต",
+                                      confirmButtonText: "ตกลง",
+                                      confirmButtonColor: "#495057",
+                                    });
+                                    return;
+                                  }
+                                  
+
+                                  if (item.Form_verification_status === "Lv1N" ) {
+                                    Swal.fire({
+                                      icon: "info",
+                                      title: "รายการนี้ถูกยกเลิก",
+                                      text: "ยังไม่ได้รับการตรวจสอบข้อมูลเครดิต",
+                                      confirmButtonText: "ตกลง",
+                                      confirmButtonColor: "#495057",
+                                    });
+                                    return;
+                                  }
                                   handleView(item);
                                 }}
                               >
-                                <AiOutlineFileSearch />
+                                <AiOutlineFileSearch /> 
                               </button>
                             </td>
-
                             <td>
-               
                               <center>
-                                {item.Form_Name_Inspector || "-"}{" "}
+                               <span style={{ fontSize : "12px" }}>{item.Form_Name_Inspector || "-"}{" "}</span> 
                                 <div
                                   style={{ fontSize: "12px", color: "#6c757d" }}
                                 >
@@ -793,63 +821,77 @@ const AdminManagement = () => {
                                 </div>
                               </center>
                             </td>
-
                             {/* <td>{item.Form_Inspector}</td> */}
-
                             <td className="text-center">
                               <center>
 
-                                  {item.Form_verification_status == "Lv0"  && (
-                                <center>
-                                  <span
-                                    className="status-badge status-wait"
-                                    // onClick={() =>
-                                    //   // handleStatusClick(item.CTM_form_number)
-                                    // }
-                                    style={{ cursor: "pointer" }}
-                                  >
-                                    รอเจ้าหน้าที่ตรวจสอบเครดิต
-                                  </span>
-                                </center>
-                              )}
+                                {item.Form_verification_status == "Lv1E" && (
+                                  <center>
+                                    <span
+                                      className="status-badge status-wait"
+                                      // onClick={() =>
+                                      //   // handleStatusClick(item.CTM_form_number)
+                                      // }
+                                      style={{ cursor: "pointer" }}
+                                    >
+                                      รอการแก้ไขข้อมูล
+                                    </span>
+                                  </center>
+                                )}
 
+                                
+                                {item.Form_verification_status == "Lv0" && (
+                                  <center>
+                                    <span
+                                      className="status-badge status-wait"
+                                      // onClick={() =>
+                                      //   // handleStatusClick(item.CTM_form_number)
+                                      // }
+                                      style={{ cursor: "pointer" }}
+                                    >
+                                      รอเจ้าหน้าที่ตรวจสอบเครดิต
+                                    </span>
+                                  </center>
+                                )}
 
+                                  {item.Form_verification_status === "Lv1N" && (
+                              <span
+                                className="status-badge status-cancel"
+                                // onClick={() =>
+                                //   handleStatusClick(item.CTM_form_number)
+                                // }
+                                style={{ cursor: "pointer" }}
+                              >
+                                1N ยกเลิกรายการตรวจสอบ
+                              </span>
+                            )}
 
-                                 {item.Form_verification_status == "Lv1" &&
-                              item.Form_verification_status != "Lv1N" && (
-                                <center>
-                                  <span
-                                    className="status-badge status-pass"
-                                    // onClick={() =>
-                                    //   // handleStatusClick(item.CTM_form_number)
-                                    // }
-                                    style={{ cursor: "pointer" }}
-                                  >
-                                    ตรวจแล้ว
-                                  </span>
-                                </center>
-                              )}
-
-
-
-
-
-
+                                {item.Form_verification_status == "Lv1" &&
+                                  item.Form_verification_status != "Lv1N" && (
+                                    <center>
+                                      <span
+                                        className="status-badge status-pass"
+                                        // onClick={() =>
+                                        //   // handleStatusClick(item.CTM_form_number)
+                                        // }
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        ตรวจแล้ว
+                                      </span>
+                                    </center>
+                                  )}
 
                                 {item.Form_Approval_results === "approved" && (
                                   <span className="status-badge status-pass">
-                                    ผ่านการอนุมัติ
-                                      รหัสสัญญา {item.Form_Contract_number}
+                                    ผ่านการอนุมัติ รหัสสัญญา{" "}
+                                    {item.Form_Contract_number}
                                   </span>
-                                  
-                                  
                                 )}
-
 
                                 {item.Form_Approval_results === "rejected" && (
                                   <>
                                     <span className="status-badge status-fail">
-                                      ไม่ผ่านการอนุมัติ{" "}<br/>
+                                      ไม่ผ่านการอนุมัติ <br />
                                       {/* ✅ สถานะการส่ง SMS */}
                                       {item.Form_status_SMS === "OK" ? (
                                         <span className="status-badge status-success ml-2">
@@ -874,8 +916,6 @@ const AdminManagement = () => {
                                 {item.Form_note_approval}
                               </div>
                             </td>
-
-                            
                           </tr>
                         ))}
                       </>
@@ -973,7 +1013,7 @@ const AdminManagement = () => {
                             }}
                             onClick={() =>
                               openFileInNewTab(
-                                `img/consent/${getDataShow?.Form_consent_document}`
+                                `img/consent/${getDataShow?.Form_consent_document}`,
                               )
                             }
                           >
@@ -990,7 +1030,7 @@ const AdminManagement = () => {
                             }}
                             onClick={() =>
                               openFileInNewTab(
-                                `img/application/${getDataShow?.Form_application_document}`
+                                `img/application/${getDataShow?.Form_application_document}`,
                               )
                             }
                           >
@@ -1007,7 +1047,7 @@ const AdminManagement = () => {
                             }}
                             onClick={() =>
                               openFileInNewTab(
-                                `img/idcard/${getDataShow?.Form_idcard_photo}`
+                                `img/idcard/${getDataShow?.Form_idcard_photo}`,
                               )
                             }
                           >
@@ -1089,7 +1129,7 @@ const AdminManagement = () => {
                       <span style={{ fontWeight: "100" }}>
                         {getDataShow?.Form_loan_amount
                           ? Number(
-                              getDataShow.Form_loan_amount
+                              getDataShow.Form_loan_amount,
                             ).toLocaleString()
                           : "-"}{" "}
                         บาท

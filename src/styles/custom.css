@@ -2239,8 +2239,8 @@ input[type="date"]:focus {
   width: 90%;
   margin-top: 25px;
   font-family: "THSarabunPSK", sans-serif;
-  font-size: px;
-  color: #4a4a4a;
+
+  color: #000000;
 }
 
 /* .report-container,
