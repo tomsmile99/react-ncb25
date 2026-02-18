@@ -78,7 +78,7 @@ const convertToThaiDate1 = (dateString) => {
   return `${day} ${month} ${year}`;
 };
 
-const SalepersonView_Examination = () => { 
+const SalepersonView_Examination = () => {
   const getstore = useRecoilValue(userToken);
   const _PerWP = Base64.decode(getstore.PerWP);
 
@@ -150,7 +150,7 @@ const SalepersonView_Examination = () => {
         `/api/insurances/datacustomers_AdminLv1`,
         {
           params,
-        }
+        },
       );
 
       const { status, sqlDataCustomers, totalPages } = data;
@@ -165,7 +165,7 @@ const SalepersonView_Examination = () => {
       console.error("Error fetching data:", error.message);
     }
   };
- 
+
   const handleStatusClick = async (idForm) => {
     setSelectedItem(idForm);
 
@@ -178,7 +178,7 @@ const SalepersonView_Examination = () => {
         "/api/insurances/datacustomers_AdminSingle",
         {
           params,
-        }
+        },
       );
 
       const { status, result, message } = data;
@@ -317,7 +317,7 @@ const SalepersonView_Examination = () => {
         "/api/insurances/datacustomers/dataPDF",
         {
           params,
-        }
+        },
       );
 
       const { status, result, message } = data;
@@ -374,6 +374,19 @@ const SalepersonView_Examination = () => {
   //Report DSR Page
   const handleSubmitReport = async () => {
     // ==========================
+    // ❌ rejected แต่ไม่เลือกเหตุผล
+    // ==========================
+    if (approval === "rejected" && reasons.length !== 1) {
+      Swal.fire({
+        icon: "warning",
+        title: "กรุณาเลือกเหตุผล",
+        text: "กรุณาเลือกเหตุผลที่ไม่ผ่าน 1 ข้อ",
+        confirmButtonColor: "#d33",
+      });
+      return;
+    }
+
+    // ==========================
     // ❌ ดักกรณีผ่านอนุมัติแต่ไม่กรอกเลขที่สัญญา
     // ==========================
     if (approval === "approved" && !contractNumber.trim()) {
@@ -400,7 +413,7 @@ const SalepersonView_Examination = () => {
     try {
       const res = await apiClient.post(
         "/api/insurances/datacustomers/updateDataApprove",
-        { payload: JSON.stringify(payload) }
+        { payload: JSON.stringify(payload) },
       );
 
       const { status, statusSms, smsDetail, smsSmid } = res.data;
@@ -577,7 +590,7 @@ const SalepersonView_Examination = () => {
                           {item.CTM_phone
                             ? `${item.CTM_phone.slice(
                                 0,
-                                3
+                                3,
                               )}-${item.CTM_phone.slice(3)}`
                             : "-"}
                         </td>
@@ -593,7 +606,7 @@ const SalepersonView_Examination = () => {
                             เขต: {item.CTM_branch || "-"}
                           </div>
                           <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                             {item.CTM_business_region || "-"}
+                            {item.CTM_business_region || "-"}
                           </div>
                         </td>
                         <td>{convertToThaiDate(item.date_upEvidence)}</td>
@@ -602,7 +615,7 @@ const SalepersonView_Examination = () => {
                             className="doc-btn doc-consent mr-1"
                             onClick={() =>
                               openFileInNewTab(
-                                `img/consent/${item.Form_consent_document}`
+                                `img/consent/${item.Form_consent_document}`,
                               )
                             }
                             title="หนังสือยินยอมเปิดเผยข้อมูล"
@@ -614,7 +627,7 @@ const SalepersonView_Examination = () => {
                             className="doc-btn doc-application mr-1"
                             onClick={() =>
                               openFileInNewTab(
-                                `img/application/${item.Form_application_document}`
+                                `img/application/${item.Form_application_document}`,
                               )
                             }
                             title="แบบฟอร์มคำขอ"
@@ -626,7 +639,7 @@ const SalepersonView_Examination = () => {
                             className="doc-btn doc-idcard mr-2 mt-1"
                             onClick={() =>
                               openFileInNewTab(
-                                `img/idcard/${item.Form_idcard_photo}`
+                                `img/idcard/${item.Form_idcard_photo}`,
                               )
                             }
                             title="รูปบัตรประชาชน"
@@ -817,7 +830,7 @@ const SalepersonView_Examination = () => {
                             }}
                             onClick={() =>
                               openFileInNewTab(
-                                `img/consent/${getDataShow?.Form_consent_document}`
+                                `img/consent/${getDataShow?.Form_consent_document}`,
                               )
                             }
                           >
@@ -834,7 +847,7 @@ const SalepersonView_Examination = () => {
                             }}
                             onClick={() =>
                               openFileInNewTab(
-                                `img/application/${getDataShow?.Form_application_document}`
+                                `img/application/${getDataShow?.Form_application_document}`,
                               )
                             }
                           >
@@ -851,7 +864,7 @@ const SalepersonView_Examination = () => {
                             }}
                             onClick={() =>
                               openFileInNewTab(
-                                `img/idcard/${getDataShow?.Form_idcard_photo}`
+                                `img/idcard/${getDataShow?.Form_idcard_photo}`,
                               )
                             }
                           >
@@ -903,7 +916,7 @@ const SalepersonView_Examination = () => {
                     <div className="">
                       <strong>ประเภทสินเชื่อที่ลูกค้าสมัคร : </strong>
                       <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.LTNL_Name || "-"} 
+                        {getDataShow?.LTNL_Name || "-"}
                       </span>
                     </div>
 
@@ -912,7 +925,7 @@ const SalepersonView_Examination = () => {
                       <span style={{ fontWeight: "100" }}>
                         {getDataShow?.Form_loan_amount
                           ? Number(
-                              getDataShow.Form_loan_amount
+                              getDataShow.Form_loan_amount,
                             ).toLocaleString()
                           : "-"}{" "}
                         บาท
@@ -1016,7 +1029,10 @@ const SalepersonView_Examination = () => {
                     </label>
 
                     <div className="radio-group">
-                      <label className="radio-option mr-3" style={{fontSize :"14px"}}>
+                      <label
+                        className="radio-option mr-3"
+                        style={{ fontSize: "14px" }}
+                      >
                         <input
                           type="radio"
                           name="approval"
@@ -1029,7 +1045,10 @@ const SalepersonView_Examination = () => {
                         ผ่านการอนุมัติ
                       </label>
 
-                      <label className="radio-option" style={{fontSize :"14px"}}>
+                      <label
+                        className="radio-option"
+                        style={{ fontSize: "14px" }}
+                      >
                         <input
                           type="radio"
                           name="approval"
@@ -1054,7 +1073,13 @@ const SalepersonView_Examination = () => {
                         width: "fit-content",
                       }}
                     >
-                      <p style={{ marginBottom: "6px", fontWeight: 600 ,color:'red'}}>
+                      <p
+                        style={{
+                          marginBottom: "6px",
+                          fontWeight: 600,
+                          color: "red",
+                        }}
+                      >
                         โปรดเลือกเหตุผลที่ไม่ผ่าน * :
                       </p>
 
@@ -1103,8 +1128,7 @@ const SalepersonView_Examination = () => {
                           4. เนื่องจากรายงาน ERROR / รายการไม่ถูกต้อง
                         </span>
                       </label>
-              
-                    </div> 
+                    </div>
                   )}
 
                   {/* ✅ ตรวจสอบผลลัพธ์ */}
@@ -1138,23 +1162,22 @@ const SalepersonView_Examination = () => {
                             </span>
                           </label>
 
-                         <input
-                          className={`input-normal ${contractError ? "input-error" : ""}`}
-                          value={contractNumber}
-                          onChange={(e) => {
-                            // ✅ เอาเฉพาะตัวเลข และจำกัดไม่เกิน 10 หลัก
-const value = e.target.value
-  .replace(/[^a-zA-Z0-9]/g, "") // ❌ ตัดอักขระพิเศษ
-  .slice(0, 10);                // จำกัด 10 ตัว
+                          <input
+                            className={`input-normal ${contractError ? "input-error" : ""}`}
+                            value={contractNumber}
+                            onChange={(e) => {
+                              // ✅ เอาเฉพาะตัวเลข และจำกัดไม่เกิน 10 หลัก
+                              const value = e.target.value
+                                .replace(/[^a-zA-Z0-9]/g, "") // ❌ ตัดอักขระพิเศษ
+                                .slice(0, 10); // จำกัด 10 ตัว
 
-                            setContractNumber(value);
-                            setContractError(false); // พอพิมพ์แล้วล้าง error
-                          }}
-                          placeholder="กรอกเลขที่สัญญา (10 หลัก)"
-                          inputMode="numeric"
-                          maxLength={10}
-                        />
-
+                              setContractNumber(value);
+                              setContractError(false); // พอพิมพ์แล้วล้าง error
+                            }}
+                            placeholder="กรอกเลขที่สัญญา (10 หลัก)"
+                            inputMode="numeric"
+                            maxLength={10}
+                          />
 
                           {contractError && (
                             <small style={{ color: "#e5533d" }}>
@@ -1265,7 +1288,7 @@ const value = e.target.value
             {/* ✅ วันที่ */}
             {(() => {
               const { day, month, year } = getThaiDateParts(
-                getDataShowPdf?.CTM_created_at
+                getDataShowPdf?.CTM_created_at,
               );
               // const { day, month, year } = getThaiDateParts(dateNow);
 

@@ -160,8 +160,14 @@ const reportNCBLite = () => {
   };
 
   const handleShowReport = async () => {
+    const hasMonth = filters.monthSMS;
+    const hasYear =
+      filters.yearSMS && !isNaN(filters.yearSMS)
+        ? Number(filters.yearSMS) - 543
+        : null;   //แปลงเป็น คศ
+
     // 1️⃣ ตรวจภาค
-    if (!filters.region) {
+    if (!filters.region && !hasMonth && !hasYear) {
       await Swal.fire({
         icon: "warning",
         title: "แจ้งเตือน",
@@ -172,7 +178,7 @@ const reportNCBLite = () => {
     }
 
     // 2️⃣ ตรวจเขต
-    if (!filters.zone) {
+    if (!filters.zone && !hasMonth && !hasYear) {
       await Swal.fire({
         icon: "warning",
         title: "แจ้งเตือน",
@@ -183,7 +189,7 @@ const reportNCBLite = () => {
     }
 
     // 3️⃣ ตรวจสถานะ
-    if (!filters.status) {
+    if (!filters.status && !hasMonth && !hasYear) {
       await Swal.fire({
         icon: "warning",
         title: "แจ้งเตือน",
@@ -194,7 +200,7 @@ const reportNCBLite = () => {
     }
 
     // 4️⃣ ตรวจวันที่เริ่ม
-    if (!filters.startDate) {
+    if (!filters.startDate && !hasMonth && !hasYear) {
       await Swal.fire({
         icon: "warning",
         title: "แจ้งเตือน",
@@ -205,7 +211,7 @@ const reportNCBLite = () => {
     }
 
     // 5️⃣ ตรวจวันที่สิ้นสุด
-    if (!filters.endDate) {
+    if (!filters.endDate && !hasMonth && !hasYear) {
       await Swal.fire({
         icon: "warning",
         title: "แจ้งเตือน",
@@ -226,6 +232,7 @@ const reportNCBLite = () => {
       return;
     }
 
+  
     // ✅ ผ่านทุกเงื่อนไข → ยิง API
     try {
       setLoading(true);
@@ -234,21 +241,22 @@ const reportNCBLite = () => {
         "/api/insurances/datacustomers_AdminReportExcel",
         {
           params: {
-            region_id: filters.region,
-            belong_id: filters.zone,
-            status: filters.status,
+            region_id: filters.region || 'all',
+            belong_id: filters.zone || 'all',
+            status: filters.status || 'all',
             start_date: filters.startDate,
             end_date: filters.endDate,
+            monthSMS: hasMonth || null,
+            yearSMS: hasYear || null,
           },
-        }
+        },
       );
 
       const { status, sqlDataCustomers } = data;
 
       if (status === 200) {
-      
         // console.log(sqlDataCustomers)
-        setReportData(data.sqlDataCustomers);
+        setReportData(sqlDataCustomers);
       }
     } catch (err) {
       console.error(err);
@@ -263,41 +271,47 @@ const reportNCBLite = () => {
   };
 
   const renderApprovalResult = (item) => {
-  // 1️⃣ ถ้า Form_Approval_results ว่าง
-  if (!item.Form_Approval_results) {
-    if (item.Form_verification_status === "Lv0") {
-      return "รอพิจารณา";
-    }
-    return "-";
-  }
-
-  // 2️⃣ ถ้า Form_Approval_results มีค่า
-  switch (item.Form_Approval_results) {
-    case "approved":
-      return "อนุมัติ";
-    case "rejected":
-      return "ไม่อนุมัติ";
-    case "Cancel":
-      return "ยกเลิกรายการ";
-    default:
+    // 1️⃣ ถ้า Form_Approval_results ว่าง
+    if (!item.Form_Approval_results) {
+      if (item.Form_verification_status === "Lv0") {
+        return "รอพิจารณา";
+      }
       return "-";
-  }
-};
+    }
 
+    // 2️⃣ ถ้า Form_Approval_results มีค่า
+    switch (item.Form_Approval_results) {
+      case "approved":
+        return "อนุมัติ";
+      case "rejected":
+        return "ไม่อนุมัติ";
+      case "Cancel":
+        return "ยกเลิกรายการ";
+      default:
+        return "-";
+    }
+  };
 
   const handleExportExcel = async () => {
+    const hasMonth = filters.monthSMS;
+    const hasYear =
+      filters.yearSMS && !isNaN(filters.yearSMS)
+        ? Number(filters.yearSMS) - 543
+        : null;   //แปลงเป็น คศ
     try {
       const { data } = await apiClient.get(
         "/api/insurances/datacustomers_AdminReportExcel",
         {
-          params: {
-            region_id: filters.region,
-            belong_id: filters.zone,
-            status: filters.status,
+         params: {
+            region_id: filters.region || 'all',
+            belong_id: filters.zone || 'all',
+            status: filters.status || 'all',
             start_date: filters.startDate,
             end_date: filters.endDate,
+            monthSMS: hasMonth || null,
+            yearSMS: hasYear || null,
           },
-        }
+        },
       );
 
       if (data.status !== 200 || data.sqlDataCustomers.length === 0) {
@@ -305,7 +319,7 @@ const reportNCBLite = () => {
         return;
       }
 
-      // 🔹 เพิ่มคอลัมน์ลำดับ 
+      // 🔹 เพิ่มคอลัมน์ลำดับ
       const rows = data.sqlDataCustomers.map((item, index) => ({
         ลำดับ: index + 1,
         "วัน/เวลา ที่รับ Consent":
@@ -313,7 +327,7 @@ const reportNCBLite = () => {
         "วัน/เวลา รายงานผล": formatThaiDateTime(item.Form_date_inspertor) ?? "",
         "Action Time": getActionTime(
           item.date_upEvidence,
-          item.Form_date_inspertor
+          item.Form_date_inspertor,
         ),
         "ชื่อ-นามสกุล ลูกค้า":
           `${item.CTM_title_name ?? ""}${item.CTM_firstname ?? ""} ${item.CTM_lastname ?? ""}` ??
@@ -331,9 +345,10 @@ const reportNCBLite = () => {
         ประเภทสินเชื่อ: item.LTNL_Name ?? "-",
         วงเงินขอสินเชื่อ: item.Form_loan_amount ?? "-",
         คะแนนเครดิต: item.SCORE_credit_score ?? "-",
-        "คุณสู้ เราช่วย": item.SCORE_project_status === "y" ? "เข้าร่วม" : "ไม่เข้าร่วม",
+        "คุณสู้ เราช่วย":
+          item.SCORE_project_status === "y" ? "เข้าร่วม" : "ไม่เข้าร่วม",
         บุคคลล้มละลาย: item.SCORE_project_status === "yes" ? "เป็น" : "ไม่เป็น",
-        ผลการพิจารณาการให้สินเชื่อ : renderApprovalResult(item),
+        ผลการพิจารณาการให้สินเชื่อ: renderApprovalResult(item),
         ระดับคะแนนเครดิต: item.SCORE_credit_level ?? "-",
         ความน่าจะเป็นในการชำระหนี้: item.SCORE_payment_behavior ?? "-",
         เปอร์เซ็นต์การชำระหนี้: item.SCORE_percent_behavior ?? "-",
@@ -344,11 +359,11 @@ const reportNCBLite = () => {
         รายละเอียดการแก้ไข: item.SCORE_additional_fee_Edit ?? "-",
 
         หมายเหตุ: item.SCORE_additional_fee ?? "-",
-        หมายเหตุการขอยกเลิก :item.Form_note_approval ?? "-",
-        "สถานะการส่ง SMS" :item.Form_status_SMS ?? "-",
-        "วันที่รายงานผล" :formatThaiDateTime(item.Form_verification_date) ?? "-",
+        หมายเหตุการขอยกเลิก: item.Form_note_approval ?? "-",
+        "สถานะการส่ง SMS": item.Form_status_SMS ?? "-",
+        วันที่รายงานผล: formatThaiDateTime(item.Form_verification_date) ?? "-",
 
-        "เลขอ้างอิง SMS"  :item.Form_id_SMS ?? "-",
+        "เลขอ้างอิง SMS": item.Form_id_SMS ?? "-",
       }));
 
       // 🔹 สร้าง worksheet
@@ -405,12 +420,18 @@ const reportNCBLite = () => {
         new Blob([excelBuffer], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         }),
-        `(RP) - รายงานทะเบียนขอสืบค้นข้อมูลเครดิต (วันที่ ${formatThaiDate(filters.startDate)}ถึงวันที่${formatThaiDate(filters.endDate)}).xlsx`
+        `(RP) - รายงานทะเบียนขอสืบค้นข้อมูลเครดิต (วันที่ ${formatThaiDate(filters.startDate)}ถึงวันที่${formatThaiDate(filters.endDate)}).xlsx`,
       );
     } catch (err) {
       console.error(err);
       Swal.fire("ผิดพลาด", "ไม่สามารถ Export Excel ได้", "error");
     }
+  };
+
+  const getYearOptions = () => {
+    const currentYearBE = new Date().getFullYear() + 543;
+
+    return Array.from({ length: 4 }, (_, i) => currentYearBE - i);
   };
 
   return (
@@ -453,7 +474,7 @@ const reportNCBLite = () => {
             <option value="">- เลือกสถานะ -</option>
             <option value="all">ทุกสถานะ</option>
             <option value="Lv1N">0N - ยกเลิกรายการ</option>
-            <option value="Lv2">01 - ตรวจสอบแล้ว</option>
+            <option value="Lv1">01 - ตรวจสอบแล้ว</option>
             <option value="rejected">2N - ไม่ผ่านการอนุมัติ</option>
             <option value="approved">2Y - ผ่านการอนุมัติ</option>
           </select>
@@ -481,6 +502,58 @@ const reportNCBLite = () => {
                 onChange={handleChange}
               />
             </div>
+          </div>
+        </div>
+
+        <div className="filter-group">
+          <label>
+            เดือน / ปี{" "}
+            <span style={{ color: "#ff8c00", fontWeight: "600" }}>
+              หน้าบ้านรายงานผล
+            </span>
+          </label>
+
+          <div className="date-range">
+            {/* เดือน */}
+            <select
+              name="monthSMS"
+              value={filters.monthSMS}
+              onChange={handleChange}
+            >
+              <option value="">เลือกเดือน</option>
+              {[
+                "มกราคม",
+                "กุมภาพันธ์",
+                "มีนาคม",
+                "เมษายน",
+                "พฤษภาคม",
+                "มิถุนายน",
+                "กรกฎาคม",
+                "สิงหาคม",
+                "กันยายน",
+                "ตุลาคม",
+                "พฤศจิกายน",
+                "ธันวาคม",
+              ].map((month, index) => (
+                <option key={index + 1} value={index + 1}>
+                  {month}
+                </option>
+              ))}
+            </select>
+
+            {/* ปี พ.ศ. */}
+            <select
+              name="yearSMS"
+              value={filters.yearSMS}
+              onChange={handleChange}
+            >
+              <option value="">เลือกปี</option>
+              {getYearOptions().map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
@@ -692,7 +765,7 @@ const reportNCBLite = () => {
                     <td>
                       {item.Form_loan_amount
                         ? `${Number(item.Form_loan_amount).toLocaleString(
-                            "th-TH"
+                            "th-TH",
                           )} บาท`
                         : "-"}
                     </td>

@@ -3125,7 +3125,7 @@ const AdminSetData_Litemain = () => {
                         <span className="required">*</span> :{" "}
                         <label>
                           <input
-                            type="number"
+                            type="text"
                             placeholder="กรุณากรอก"
                             className={`input-normal ${
                               submitted && !valueCredit ? "input-error" : ""
@@ -3230,7 +3230,7 @@ const AdminSetData_Litemain = () => {
                               คะแนนเครดิต <span className="required">*</span>
                             </h5>
                             <input
-                              type="number"
+                              type="text"
                               className={`input-normal2 ${
                                 submitted && !score ? "input-error" : ""
                               }`}
@@ -3262,7 +3262,7 @@ const AdminSetData_Litemain = () => {
                               <span className="required">*</span>
                             </h5>
                             <input
-                              type="number"
+                              type="text"
                               className={`input-normal2 ${
                                 submitted && !probabilityInput
                                   ? "input-error"
@@ -3469,7 +3469,7 @@ const AdminSetData_Litemain = () => {
                           {/* 🔹 จำนวนบัญชี */}
 
                           <input
-                            type="number"
+                            type="text"
                             className="input-normal"
                             placeholder="กรอกจำนวนบัญชี"
                             value={acc.amount}

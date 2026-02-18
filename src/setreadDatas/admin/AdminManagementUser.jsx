@@ -49,6 +49,38 @@ const convertToThaiDate = (dateString) => {
   return `${day} ${month} ${year}`;
 };
 
+const convertToThaiDateTime = (dateString) => {
+  if (!dateString) return "-";
+
+  const date = new Date(dateString);
+
+  const thaiMonths = [
+    "ม.ค.",
+    "ก.พ.",
+    "มี.ค.",
+    "เม.ย.",
+    "พ.ค.",
+    "มิ.ย.",
+    "ก.ค.",
+    "ส.ค.",
+    "ก.ย.",
+    "ต.ค.",
+    "พ.ย.",
+    "ธ.ค.",
+  ];
+
+  const day = date.getDate();
+  const month = thaiMonths[date.getMonth()];
+  const year = date.getFullYear() + 543;
+
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+
+  return `${day} ${month} ${year} ${hours}:${minutes}:${seconds} น.`;
+};
+
+
 const convertToThaiDate1 = (dateString) => {
   const date = new Date(dateString);
 
@@ -141,7 +173,7 @@ const AdminManagement = () => {
       searchKeyword: searchType, // ✅ ใช้ตัวนี้เท่านั้น
     };
 
-    console.log(params);
+    // console.log(params);
 
     try {
       const { data } = await apiClient.get(
@@ -575,9 +607,7 @@ const AdminManagement = () => {
                       <th className="text" style={{ width: "10%" }}>
                         ผู้ขอสืบค้น
                       </th>
-                        <th className="text" style={{ width: "7%" }}>
-                        วันที่ยื่นขอสืบค้น
-                      </th>
+                        
                       <th className="text" style={{ width: "7%" }}>
                         สาขา/หน่วย
                       </th>
@@ -589,20 +619,27 @@ const AdminManagement = () => {
                       </th>
                     
 
-                      <th className="text" style={{ width: "5%" }}>
-                        วัน/เวลา ที่บันทึก
-                      </th>
 
                       <th className="text" style={{ width: "8%" }}>
                         เอกสารประกอบ
                       </th>
-
-                      <th className="text-center" style={{ width: "3%" }}>
-                        รายงานผล
+                       
+                      
+                      <th className="text" style={{ width: "7%" }}>
+                        วันที่/เวลา ที่ยื่นเรื่อง
                       </th>
-                      <th className="text" style={{ width: "10%" }}>
+                        <th className="text" style={{ width: "10%" }}>
                         ผู้รายงานผลตรวจ
                       </th>
+                     
+                      <th className="text" style={{ width: "5%" }}>
+                        วัน/เวลา ตรวจสอบ
+                      </th>
+ <th className="text-center" style={{ width: "3%" }}>
+                        รายงานผล
+                      </th>
+                     
+                    
 
                       {/* <th className="text" style={{ width: "5%" }}>
                         วันที่รายงานผลตรวจ
@@ -698,7 +735,7 @@ const AdminManagement = () => {
                              {item.CTM_position || "-"}
                               </div>
                             </td>
-                            <td>{convertToThaiDate(item.date_upEvidence)}</td>
+                          
                             <td>
                               <div
                               
@@ -720,7 +757,7 @@ const AdminManagement = () => {
                                 {item.CTM_business_region || "-"}
                               </div>
                             </td>
-                            <td>{convertToThaiDate(item.CTM_created_at)}</td>
+                           
                             <td className="text">
                               <button
                                 className="doc-btn doc-consent mr-1"
@@ -758,7 +795,30 @@ const AdminManagement = () => {
                                 <FaRegIdCard />
                               </button>
                             </td>
-                            <td className="text-center">
+                           
+                               <td>{convertToThaiDateTime(item.date_upEvidence)}</td>
+                          
+                            <td>
+                              <center>
+                               <span style={{ fontSize : "12px" }}>{item.Form_Name_Inspector || "-"}{" "}</span> 
+                                <div
+                                  style={{ fontSize: "12px", color: "#6c757d" }}
+                                >
+                                  {/* วันที่ตรวจ:{" "}
+                                  {item.Form_date_inspertor ? (
+                                    convertToThaiDateTime(item.Form_date_inspertor)
+                                  ) : (
+                                    <center>
+                                      <span style={{ fontWeight: 600 }}>
+                                        {item.Form_date_inspertor || "-"}
+                                      </span>
+                                    </center>
+                                  )} */}
+                                </div>
+                              </center>
+                            </td>
+                              <td>{convertToThaiDateTime(item.Form_date_inspertor)}</td>
+                               <td className="text-center">
                               <button
                                 className="btn-icon"
                                 title="รายงานผล"
@@ -801,25 +861,6 @@ const AdminManagement = () => {
                               >
                                 <AiOutlineFileSearch /> 
                               </button>
-                            </td>
-                            <td>
-                              <center>
-                               <span style={{ fontSize : "12px" }}>{item.Form_Name_Inspector || "-"}{" "}</span> 
-                                <div
-                                  style={{ fontSize: "12px", color: "#6c757d" }}
-                                >
-                                  วันที่ตรวจ:{" "}
-                                  {item.Form_date_inspertor ? (
-                                    convertToThaiDate(item.Form_date_inspertor)
-                                  ) : (
-                                    <center>
-                                      <span style={{ fontWeight: 600 }}>
-                                        {item.Form_date_inspertor || "-"}
-                                      </span>
-                                    </center>
-                                  )}
-                                </div>
-                              </center>
                             </td>
                             {/* <td>{item.Form_Inspector}</td> */}
                             <td className="text-center">

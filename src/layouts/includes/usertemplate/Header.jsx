@@ -119,7 +119,7 @@ const Header = () => {
         role="dialog"
         aria-hidden="true"
       >
-        <div className="modal-dialog-centered" role="document">
+        <div className="modal-dialog modal-dialog-centered" role="document">
           <div className="modal-content contact-modal">
             <div type="button" className="close" data-dismiss="modal">
               <span>&times;</span>
