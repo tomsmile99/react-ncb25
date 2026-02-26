@@ -737,7 +737,7 @@ const SalepersonView_updatephoto = ({ idForm }) => {
                 errors.images.img3 ? "input-error" : ""
               }`}
             >
-              <label className="tag-label1">รูปบัตรประชาชน</label>
+              <label className="tag-label1">รูปสำเนาบัตรประชาชน</label>
               <input
                 type="file"
                 name="img3"

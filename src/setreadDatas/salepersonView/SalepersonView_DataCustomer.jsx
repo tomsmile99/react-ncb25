@@ -1022,30 +1022,30 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
               )}
 
               {/* {images.img2 && (
-  <div className="pt-4">
-    <img
-      src={
-        images.img2 instanceof File
-          ? URL.createObjectURL(images.img2) // ✅ รูปใหม่
-          : `${import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB}img/application/${images.img2}` // ✅ รูปเก่า
-      }
-      alt="สำเนาใบสมัครสินเชื่อ"
-      className="preview-img-full"
-      onClick={() =>
-        openModal(
-          images.img2 instanceof File
-            ? URL.createObjectURL(images.img2)
-            : `${import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB}img/application/${images.img2}`
-        )
-      }
-    />
-    <p className="img-label">สำเนาใบสมัครสินเชื่อ</p>
-  </div>
-)} */}
+                  <div className="pt-4">
+                    <img
+                      src={
+                        images.img2 instanceof File
+                          ? URL.createObjectURL(images.img2) // ✅ รูปใหม่
+                          : `${import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB}img/application/${images.img2}` // ✅ รูปเก่า
+                      }
+                      alt="สำเนาใบสมัครสินเชื่อ"
+                      className="preview-img-full"
+                      onClick={() =>
+                        openModal(
+                          images.img2 instanceof File
+                            ? URL.createObjectURL(images.img2)
+                            : `${import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB}img/application/${images.img2}`
+                        )
+                      }
+                    />
+                    <p className="img-label">สำเนาใบสมัครสินเชื่อ</p>
+                  </div>
+                )} */}
             </div>
 
             <div className="upload-group">
-              <label className="tag-label1 upload-group">รูปบัตรประชาชน</label>
+              <label className="tag-label1 upload-group">รูปสำเนาบัตรประชาชน</label>
               <input
                 type="file"
                 name="img3"
