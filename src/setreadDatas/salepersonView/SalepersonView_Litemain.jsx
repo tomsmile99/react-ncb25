@@ -70,7 +70,6 @@ const SalepersonView_Litemain = () => {
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
-   
     }
   };
 
@@ -89,20 +88,21 @@ const SalepersonView_Litemain = () => {
         "/api/insurances/datacustomers/dataPDF",
         {
           params,
-        }
+        },
       );
 
       const { status, result, message } = data;
 
       if (status === 200) {
-        console.log("✅ ดึงข้อมูล PDF สำเร็จ");
-        console.log("📦 result จากหลังบ้าน:", result);
         setgetDataShow(result[0]);
 
-        setTimeout(() => {
+        setTimeout(async () => {
           const element = pdfRef.current;
 
-          // ✅ แสดงก่อนสร้าง PDF
+          // 🔑 รอ font โหลดก่อน
+          await document.fonts.ready;
+
+          // แสดง element
           element.style.position = "static";
           element.style.top = "0";
           element.style.left = "0";
@@ -111,7 +111,7 @@ const SalepersonView_Litemain = () => {
           const options = {
             margin: 10,
             filename: `form_${idForm}.pdf`,
-            html2canvas: { scale: 2 },
+            html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
           };
 
@@ -123,13 +123,12 @@ const SalepersonView_Litemain = () => {
               window.open(pdfUrl, "_blank");
             })
             .finally(() => {
-              // ✅ ซ่อนกลับ
               element.style.position = "absolute";
               element.style.top = "-9999px";
               element.style.left = "-9999px";
               element.style.visibility = "hidden";
             });
-        }, 300); // ✅ รอ DOM render
+        }, 0);
       } else {
         console.error("❌ ไม่สำเร็จ:", message);
       }
@@ -221,7 +220,7 @@ const SalepersonView_Litemain = () => {
   // ตัดข้อมูลเฉพาะหน้าปัจจุบัน
   const currentData = probationaryEmployees.slice(
     startIndex,
-    startIndex + limit
+    startIndex + limit,
   );
 
   const handleRefresh = () => {
@@ -475,18 +474,17 @@ const SalepersonView_Litemain = () => {
                       <td>{convertToThaiDate(item.CTM_created_at)}</td>
 
                       {/* PDF */}
-                     <td className="text-center">
-                      {item.CTM_Idnumber && (
-                        <button
-                          className="btn-icon"
-                          onClick={() => handleDownloadPDF(item.CTM_Idnumber)}
-                          title="ฟอร์มหนังสือยินยอม"
-                        >
-                          <FaRegFilePdf />
-                        </button>
-                      )}
-                    </td>
-
+                      <td className="text-center">
+                        {item.CTM_Idnumber && (
+                          <button
+                            className="btn-icon"
+                            onClick={() => handleDownloadPDF(item.CTM_Idnumber)}
+                            title="ฟอร์มหนังสือยินยอม"
+                          >
+                            <FaRegFilePdf />
+                          </button>
+                        )}
+                      </td>
 
                       {/* สถานะเอกสาร */}
                       <td className="text-center">
@@ -543,17 +541,23 @@ const SalepersonView_Litemain = () => {
                       {/* ปุ่มจัดการ */}
                       <td className="text-center">
                         <div className="d-flex gap-2 justify-content-center">
-                          
-                         {item.CTM_Idnumber &&
-  ["Lv0N", "Lv1E"].includes(item.Form_verification_status) && (
-    <NavLink to={`/Sale_EditDataCustomer/${item.CTM_Idnumber}`}>
-      <button className="btn-icon" title="แก้ไขข้อมูล">
-        <FiEdit />
-      </button>
-    </NavLink>
-)}
+                          {item.CTM_Idnumber &&
+                            ["Lv0N", "Lv1E"].includes(
+                              item.Form_verification_status,
+                            ) && (
+                              <NavLink
+                                to={`/Sale_EditDataCustomer/${item.CTM_Idnumber}`}
+                              >
+                                <button
+                                  className="btn-icon"
+                                  title="แก้ไขข้อมูล"
+                                >
+                                  <FiEdit />
+                                </button>
+                              </NavLink>
+                            )}
                           {["Lv0N", ""].includes(
-                            item.Form_verification_status
+                            item.Form_verification_status,
                           ) && (
                             <button
                               className="btn-icon"
@@ -929,68 +933,6 @@ const SalepersonView_Litemain = () => {
             marginTop: "18px",
           }}
         >
-          {/* ✅ กล่องผู้ให้ความยินยอม */}
-          <div
-            style={{
-              border: "1px solid #000",
-              borderRadius: "22px",
-              width: "400px",
-              padding: "6px 10px", // 🔻 จาก 10px → 6px
-              marginBottom: "12px",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{ display: "flex", alignItems: "center" }}
-              className="pt-2"
-            >
-              {/* ไอคอนติ๊ก */}
-              <img src="/5290982.png" width={20} alt="signature-icon" />
-
-              {/* ข้อความ + เส้น */}
-              <div style={{ textAlign: "left", fontSize: "20px" }}>
-                &nbsp;&nbsp;ลงชื่อ&nbsp;
-                ..........................................................................
-                <br />
-              </div>
-            </div>
-            <div
-              style={{
-                // marginLeft: "56px",
-                marginTop: "6px",
-                width: "430px",
-                position: "relative",
-                fontSize: "20px",
-              }}
-            >
-              {/* วงเล็บ + เส้น */}(
-              ..........................................................................
-              )
-              <span style={{ fontSize: "20px", marginLeft: "8px" }}>
-                ตัวบรรจง
-              </span>
-              {/* ชื่อ (ลอยบนเส้น) */}
-              <div
-                style={{
-                  position: "absolute",
-                  top: "-10px", // 🔑 ปรับระดับความลอย
-                  left: "45%",
-                  transform: "translateX(-50%)",
-                  background: "#fff", // 🔑 กันเส้นทับตัวอักษร
-                  padding: "0 8px",
-                  whiteSpace: "nowrap",
-                  fontWeight: "normal",
-                }}
-              >
-                {getDataShow?.CTM_title_name}
-                {getDataShow?.CTM_firstname} {getDataShow?.CTM_lastname}
-              </div>
-            </div>
-
-            <div style={{ fontSize: "20px", fontWeight: 800 }}>
-              ผู้ให้ความยินยอม
-            </div>
-          </div>
           {/* ✅ โซนพยาน (จัดซ้าย–ขวา) */}
           <div
             style={{
@@ -1002,15 +944,111 @@ const SalepersonView_Litemain = () => {
             {getDataShow?.Form_witness2_name && (
               <div
                 style={{
-                  borderRadius: "10px",
-                  width: "360px",
-                  padding: "12px",
-                  textAlign: "center",
+                  marginTop: "18px",
+                  fontSize: "18px",
+                  fontWeight: "bold", // ✅ ตัวหนา
                 }}
               >
-                <div>( {getDataShow?.Form_witness2_name} )</div>
-                <div>พยาน</div>
+                <div
+                  style={{
+                    whiteSpace: "nowrap", // ✅ ไม่ให้ขึ้นบรรทัดใหม่
+                  }}
+                >
+                  ข้าพเจ้าขอรับรองว่าเป็นลายพิมพ์นิ้วหัวแม่มือข้าง.........
+                </div>
+
+                <div>
+                  ของ {getDataShow?.CTM_title_name}
+                  {getDataShow?.CTM_firstname} {getDataShow?.CTM_lastname} จริง
+                </div>
               </div>
+            )}
+
+            {/* ✅ กล่องผู้ให้ความยินยอม */}
+            <div
+              style={{
+                border: "1px solid #000",
+                borderRadius: "22px",
+                width: "400px",
+                padding: "6px 10px", // 🔻 จาก 10px → 6px
+                marginBottom: "12px",
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{ display: "flex", alignItems: "center" }}
+                className="pt-2"
+              >
+                {/* ไอคอนติ๊ก */}
+                <img src="/5290982.png" width={20} alt="signature-icon" />
+
+                {/* ข้อความ + เส้น */}
+                <div style={{ textAlign: "left", fontSize: "20px" }}>
+                  &nbsp;&nbsp;ลงชื่อ&nbsp;
+                  ..........................................................................
+                  <br />
+                </div>
+              </div>
+              <div
+                style={{
+                  // marginLeft: "56px",
+                  marginTop: "6px",
+                  width: "430px",
+                  position: "relative",
+                  fontSize: "20px",
+                }}
+              >
+                {/* วงเล็บ + เส้น */}(
+                ..........................................................................
+                )
+                <span style={{ fontSize: "20px", marginLeft: "8px" }}>
+                  ตัวบรรจง
+                </span>
+                {/* ชื่อ (ลอยบนเส้น) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-10px", // 🔑 ปรับระดับความลอย
+                    left: "45%",
+                    transform: "translateX(-50%)",
+                    background: "#fff", // 🔑 กันเส้นทับตัวอักษร
+                    padding: "0 8px",
+                    whiteSpace: "nowrap",
+                    fontWeight: "normal",
+                  }}
+                >
+                  {getDataShow?.CTM_title_name}
+                  {getDataShow?.CTM_firstname} {getDataShow?.CTM_lastname}
+                </div>
+              </div>
+
+              <div style={{ fontSize: "20px", fontWeight: 800 }}>
+                ผู้ให้ความยินยอม
+              </div>
+            </div>
+          </div>
+          {/* ✅ โซนพยาน (จัดซ้าย–ขวา) */}
+          <div
+            style={{
+              display: "flex",
+              gap: "16px", // ✅ ระยะห่างซ้าย-ขวา
+            }}
+          >
+            {/* ✅ พยานคนที่ 2 (แสดงเฉพาะตอนมีค่า) */}
+            {getDataShow?.Form_witness2_name && (
+              <>
+                <div
+                  style={{
+                    borderRadius: "10px",
+                    width: "360px",
+                    padding: "12px",
+                    textAlign: "center",
+                  }}
+                >
+                  <div>( {getDataShow?.Form_witness2_name} )</div>
+                  <div>พยาน</div>
+                </div>
+              </>
             )}
 
             {/* ✅ พยานคนที่ 1 (แสดงตลอด) */}

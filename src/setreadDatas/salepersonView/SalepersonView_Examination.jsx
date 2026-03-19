@@ -1568,68 +1568,100 @@ const SalepersonView_Examination = () => {
             marginTop: "18px",
           }}
         >
-          {/* ✅ กล่องผู้ให้ความยินยอม */}
           <div
             style={{
-              border: "1px solid #000",
-              borderRadius: "22px",
-              width: "400px",
-              padding: "6px 10px", // 🔻 จาก 10px → 6px
-              marginBottom: "12px",
-              textAlign: "center",
+              display: "flex",
+              gap: "16px", // ✅ ระยะห่างซ้าย-ขวา
             }}
           >
-            <div
-              style={{ display: "flex", alignItems: "center" }}
-              className="pt-2"
-            >
-              {/* ไอคอนติ๊ก */}
-              <img src="/5290982.png" width={20} alt="signature-icon" />
-
-              {/* ข้อความ + เส้น */}
-              <div style={{ textAlign: "left", fontSize: "20px" }}>
-                &nbsp;&nbsp;ลงชื่อ&nbsp;
-                ..........................................................................
-                <br />
-              </div>
-            </div>
-            <div
-              style={{
-                // marginLeft: "56px",
-                marginTop: "6px",
-                width: "430px",
-                position: "relative",
-                fontSize: "20px",
-              }}
-            >
-              {/* วงเล็บ + เส้น */}(
-              ..........................................................................
-              )
-              <span style={{ fontSize: "20px", marginLeft: "8px" }}>
-                ตัวบรรจง
-              </span>
-              {/* ชื่อ (ลอยบนเส้น) */}
+            {/* ✅ พยานคนที่ 2 (แสดงเฉพาะตอนมีค่า) */}
+            {getDataShowPdf?.Form_witness2_name && (
               <div
                 style={{
-                  position: "absolute",
-                  top: "-10px", // 🔑 ปรับระดับความลอย
-                  left: "45%",
-                  transform: "translateX(-50%)",
-                  background: "#fff", // 🔑 กันเส้นทับตัวอักษร
-                  padding: "0 8px",
-                  whiteSpace: "nowrap",
-                  fontWeight: "normal",
+                  marginTop: "18px",
+                  fontSize: "18px",
+                  fontWeight: "bold", // ✅ ตัวหนา
                 }}
               >
-                {getDataShowPdf?.CTM_title_name}
-                {getDataShowPdf?.CTM_firstname} {getDataShowPdf?.CTM_lastname}
+                <div
+                  style={{
+                    whiteSpace: "nowrap", // ✅ ไม่ให้ขึ้นบรรทัดใหม่
+                  }}
+                >
+                  ข้าพเจ้าขอรับรองว่าเป็นลายพิมพ์นิ้วหัวแม่มือข้าง.........
+                </div>
+
+                <div>
+                  ของ {getDataShowPdf?.CTM_title_name}
+                  {getDataShowPdf?.CTM_firstname} {getDataShowPdf?.CTM_lastname} จริง
+                </div>
+              </div>
+            )}
+
+            {/* ✅ กล่องผู้ให้ความยินยอม */}
+            <div
+              style={{
+                border: "1px solid #000",
+                borderRadius: "22px",
+                width: "400px",
+                padding: "6px 10px", // 🔻 จาก 10px → 6px
+                marginBottom: "12px",
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{ display: "flex", alignItems: "center" }}
+                className="pt-2"
+              >
+                {/* ไอคอนติ๊ก */}
+                <img src="/5290982.png" width={20} alt="signature-icon" />
+
+                {/* ข้อความ + เส้น */}
+                <div style={{ textAlign: "left", fontSize: "20px" }}>
+                  &nbsp;&nbsp;ลงชื่อ&nbsp;
+                  ..........................................................................
+                  <br />
+                </div>
+              </div>
+              <div
+                style={{
+                  // marginLeft: "56px",
+                  marginTop: "6px",
+                  width: "430px",
+                  position: "relative",
+                  fontSize: "20px",
+                }}
+              >
+                {/* วงเล็บ + เส้น */}(
+                ..........................................................................
+                )
+                <span style={{ fontSize: "20px", marginLeft: "8px" }}>
+                  ตัวบรรจง
+                </span>
+                {/* ชื่อ (ลอยบนเส้น) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-10px", // 🔑 ปรับระดับความลอย
+                    left: "45%",
+                    transform: "translateX(-50%)",
+                    background: "#fff", // 🔑 กันเส้นทับตัวอักษร
+                    padding: "0 8px",
+                    whiteSpace: "nowrap",
+                    fontWeight: "normal",
+                  }}
+                >
+                  {getDataShowPdf?.CTM_title_name}
+                  {getDataShowPdf?.CTM_firstname} {getDataShowPdf?.CTM_lastname}
+                </div>
+              </div>
+
+              <div style={{ fontSize: "20px", fontWeight: 800 }}>
+                ผู้ให้ความยินยอม
               </div>
             </div>
-
-            <div style={{ fontSize: "20px", fontWeight: 800 }}>
-              ผู้ให้ความยินยอม
-            </div>
           </div>
+
           {/* ✅ โซนพยาน (จัดซ้าย–ขวา) */}
           <div
             style={{

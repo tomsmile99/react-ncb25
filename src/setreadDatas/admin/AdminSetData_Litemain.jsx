@@ -25,6 +25,8 @@ import {
   AiOutlineCloudDownload,
   AiOutlineDelete,
 } from "react-icons/ai";
+import { HiDocumentSearch } from "react-icons/hi";
+import { FcViewDetails } from "react-icons/fc";
 const convertToThaiDate = (dateString) => {
   const date = new Date(dateString);
 
@@ -103,11 +105,11 @@ const AdminSetData_Litemain = () => {
 
   const [probabilityInput, setProbabilityInput] = useState("");
   const [probabilityPercent, setProbabilityPercent] = useState("");
-
+  const [showPreview, setShowPreview] = useState(false);
   const [openFeeModal, setOpenFeeModal] = useState(null);
 
   const [accounts, setAccounts] = useState([
-    { status: "", amount: "", isNew: false },
+    { status: "", amount: "", detel: "", isNew: false },
   ]);
   const [reasons, setReasons] = useState([{ reason: "" }]);
 
@@ -448,6 +450,7 @@ const AdminSetData_Litemain = () => {
     const newItem = {
       status: "",
       amount: "",
+      detel: "",
       isNew: true,
     };
 
@@ -632,6 +635,7 @@ const AdminSetData_Litemain = () => {
       {
         status: "",
         amount: "",
+        detel: "",
       },
     ]);
 
@@ -1231,6 +1235,14 @@ const AdminSetData_Litemain = () => {
 
   // 🔔 notification โหลดครั้งเดียว
 
+  const openPreviewModal = () => {
+    // console.log("click preview");
+    setShowPreview(true);
+  };
+  const closePreviewModal = () => {
+    setShowPreview(false);
+  };
+
   useEffect(() => {
     loadUserNotification1();
     loadUserNotification2();
@@ -1525,7 +1537,7 @@ const AdminSetData_Litemain = () => {
                   </InputGroup>
                 </div>
               </div>
-            </div> */} 
+            </div> */}
 
             <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
               {/* --- เลือกประเภท --- */}
@@ -1542,7 +1554,7 @@ const AdminSetData_Litemain = () => {
                     setSearchType(e.target.value);
                     setSearchQuerySub("");
                   }}
-                  style={{ fontSize: 13, width: 180,height:38 }}
+                  style={{ fontSize: 13, width: 180, height: 38 }}
                 >
                   <option value=""> - เลือกประเภท - </option>
                   <option value="name">ชื่อลูกค้า</option>
@@ -1569,7 +1581,7 @@ const AdminSetData_Litemain = () => {
                       borderRadius: "7px 0 0 7px",
                     }}
                   >
-                    <FiSearch style={{ color: "#888", fontSize: 16  }} />
+                    <FiSearch style={{ color: "#888", fontSize: 16 }} />
                   </InputGroup.Text>
 
                   <FormControl
@@ -3471,10 +3483,20 @@ const AdminSetData_Litemain = () => {
                           <input
                             type="text"
                             className="input-normal"
+                            style={{ width: "100px" }}
                             placeholder="กรอกจำนวนบัญชี"
                             value={acc.amount}
                             onChange={(e) =>
                               handleChange(index, "amount", e.target.value)
+                            }
+                          />
+                          <input
+                            type="text"
+                            className="input-normal"
+                            placeholder="คำอธิบายเพิ่มเติม"
+                            value={acc.detel}
+                            onChange={(e) =>
+                              handleChange(index, "detel", e.target.value)
                             }
                           />
 
@@ -3750,7 +3772,20 @@ const AdminSetData_Litemain = () => {
             </div>
 
             {/* 🔹 Footer */}
+
             <div className="popup-footer">
+              {/* ปุ่มซ้ายสุด */}
+
+                {approval === "approved" && (
+              <button
+                className="btn-submit-modern"
+                type="button"
+                onClick={openPreviewModal}
+                style={{ marginRight: "auto", background: "#f78b4c" }}
+              >
+                <HiDocumentSearch style={{ marginRight: "6px" }} />
+                ดูตัวอย่างเอกสาร
+              </button> )}
               <button className="btn-cancel-modern" onClick={closePopup}>
                 ยกเลิก
               </button>
@@ -3871,6 +3906,220 @@ const AdminSetData_Litemain = () => {
                 onClick={() => handleSaveContract()}
               >
                 บันทึก
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPreview && (
+        <div className="preview-overlay">
+          <div className="preview-modal-large">
+            <div className="preview-header">
+              <h6>
+                <FcViewDetails /> ข้อมูลเอกสารผลการตรวจเครดิต
+              </h6>
+            </div>
+
+            <div className="preview-body">
+
+              <center>
+          {joinProject === "yes" && (
+            <span
+              style={{ color: "red", fontWeight: "bold", fontSize: "18px" }}
+            >
+              ลูกค้าเข้าร่วมโครงการ "คุณสู้ เราช่วย"
+            </span>
+          )}
+        </center>
+
+              <table className="section-table">
+                <tbody>
+                  <tr>
+                    <td style={{ fontSize: "14px" }}>
+                      <b>1. มีสินเชื่อส่วนบุคคลภายใต้การกำกับ จำนวน</b>{" "}
+                      {valueCredit} แห่ง
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontSize: "14px" }}>
+                      <b>2. สถานะการเป็นบุคคลล้มละลาย : </b>{" "}
+                      {bankrupt === "no"
+                        ? "ไม่เป็น (อ้างอิงข้อมูลบุคคลล้มละลายจากกรมบังคับคดี)"
+                        : "เป็น (อ้างอิงข้อมูลบุคคลล้มละลายจากกรมบังคับคดี)"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ fontSize: "14px" }}>
+                      <b>3. คะแนนเครดิต</b>
+                      <table className="section-table">
+                        <thead>
+                          <tr>
+                            <th>
+                              <center
+                                style={{ fontSize: "20px", fontWeight: "bold" }}
+                              >
+                                คะแนนเครดิต
+                              </center>
+                            </th>
+                            <th>
+                              <center
+                                style={{ fontSize: "20px", fontWeight: "bold" }}
+                              >
+                                ระดับคะแนนเครดิต
+                              </center>
+                            </th>
+                            <th>
+                              <center
+                                style={{ fontSize: "20px", fontWeight: "bold" }}
+                              >
+                                ความน่าจะเป็นในการชำระหนี้คืน
+                              </center>
+                            </th>
+                            <th>
+                              <center
+                                style={{ fontSize: "20px", fontWeight: "bold" }}
+                              >
+                                ผลการตรวจสอบข้อมูลเครดิต
+                              </center>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody style={{ border: "none" }}>
+                          <tr style={{ border: "none" }}>
+                            <td style={{ border: "none" }}>
+                              <center
+                                style={{ fontSize: "40px", fontWeight: "bold" }}
+                              >
+                                {score}
+                              </center>
+                            </td>
+
+                            <td style={{ border: "none" }}>
+                              <center
+                                style={{ fontSize: "40px", fontWeight: "bold" }}
+                              >
+                                {level}
+                              </center>
+                            </td>
+
+                            <td style={{ border: "none" }}>
+                              <center
+                                style={{ fontSize: "40px", fontWeight: "bold" }}
+                              >
+                                {probabilityPercent}
+                              </center>
+                            </td>
+
+                            <td
+                              style={{ border: "none" }}
+                              className={
+                                result === "ผ่าน"
+                                  ? "passed-green"
+                                  : "passed-red"
+                              }
+                            >
+                              <center>
+                                <span
+                                  style={{ fontSize: "30px", fontWeight: 800 }}
+                                >
+                                  {result}
+                                </span>
+                                <br />
+                                <span style={{ fontSize: "15px" }}>
+                                  ( {risk} )
+                                </span>
+                              </center>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      {/* REASONS */}
+                      <div className="reason-block">
+                        <b style={{ color: "red" }}>
+                          3.1 เหตุผลประกอบเพิ่มเติม
+                        </b>
+
+                        <div className="reason-content">
+                          {accounts && accounts.length > 0 ? (
+                            accounts
+                              .filter((item) => item && item.status) // กันข้อมูลว่าง
+                              .map((item, index) => (
+                                <div
+                                  key={index}
+                                  style={{
+                                    fontSize: "14px",
+                                    marginBottom: "8px",
+                                  }}
+                                  className="reason-item"
+                                >
+                                  <span
+                                    style={{
+                                      display: "inline-block",
+                                      minWidth: "650px",
+                                    }}
+                                  >
+                                    {ACCOUNT_STATUS_MAP[item.status]}
+                                    {item.amount ? (
+                                      <> จำนวน {item.amount} บัญชี</>
+                                    ) : null}
+                                  </span>
+
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {item.detel ? item.detel : "-"}
+                                  </span>
+                                </div>
+                              ))
+                          ) : (
+                            <div className="reason-item">-</div>
+                          )}
+                        </div>
+
+                        <b> 3.2 เหตุผลประกอบคะแนนเครดิต</b>
+
+                        <div className="reason-content">
+                          {reasons &&
+                          reasons.filter((r) => r?.reason).length > 0 ? (
+                            reasons
+                              .filter((r) => r?.reason) // กรอง reason ว่าง
+                              .map((item, index) => (
+                                <div
+                                  key={index}
+                                  className="reason-item"
+                                  style={{ fontSize: "14px" }}
+                                >
+                                  {CREDIT_REASON_MAP[item.reason]}
+                                </div>
+                              ))
+                          ) : (
+                            <div className="reason-item">-</div>
+                          )}
+                        </div>
+                      </div>
+                      {/* FOOT NOTE */}
+                      <div className="footer-date" style={{ fontSize: "14px" }}>
+                        ข้อมูล ณ วันที่{" "}
+                        {convertToThaiDate1(
+                          new Date().toISOString().slice(0, 10),
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div className="form-group pt-3">
+                      <h6>คำอธิบายเพิ่มเติม </h6>
+                      <textarea
+                        className="input-normal"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                      ></textarea>
+                    </div>
+            </div>
+
+            <div className="preview-footer">
+              <button className="btn-close" style={{background: "#0f3d78",borderRadius:7 }} onClick={closePreviewModal}>
+                ปิด
               </button>
             </div>
           </div>

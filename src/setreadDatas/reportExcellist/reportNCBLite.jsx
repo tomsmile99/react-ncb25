@@ -276,7 +276,7 @@ const reportNCBLite = () => {
       if (item.Form_verification_status === "Lv0") {
         return "รอพิจารณา";
       }
-      return "-";
+      return "รอพิจารณา";
     }
 
     // 2️⃣ ถ้า Form_Approval_results มีค่า
@@ -288,7 +288,7 @@ const reportNCBLite = () => {
       case "Cancel":
         return "ยกเลิกรายการ";
       default:
-        return "-";
+        return "รอพิจารณา";
     }
   };
 

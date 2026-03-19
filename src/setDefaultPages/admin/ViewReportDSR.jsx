@@ -74,7 +74,7 @@ const ViewReportDSR = () => {
         "/api/insurances/datacustomers_AdminSingle",
         {
           params,
-        }
+        },
       );
 
       const { status, result, resultReasons, resultCreditscore, message } =
@@ -145,7 +145,7 @@ const ViewReportDSR = () => {
             <span style={{ fontSize: "22px" }}>
               {" "}
               วันที่รายงานผล :{" "}
-              {convertToThaiDateFull(getDataShow.SCORE_Date_chk)}
+              {convertToThaiDateFull(getDataShow.Form_date_inspertor)}
             </span>
           </div>
           <div>
@@ -171,7 +171,7 @@ const ViewReportDSR = () => {
             <span style={{ fontSize: "22px" }}>
               วงเงินขอสินเชื่อ :{" "}
               {Number(getDataShow?.Form_loan_amount || 0).toLocaleString(
-                "th-TH"
+                "th-TH",
               )}{" "}
               บาท
             </span>
@@ -200,7 +200,7 @@ const ViewReportDSR = () => {
           <tbody>
             <tr>
               <td style={{ fontSize: "22px" }}>
-                <b >1. มีสินเชื่อส่วนบุคคลภายใต้การกำกับ จำนวน</b>{" "}
+                <b>1. มีสินเชื่อส่วนบุคคลภายใต้การกำกับ จำนวน</b>{" "}
                 {getDataShow.SCORE_loan_amount} แห่ง
               </td>
             </tr>
@@ -214,7 +214,7 @@ const ViewReportDSR = () => {
             </tr>
             <tr>
               <td style={{ fontSize: "22px" }}>
-                <b >3. คะแนนเครดิต</b>
+                <b>3. คะแนนเครดิต</b>
                 <table className="section-table">
                   <thead>
                     <tr>
@@ -250,7 +250,7 @@ const ViewReportDSR = () => {
                   </thead>
                   <tbody style={{ border: "none" }}>
                     <tr style={{ border: "none" }}>
-                      <td style={{ border: "none"  }}>
+                      <td style={{ border: "none" }}>
                         <center
                           style={{ fontSize: "50px", fontWeight: "bold" }}
                         >
@@ -299,14 +299,27 @@ const ViewReportDSR = () => {
                 <div className="reason-block">
                   <b style={{ color: "red" }}>3.1 เหตุผลประกอบเพิ่มเติม</b>
 
-                  <div className="reason-content" >
+                  <div className="reason-content">
                     {getDataReasons.length > 0 ? (
                       getDataReasons.map((item, index) => (
-                        <div key={index} className="reason-item" style={{ fontSize: "22px" }}>
-                          {item.account_status}
-                          {item.account_total ? (
-                            <> จำนวน {item.account_total} บัญชี</>
-                          ) : null}
+                        <div
+                          key={index}
+                          style={{ fontSize: "22px", marginBottom: "8px" }}
+                        >
+                          <span
+                            style={{
+                              display: "inline-block",
+                              minWidth: "650px",
+                            }}
+                          >
+                            {item.account_status}
+                            {item.account_total ? (
+                              <> จำนวน {item.account_total} บัญชี</>
+                            ) : null}
+                          </span>{" "}
+                          <span style={{ fontWeight: "bold" }}>
+                            {item.account_total ? item.account_detal : "-"}
+                          </span>
                         </div>
                       ))
                     ) : (
@@ -319,7 +332,11 @@ const ViewReportDSR = () => {
                   <div className="reason-content">
                     {getDataScore.length > 0 ? (
                       getDataScore.map((item, index) => (
-                        <div key={index} className="reason-item" style={{ fontSize: "22px" }}>
+                        <div
+                          key={index}
+                          className="reason-item"
+                          style={{ fontSize: "22px" }}
+                        >
                           {item.credit_reason}
                         </div>
                       ))
@@ -347,11 +364,15 @@ const ViewReportDSR = () => {
           </div>
 
           {/* หมายเหตุ */}
-          <div className="notice-title" style={{ fontSize: "22px" }}>หมายเหตุ :</div>
+          <div className="notice-title" style={{ fontSize: "22px" }}>
+            หมายเหตุ :
+          </div>
 
           {/* ข้อ 1 */}
           <div className="notice-row">
-            <span className="notice-no" style={{ fontSize: "22px" }}>1.</span>
+            <span className="notice-no" style={{ fontSize: "22px" }}>
+              1.
+            </span>
             <div className="notice-text" style={{ fontSize: "22px" }}>
               {/* <span className="notice-bold"> */}
               คุณสมบัติผู้ขอสินเชื่อส่วนบุคคล รายได้ไม่เกิน 30,000 บาท/เดือน
@@ -365,7 +386,7 @@ const ViewReportDSR = () => {
 
           {/* ข้อ 2 */}
           <div className="notice-row" style={{ fontSize: "22px" }}>
-            <span className="notice-no" >2.</span>
+            <span className="notice-no">2.</span>
             <div className="notice-text">
               ลูกค้าใหม่ ที่มีสถานะเป็นบุคคลล้มละลาย ไม่ให้สินเชื่อ
               (ตามประกาศที่ 882/2556)
@@ -385,7 +406,6 @@ const ViewReportDSR = () => {
 
         <div
           style={{
-          
             fontSize: "22px",
             width: "100%",
             marginTop: "20px",

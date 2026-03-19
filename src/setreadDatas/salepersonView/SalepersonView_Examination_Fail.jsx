@@ -1534,6 +1534,42 @@ const SalepersonView_Examination_Fail = () => {
             marginTop: "18px",
           }}
         >
+
+  {/* ✅ โซนพยาน (จัดซ้าย–ขวา) */}
+          <div
+            style={{
+              display: "flex",
+              gap: "16px", // ✅ ระยะห่างซ้าย-ขวา
+            }}
+          >
+
+                {/* ✅ พยานคนที่ 2 (แสดงเฉพาะตอนมีค่า) */}
+            {getDataShowPdf?.Form_witness2_name && (
+              <div
+                style={{
+                  marginTop: "18px",
+                  fontSize: "18px",
+                  fontWeight: "bold", // ✅ ตัวหนา
+                }}
+              >
+                <div
+                  style={{
+                    whiteSpace: "nowrap", // ✅ ไม่ให้ขึ้นบรรทัดใหม่
+                  }}
+                >
+                  ข้าพเจ้าขอรับรองว่าเป็นลายพิมพ์นิ้วหัวแม่มือข้าง.........
+                </div>
+
+                <div>
+                  ของ {getDataShowPdf?.CTM_title_name}
+                  {getDataShowPdf?.CTM_firstname} {getDataShowPdf?.CTM_lastname} จริง
+                </div>
+              </div>
+            )}
+
+
+
+
           {/* ✅ กล่องผู้ให้ความยินยอม */}
           <div
             style={{
@@ -1596,6 +1632,10 @@ const SalepersonView_Examination_Fail = () => {
               ผู้ให้ความยินยอม
             </div>
           </div>
+
+</div>
+
+
           {/* ✅ โซนพยาน (จัดซ้าย–ขวา) */}
           <div
             style={{
