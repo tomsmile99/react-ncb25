@@ -13,7 +13,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
       "ก.พ.",
       "มี.ค.",
       "เม.ย.",
-      "พ.ค.",
+      "พ.ค.", 
       "มิ.ย.",
       "ก.ค.",
       "ส.ค.",
@@ -949,6 +949,9 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
                 <option value="8">
                   ลูกค้าเก่าต่อสัญญา/RENEW เงื่อนไขการชำระรายงวด
                   มีการต่อสัญญาต่อเนื่อง ตั้งแต่ 1 ปีขึ้นไป
+                </option>
+                  <option value="9">
+                 ลูกค้าเก่า เงื่อนไขสินเชื่อเพื่อให้ความช่วยเหลือลูกหนี้
                 </option>
               </select>
             </div>
