@@ -85,11 +85,21 @@ export default function AuthRouter() {
       //console.log(`${role.toUpperCase()} เข้าระบบโดย : ${fullnamePer}`);
 
       // ✅ redirect แค่ครั้งเดียว
-      hasRedirected.current = true;
+      // hasRedirected.current = true;
 
-      navigate(role === "admin" ? "/Admin_CheckCredit" : "/Salesperson", {
-        replace: true,
-      });
+      // navigate(role === "admin" ? "/Admin_CheckCredit" : "/Salesperson", {
+      //   replace: true,
+      // });
+
+      if(!hasRedirected.current && location.pathname === "/"){
+        hasRedirected.current = true;
+        navigate(role === "admin" ? "/Admin_CheckCredit" : "/Salesperson", {
+          replace: true,
+        });
+      }
+
+
+
     } catch (err) {
       console.error("❌ Token error:", err);
       navigate("/");
