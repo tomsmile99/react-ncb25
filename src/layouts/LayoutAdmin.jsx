@@ -22,6 +22,7 @@ const LayoutAdmin = () => {
 
   const [contDataMenuChkCD1, setContDataMenuChkCD1] = useState([]); // Object to group by section ID
   const [contDataMenuChkCD2, setContDataMenuChkCD2] = useState([]); // Object to group by section ID
+  const [contDataMenuChkCD3, setContDataMenuChkCD3] = useState([]); // Object to group by section ID
 
   const [activeTab, setActiveTab] = useState("wait");
 
@@ -29,7 +30,7 @@ const LayoutAdmin = () => {
   const loadUserNotification1 = async () => {
     try {
       const { data } = await apiClient.get(
-        "/api/insurances/datacustomers_Admin_count"
+        "/api/insurances/datacustomers_Admin_count",
       );
 
       if (data?.status) {
@@ -44,7 +45,7 @@ const LayoutAdmin = () => {
   const loadUserNotification2 = async () => {
     try {
       const { data } = await apiClient.get(
-        "/api/insurances/datacustomers_Admin_Edit_count"
+        "/api/insurances/datacustomers_Admin_Edit_count",
       );
 
       if (data?.status) {
@@ -55,9 +56,26 @@ const LayoutAdmin = () => {
     }
   };
 
+  // 🔔 แจ้งเตือนหน้าแจ้งรอแก้ไขข้อมูล
+  const loadUserNotification3 = async () => {
+    try {
+      const { data } = await apiClient.get(
+        "/api/insurances/datacustomers/count-approverNcb",
+      );
+
+      if (data?.status) {
+
+        setContDataMenuChkCD3(data.total); // 🔔 จำนวนงานตรวจสอบ
+      }
+    } catch (err) {
+      console.error("Error fetching notification:", err);
+    }
+  };
+
   useEffect(() => {
     loadUserNotification1();
     loadUserNotification2();
+    loadUserNotification3();
   }, []);
 
   return (
@@ -68,6 +86,7 @@ const LayoutAdmin = () => {
           FullnamePer={fullnamePer}
           contDataMenuChkCD1={contDataMenuChkCD1}
           contDataMenuChkCD2={contDataMenuChkCD2}
+          contDataMenuChkCD3={contDataMenuChkCD3}
         />
 
         <Outlet />

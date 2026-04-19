@@ -25,7 +25,7 @@ const reportNCBLiteDSRMain = () => {
                   <BiSolidMessageSquareEdit
                     style={{ marginRight: "6px", color: "#3056d2" }}
                   />
-                   รายการรอการแก้ไขข้อมูลการตรวจสอบเครดิต
+                   รายงานสรุปการยื่นขอสืบค้น ( นอกหลักเกณฑ์ )
                 </h1>
               </div>
               <div className="col-sm-12 col-md-6">
@@ -36,7 +36,7 @@ const reportNCBLiteDSRMain = () => {
                     </a>
                   </li>
                   <li className="breadcrumb-item active">
-                     รายการรอการแก้ไขข้อมูลการตรวจสอบเครดิต
+                     รายงานสรุปการยื่นขอสืบค้น ( นอกหลักเกณฑ์ )
                   </li>
                 </ol>
               </div>

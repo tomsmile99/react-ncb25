@@ -22,6 +22,7 @@ const LayoutUser = () => {
 
 
   const _PerWP = Base64.decode(getstore.PerWP);
+    const PerD = Base64.decode(getstore.PerD);
   const wpnamePer = Base64.decode(getstore.PerFuNas);
   const PerPhotoProfile_N = Base64.decode(getstore.PerPhotoProfile_N);
   const fullnamePer = Base64.decode(getstore.PerFuNas);
@@ -30,6 +31,9 @@ const LayoutUser = () => {
 
   const [contDataMenuChkCD1, setContDataMenuChkCD1] = useState([]); // Object to group by section ID
   const [contDataMenuChkCD2, setContDataMenuChkCD2] = useState([]); // Object to group by section ID
+   const [contDataMenuChkCD3, setContDataMenuChkCD3] = useState([]); // Object to group by section ID
+   const [contDataMenuChkCD4, setContDataMenuChkCD4] = useState([]); // Object to group by section ID
+
 
   // 🔔 แจ้งเตือนหน้ายื่นแบบฟอร์ม 
 const loadUserNotification1 = async () => {
@@ -66,16 +70,55 @@ const loadUserNotification2 = async () => {
   }
 };
 
+const loadUserNotification3 = async () => {
+       
+  try {
+    const { data } = await apiClient.get(
+      "/api/insurances/datacustomers/count-Head",
+      { params: { PerD } }
+    );
+
+    if (data?.status) {
+      
+      setContDataMenuChkCD3(data.total);
+
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const loadUserNotification4 = async () => {
+       
+  try {
+    const { data } = await apiClient.get(
+      "/api/insurances/datacustomers/count-approver",
+      { params: { PerD } }
+    );
+
+    if (data?.status) {
+      
+      setContDataMenuChkCD4(data.total);
+
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
 
   useEffect(() => {
     loadUserNotification1();
     loadUserNotification2();
+    loadUserNotification3();
+    loadUserNotification4();
   }, []);
 
   return (
     <div className="text-sm hold-transition layout-navbar-fixed">
       <Header WPnamePer={wpnamePer} PicPer={PerPhotoProfile_N} />
-      <Navbar FullnamePer={fullnamePer} contDataMenuChkCD1={contDataMenuChkCD1} contDataMenuChkCD2={contDataMenuChkCD2} />
+      <Navbar FullnamePer={fullnamePer} contDataMenuChkCD1={contDataMenuChkCD1} contDataMenuChkCD2={contDataMenuChkCD2}  contDataMenuChkCD3={contDataMenuChkCD3} contDataMenuChkCD4={contDataMenuChkCD4} />
 
       <Outlet />
 

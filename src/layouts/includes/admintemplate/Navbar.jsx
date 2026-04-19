@@ -16,6 +16,7 @@ import { RiFileExcel2Fill } from "react-icons/ri";
 
 import { BiSolidEditLocation } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
 // icons
 import {
   FcDownLeft,
@@ -35,6 +36,7 @@ const Navbar = ({
   FullnamePer,
   contDataMenuChkCD1,
   contDataMenuChkCD2,
+  contDataMenuChkCD3,
 
   getcountidea,
 }) => {
@@ -153,6 +155,7 @@ const Navbar = ({
                 <Badge count={contDataMenuChkCD1} />
               </NavLink>
             </li>
+           
             <li className="nav-item">
               <NavLink to="/Admin_ManagementUser" className={navClass}>
                 <FaSearch
@@ -163,6 +166,17 @@ const Navbar = ({
                 {/* <Badge count={getemployee_contain_Counts} /> */}
               </NavLink>
             </li>
+             <li className="nav-item">
+              <NavLink to="/AdminView_Litemain_OutsideNcb" className={navClass}>
+                <FaCheckCircle
+                  className=""
+                  style={{ color: "#06407aff", fontSize: "13px" }}
+                />
+                <p style={{ fontSize: "12px" }}>คำขอตรวจสอบนอกหลักเกณฑ์</p>
+                <Badge count={contDataMenuChkCD3} />
+              </NavLink>
+            </li>
+
             {/* <li className="nav-item">
                   <NavLink to="/Admin_Refuse" className={navClass}>
                     <TbDevicesCancel
@@ -263,18 +277,18 @@ const Navbar = ({
                   className=""
                   style={{ color: "#06407aff", fontSize: "19px" }}
                 />
-                <p>รายงานสรุปการยื่นขอสืบค้น</p>
+                <p  style={{fontSize:"12px"}}>รายงานสรุปการยื่นขอสืบค้น</p>
                 {/* <Badge count={getemployee_contain_Counts} /> */}
               </NavLink>
             </li>
-            {/* 
+
             <li className="nav-item">
               <NavLink to="/ReportNCBLiteDSRMain" end className={navClass}>
-                <RiFileExcel2Fill className="" style={{ color: "#06407aff" }} />
-                <p>สรุปข้อมูลเครดิต (DSR)</p> */}
-            {/* <Badge count={getemployee_contain_Counts} /> */}
-            {/* </NavLink>
-            </li> */}
+                <RiFileExcel2Fill className="" style={{ color: "#06407aff" , fontSize: "19px" }} />
+                <p  style={{fontSize:"12px"}}>สรุปการยื่นขอสืบค้น ( นอกหลักเกณฑ์ )</p>
+                {/* <Badge count={getemployee_contain_Counts} /> */}
+              </NavLink>
+            </li>
 
             {/* <li className="nav-item">
               <NavLink to="/ReportNCBLiteMainOut" end className={navClass}>

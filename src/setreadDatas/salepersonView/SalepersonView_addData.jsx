@@ -7,7 +7,7 @@ import { RiIdCardFill } from "react-icons/ri";
 import { LuScanText } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
+import { FaLocationDot } from "react-icons/fa6";
 import axios from "axios";
 
 const thaiMonths = [
@@ -39,19 +39,16 @@ const SalepersonView_addData = ({ idForm }) => {
   const PerBL_N = Base64.decode(getstore.PerBL_N);
   const PerRG_N = Base64.decode(getstore.PerRG_N);
 
-
   const PerFuNasRaw = Base64.decode(getstore.PerFuNas); // ชื่อ
-    const PerTiNaRaw = Base64.decode(getstore.PerTiNa);  // คำนำหน้า
-    const PerFuNas = `${PerTiNaRaw}${PerFuNasRaw}`.trim();
-
-
+  const PerTiNaRaw = Base64.decode(getstore.PerTiNa); // คำนำหน้า
+  const PerFuNas = `${PerTiNaRaw}${PerFuNasRaw}`.trim();
 
   const _AgU = Base64.decode(getstore.AgU);
   const PerD = Base64.decode(getstore.PerD);
   const _PerWP = Base64.decode(getstore.PerWP);
   const _PerPhotoProfile_N = Base64.decode(getstore.PerPhotoProfile_N);
   const PerLV = Base64.decode(getstore.PerPST_LV);
-  const PerPST = Base64.decode(getstore.PerPST); 
+  const PerPST = Base64.decode(getstore.PerPST);
   const PerWPN = Base64.decode(getstore.PerWP_N);
   const PerBL = Base64.decode(getstore.PerBL);
   const PerWP = Base64.decode(getstore.PerWP);
@@ -59,7 +56,9 @@ const SalepersonView_addData = ({ idForm }) => {
 
   const [phoneError, setPhoneError] = useState(false);
   const [FullNameTitle, setFullNameTitle] = useState("");
-     const [IdcardError, setIdcardError] = useState(false);
+  const [IdcardError, setIdcardError] = useState(false);
+
+  const [isDifferentBranch, setIsDifferentBranch] = useState(false);
 
   const GetDataTitle = async () => {
     try {
@@ -117,6 +116,9 @@ const SalepersonView_addData = ({ idForm }) => {
 
   const [signMethod, setSignMethod] = useState("");
   const [showPopupSameLastname, setShowPopupSameLastname] = useState(false); // popup #1
+  const [showPopupSamNew, setShowPopupSamNew] = useState(false); // popup #1
+  const [showChkStatusNew, setShowChkStatusNew] = useState(0); // popup #1
+
   const [showSignMethod, setShowSignMethod] = useState(false); // popup #2
 
   const [showWitnessPopup1, setShowWitnessPopup1] = useState(false); // popup #1
@@ -170,7 +172,7 @@ const SalepersonView_addData = ({ idForm }) => {
 
     return `${yearCE}-${String(month).padStart(2, "0")}-${String(day).padStart(
       2,
-      "0"
+      "0",
     )}`;
   };
 
@@ -202,9 +204,7 @@ const SalepersonView_addData = ({ idForm }) => {
       return;
     }
 
-
-
-    setShowSignMethod(false);
+    // setShowSignMethod(false);
 
     // ============================
     // ✅ กรณีใช้ "ลายนิ้วมือ"
@@ -212,28 +212,10 @@ const SalepersonView_addData = ({ idForm }) => {
     if (signMethod === "finger") {
       let witness1ToSend = witness1;
 
-      
-    // กันไม่ให้พยานตรงกับพนักงาน
-      // const w2Last = (witness2?.lastname  || "").trim();
-      // const cLast = (customerLastname || "").trim();
-      // const w1Last = (witness1?.lastname || "").trim();
+      // console.log(witness1ToSend);
+      // return
 
-      // // ถ้ายังไม่กรอก ไม่ต้องเช็ค
-      // if (!w2Last) return true;
-
-      // // ❌ ห้ามซ้ำกับลูกค้า
-      // if (w2Last === cLast) {
-      //   setShowWarningPopup(true);
-      //   return false;
-      // }
-
-      // // ❌ ห้ามซ้ำกับพยาน 1
-      // if (w2Last === w1Last) {
-      //   setShowWarningPopup(true);
-      //   return false;
-      // }
-
-     if (customerLastname !== employeeLastname) {
+      if ((customerLastname !== employeeLastname) & (showChkStatusNew === 0)) {
         const parts = FullNameTitle.trim().split(/\s+/);
         const fname = parts[0];
         const lname = parts.slice(1).join(" ");
@@ -247,6 +229,8 @@ const SalepersonView_addData = ({ idForm }) => {
         return;
       }
 
+      // console.log(witness1ToSend);
+      // return;
       const birthdayCE = convertBirthdayToCE();
 
       if (!birthdayCE) {
@@ -254,9 +238,8 @@ const SalepersonView_addData = ({ idForm }) => {
         return;
       }
 
-      
-    // กันไม่ให้พยานตรงกับพนักงาน
-      const w2Last = (witness2?.lastname  || "").trim();
+      // กันไม่ให้พยานตรงกับพนักงาน
+      const w2Last = (witness2?.lastname || "").trim();
       const cLast = (customerLastname || "").trim();
       const w1Last = (witness1?.lastname || "").trim();
 
@@ -293,7 +276,7 @@ const SalepersonView_addData = ({ idForm }) => {
           "/api/insurances/datacustomers/adddata",
           {
             payload: JSON.stringify(payload),
-          }
+          },
         );
 
         const { status, data: result, message } = data;
@@ -304,6 +287,7 @@ const SalepersonView_addData = ({ idForm }) => {
           // console.log("📝 message:", message);
 
           // ✅ เด้งกลับไปหน้าตาราง + ส่ง id ที่เพิ่งบันทึกไปด้วย
+          setShowChkStatusNew(0);
           window.location.assign("/Salesperson");
           // navigate("/Salesperson", {
           //   state: {
@@ -358,7 +342,7 @@ const SalepersonView_addData = ({ idForm }) => {
           "/api/insurances/datacustomers/adddata",
           {
             payload: JSON.stringify(payload),
-          }
+          },
         );
 
         const { status, data: result, message } = data;
@@ -368,6 +352,7 @@ const SalepersonView_addData = ({ idForm }) => {
           // console.log("📦 ข้อมูลที่บันทึก:", result);
           // console.log("📝 message:", message);
           // ✅ เด้งกลับไปหน้าตาราง + ส่ง id ที่เพิ่งบันทึกไปด้วย
+           setShowChkStatusNew(0)
           window.location.assign("/Salesperson");
           // navigate("/Salesperson", {
           //   state: {
@@ -384,7 +369,7 @@ const SalepersonView_addData = ({ idForm }) => {
   const employeeLastname = FullNameTitle.split(" ").pop().trim();
   const customerLastname = formData.lastname.trim();
 
-  const handleCheckLastname = () => {
+  const handleCheckLastname = (out) => {
     // ✅ 0. ตรวจสอบเบอร์โทรศัพท์ก่อนเสมอ
     if (!formData?.CTM_phone || formData.CTM_phone.trim() === "") {
       setPhoneError(true);
@@ -397,15 +382,15 @@ const SalepersonView_addData = ({ idForm }) => {
       return;
     }
 
-      if (!formData.CTM_phone || formData.CTM_phone.length !== 10) {
-        Swal.fire({
+    if (!formData.CTM_phone || formData.CTM_phone.length !== 10) {
+      Swal.fire({
         icon: "warning",
         title: "กรุณากรอกเบอร์โทรศัพท์ให้ครบ",
         text: "ต้องระบุเบอร์โทรศัพท์ให้ครบ 10 หลักก่อนทำรายการ",
         confirmButtonText: "ตกลง",
       });
-    return;
-  }
+      return;
+    }
 
     if (!formData?.CTM_citizen_id || formData.CTM_citizen_id.trim() === "") {
       setPhoneError(true);
@@ -417,18 +402,16 @@ const SalepersonView_addData = ({ idForm }) => {
       });
       return;
     }
-     if (!formData.CTM_citizen_id || formData.CTM_citizen_id.length !== 13) {
-    
-        Swal.fire({
+    if (!formData.CTM_citizen_id || formData.CTM_citizen_id.length !== 13) {
+      Swal.fire({
         icon: "warning",
         title: "กรุณากรอกเลขบัตรประชาชนให้ครบ 13 หลัก",
         text: "ต้องระบุเลขบัตรประชาชนให้ครบ 13 หลักก่อนทำรายการ",
         confirmButtonText: "ตกลง",
       });
-    
-    return;
-  }
 
+      return;
+    }
 
     // 🔴 ต้องเป็นตัวเลข 13 หลักเท่านั้น
     const citizenId = formData.CTM_citizen_id.replace(/\D/g, "");
@@ -490,6 +473,13 @@ const SalepersonView_addData = ({ idForm }) => {
 
     if (!customerLastname) return setShowWarningPopup(true);
 
+    // 🔥 ถ้ามีค่า out = "out"
+    if (out === "out") {
+      setShowChkStatusNew(1);
+      setShowPopupSamNew(true);
+      return; // ❗ ไม่ต้องเข้า logic ต่อ
+    }
+
     // ถ้าลูกค้านามสกุล = พนักงาน → ต้องแก้พยานคนแรกก่อน
     if (customerLastname === employeeLastname) {
       setShowPopupSameLastname(true);
@@ -536,7 +526,7 @@ const SalepersonView_addData = ({ idForm }) => {
       });
 
       if (res.data.status === 200) {
-        console.log(res);
+        // console.log(res);
         const card = res.data;
 
         // 🔹 วันหมดอายุบัตร
@@ -548,7 +538,7 @@ const SalepersonView_addData = ({ idForm }) => {
         // ❌ 1) เช็คบัตรหมดอายุ
         if (isCardExpired(expiryEn)) {
           alert(
-            `❌ บัตรประชาชนหมดอายุ\nวันหมดอายุ: ${card.dateexpiry?.dateexpiryformatth}`
+            `❌ บัตรประชาชนหมดอายุ\nวันหมดอายุ: ${card.dateexpiry?.dateexpiryformatth}`,
           );
           return;
         }
@@ -613,57 +603,53 @@ const SalepersonView_addData = ({ idForm }) => {
 
     return `${ceYear}-${String(month).padStart(2, "0")}-${String(day).padStart(
       2,
-      "0"
+      "0",
     )}`;
   };
   const handlePhoneChange = (e) => {
-  const value = e.target.value
-    .replace(/\D/g, "") // ❌ ตัดทุกอย่างที่ไม่ใช่ตัวเลข
-    .slice(0, 10);      // ❌ ไม่เกิน 10 หลัก
+    const value = e.target.value
+      .replace(/\D/g, "") // ❌ ตัดทุกอย่างที่ไม่ใช่ตัวเลข
+      .slice(0, 10); // ❌ ไม่เกิน 10 หลัก
 
-  setFormData((prev) => ({
-    ...prev,
-    CTM_phone: value,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      CTM_phone: value,
+    }));
+  };
 
-const handleCitizenIdChange = (e) => {
-  const value = e.target.value
-    .replace(/\D/g, "") // ❌ ตัดทุกอย่างที่ไม่ใช่ตัวเลข
-    .slice(0, 13);      // ❌ ไม่ให้เกิน 13 หลัก
+  const handleCitizenIdChange = (e) => {
+    const value = e.target.value
+      .replace(/\D/g, "") // ❌ ตัดทุกอย่างที่ไม่ใช่ตัวเลข
+      .slice(0, 13); // ❌ ไม่ให้เกิน 13 หลัก
 
-  setFormData((prev) => ({
-    ...prev,
-    CTM_citizen_id: value,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      CTM_citizen_id: value,
+    }));
+  };
 
+  // const validateWitness2Lastname = (lastname) => {
+  //   const w2Last = (lastname || "").trim();
+  //   const cLast = (customerLastname || "").trim();
+  //   const w1Last = (witness1?.lastname || "").trim();
 
-// const validateWitness2Lastname = (lastname) => {
-//   const w2Last = (lastname || "").trim();
-//   const cLast = (customerLastname || "").trim();
-//   const w1Last = (witness1?.lastname || "").trim();
+  //   // ถ้ายังไม่กรอก ไม่ต้องเช็ค
+  //   if (!w2Last) return true;
 
-//   // ถ้ายังไม่กรอก ไม่ต้องเช็ค
-//   if (!w2Last) return true;
+  //   // ❌ ห้ามซ้ำกับลูกค้า
+  //   if (w2Last === cLast) {
+  //     setShowWarningPopup(true);
+  //     return false;
+  //   }
 
-//   // ❌ ห้ามซ้ำกับลูกค้า
-//   if (w2Last === cLast) {
-//     setShowWarningPopup(true);
-//     return false;
-//   }
+  //   // ❌ ห้ามซ้ำกับพยาน 1
+  //   if (w2Last === w1Last) {
+  //     setShowWarningPopup(true);
+  //     return false;
+  //   }
 
-//   // ❌ ห้ามซ้ำกับพยาน 1
-//   if (w2Last === w1Last) {
-//     setShowWarningPopup(true);
-//     return false;
-//   }
-
-//   return true;
-// };
-
-
-
+  //   return true;
+  // };
 
   //คะแนนประเมินแต่ละรอบ
 
@@ -762,9 +748,9 @@ const handleCitizenIdChange = (e) => {
                 onChange={handleChange}
                 placeholder="นามสกุล"
               />
-            </div> 
+            </div>
 
-           <div className="form-group small">
+            <div className="form-group small">
               <label>หมายเลขบัตรประชาชน</label>
               <input
                 type="text"
@@ -782,7 +768,6 @@ const handleCitizenIdChange = (e) => {
                   </small>
                 )}
             </div>
-
 
             <div className="form-group small">
               <label>วันเดือนปีเกิด (พ.ศ.)</label>
@@ -828,7 +813,7 @@ const handleCitizenIdChange = (e) => {
                   <option value="">ปี พ.ศ.</option>
                   {Array.from(
                     { length: maxYearBE - minYearBE + 1 },
-                    (_, i) => maxYearBE - i
+                    (_, i) => maxYearBE - i,
                   ).map((year) => (
                     <option key={year} value={year}>
                       {year}
@@ -838,150 +823,59 @@ const handleCitizenIdChange = (e) => {
               </div>
             </div>
 
-          <div className="form-group small">
-  <label>เบอร์โทรศัพท์</label>
-  <input
-    type="text"
-    name="CTM_phone"
-    value={formData.CTM_phone}
-    onChange={handlePhoneChange}
-    placeholder="กรุณากรอกเบอร์โทรศัพท์"
-    maxLength={10}
-  />
+            <div className="form-group small">
+              <label>เบอร์โทรศัพท์</label>
+              <input
+                type="text"
+                name="CTM_phone"
+                value={formData.CTM_phone}
+                onChange={handlePhoneChange}
+                placeholder="กรุณากรอกเบอร์โทรศัพท์"
+                maxLength={10}
+              />
 
-  {/* แจ้งเตือนถ้ายังไม่ครบ 10 หลัก */}
-  {formData.CTM_phone &&
-    formData.CTM_phone.length < 10 && (
-      <small style={{ color: "red" }}>
-        กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก
-      </small>
-    )}
-</div>
-
-            {/* <div className="form-group full">
-              <h3 className="card-title mt-2">ที่อยู่ตามทะเบียนบ้าน</h3>
-            
-
-              <div className="row">
-                <div className="col-md-4">
-                  <label className="form-label">บ้านเลขที่</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_house_no"
-                    value={formData.CTM_house_no}
-                    onChange={handleChange}
-                    placeholder="บ้านเลขที่"
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <label className="form-label">หมู่</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_moo"
-                    value={formData.CTM_moo}
-                    onChange={handleChange}
-                    placeholder="หมู่"
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <label className="form-label">ซอย</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_soi"
-                    value={formData.CTM_soi}
-                    onChange={handleChange}
-                    placeholder="ซอย"
-                  />
-                </div>
-              </div>
-
-              
-              <div className="row mt-2">
-                <div className="col-md-4">
-                  <label className="form-label">ถนน</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_road"
-                    value={formData.CTM_road}
-                    onChange={handleChange}
-                    placeholder="ถนน"
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <label className="form-label">หมู่บ้าน / อาคาร</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_village_or_building"
-                    value={formData.CTM_village_or_building}
-                    onChange={handleChange}
-                    placeholder="หมู่บ้าน / อาคาร"
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <label className="form-label">แขวง / ตำบล</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_sub_district"
-                    value={formData.CTM_sub_district}
-                    onChange={handleChange}
-                    placeholder="แขวง / ตำบล"
-                  />
-                </div>
-              </div>
-
-  
-              <div className="row mt-2">
-                <div className="col-md-4">
-                  <label className="form-label">เขต / อำเภอ</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_district"
-                    value={formData.CTM_district}
-                    onChange={handleChange}
-                    placeholder="เขต / อำเภอ"
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <label className="form-label">จังหวัด</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_province"
-                    value={formData.CTM_province}
-                    onChange={handleChange}
-                    placeholder="จังหวัด"
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <label className="form-label">รหัสไปรษณีย์</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_postal_code"
-                    value={formData.CTM_postal_code}
-                    onChange={handleChange}
-                    placeholder="รหัสไปรษณีย์"
-                  />
-                </div>
-              </div>
-            </div> */}
+              {/* แจ้งเตือนถ้ายังไม่ครบ 10 หลัก */}
+              {formData.CTM_phone && formData.CTM_phone.length < 10 && (
+                <small style={{ color: "red" }}>
+                  กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก
+                </small>
+              )}
+            </div>
           </div>
-          <button className="btn-submit" onClick={handleCheckLastname}>
-            <LuScanText /> ตรวจสอบ
-          </button>
+          <div className="form-header-modern">
+            <h3 className="card-titles">ส่วนเสริม</h3>
+
+            <label className="switch-container" title="ฟอร์มหนังสือยินยอม">
+              <span className="switch-label">
+                {" "}
+                <FaLocationDot /> ฝากหน่วยอื่นรับเอกสารลูกค้าแทน
+              </span>
+
+              <input
+                type="checkbox"
+                checked={isDifferentBranch}
+                onChange={(e) => setIsDifferentBranch(e.target.checked)}
+              />
+
+              <span className="switch-slider"></span>
+            </label>
+          </div>
+
+          {isDifferentBranch ? (
+            // 👉 ถ้าเลือก → แสดงปุ่มเปลี่ยนชื่อพยาน
+            <button
+              className="btn-witness"
+              onClick={() => handleCheckLastname("out")}
+              // onClick={() => setShowPopupSamNew(true)}
+            >
+              <LuScanText /> ระบุ : ชื่อพยาน (พนักงานที่รับลูกค้าแทน)
+            </button>
+          ) : (
+            // 👉 ถ้าไม่เลือก → แสดงปุ่มตรวจสอบ
+            <button className="btn-submit" onClick={handleCheckLastname}>
+              <LuScanText /> ตรวจสอบในสาขา / หน่วย
+            </button>
+          )}
           {/* <button className="btn-submit">บันทึกข้อมูล</button> */}
         </div>
       </div>
@@ -1235,21 +1129,20 @@ const handleCitizenIdChange = (e) => {
 
             <div className="form-group">
               <label>นามสกุล</label>
-             <input
-  className="input-normal"
-  value={witness2.lastname}
-  placeholder="ตัวอย่าง: สุขใจ"
-  onChange={(e) => {
-    const value = e.target.value;
+              <input
+                className="input-normal"
+                value={witness2.lastname}
+                placeholder="ตัวอย่าง: สุขใจ"
+                onChange={(e) => {
+                  const value = e.target.value;
 
-    // เซ็ตค่าก่อน
-    setWitness2((prev) => ({ ...prev, lastname: value }));
+                  // เซ็ตค่าก่อน
+                  setWitness2((prev) => ({ ...prev, lastname: value }));
 
-    // ตรวจสอบทันที
-    // validateWitness2Lastname(value);
-  }}
-/>
-
+                  // ตรวจสอบทันที
+                  // validateWitness2Lastname(value);
+                }}
+              />
             </div>
 
             <div className="modal-actions minimal-actions">
@@ -1264,6 +1157,63 @@ const handleCitizenIdChange = (e) => {
               </button>
               <button className="modal-btn next" onClick={handleSubmitWitness}>
                 บันทึก
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ POPUP #New : เปลี่ยนพยาน */}
+      {showPopupSamNew && (
+        <div className="modal-overlay1">
+          <div className="modal-content1">
+            <div className="witness-header"></div>
+            <h6>เปลี่ยนชื่อ - นามสกุล พยาน</h6>
+            <p style={{ color: "#e13030ff" }}>
+              *กรณี ฝากหน่วยอื่นรับเอกสารลูกค้าแทน* (พยานห้ามมีนามสกุลเดียวกับลูกค้า)
+            </p>
+
+            <div className="form-group pt-2">
+              <label>คำนำหน้า + ชื่อ</label>
+              <input
+                className="input-normal"
+                value={witness1.firstname}
+                onChange={(e) =>
+                  setWitness1({ ...witness1, firstname: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="form-group">
+              <label>นามสกุล</label>
+              <input
+                className="input-normal"
+                value={witness1.lastname}
+                onChange={(e) =>
+                  setWitness1({ ...witness1, lastname: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="modal-btn cancel"
+                onClick={() => setShowPopupSamNew(false)}
+              >
+                ปิด
+              </button>
+              <button
+                className="modal-btn next"
+                onClick={() => {
+                  if (witness1.lastname.trim() === customerLastname) {
+                    setShowWarningPopup(true);
+                    return;
+                  }
+                  setShowPopupSamNew(false);
+                  setShowSignMethod(true);
+                }}
+              >
+                ถัดไป
               </button>
             </div>
           </div>

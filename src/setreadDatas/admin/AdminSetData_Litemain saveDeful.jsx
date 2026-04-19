@@ -10,7 +10,7 @@ import { FaPlus, FaCalculator, FaTrash } from "react-icons/fa";
 import { BsFiletypeDoc } from "react-icons/bs";
 import { jsPDF } from "jspdf";
 import { Button } from "@mui/material";
-import { Form, FormControl } from "react-bootstrap";
+import { FormControl } from "react-bootstrap";
 import Pagination from "../../component/Pagination";
 import Swal from "sweetalert2";
 import { Base64 } from "js-base64";
@@ -25,8 +25,6 @@ import {
   AiOutlineCloudDownload,
   AiOutlineDelete,
 } from "react-icons/ai";
-import { HiDocumentSearch } from "react-icons/hi";
-import { FcViewDetails } from "react-icons/fc";
 const convertToThaiDate = (dateString) => {
   const date = new Date(dateString);
 
@@ -83,13 +81,8 @@ const convertToThaiDate1 = (dateString) => {
 
 const AdminSetData_Litemain = () => {
   const getstore = useRecoilValue(userToken);
-
   const PerD = Base64.decode(getstore.PerD); //รหัส
-
-  const PerFuNasRaw = Base64.decode(getstore.PerFuNas); // ชื่อ
-  const PerTiNaRaw = Base64.decode(getstore.PerTiNa); // คำนำหน้า
-  const PerFuNas = `${PerTiNaRaw}${PerFuNasRaw}`.trim();
-
+  const PerFuNas = Base64.decode(getstore.PerFuNas); //ชื่อ
   const PerPST_N = Base64.decode(getstore.PerPST_N); //ชื่อตำแหน่ง
   const PerBL_N = Base64.decode(getstore.PerBL_N);
 
@@ -105,17 +98,18 @@ const AdminSetData_Litemain = () => {
 
   const [probabilityInput, setProbabilityInput] = useState("");
   const [probabilityPercent, setProbabilityPercent] = useState("");
-  const [showPreview, setShowPreview] = useState(false);
+
   const [openFeeModal, setOpenFeeModal] = useState(null);
 
   const [accounts, setAccounts] = useState([
-    { status: "", amount: "", detel: "", isNew: false },
+    { status: "", amount: "", isNew: false },
   ]);
   const [reasons, setReasons] = useState([{ reason: "" }]);
 
   const [searchQuery, setSearchQuery] = useState(""); //ค้นหา
-  const [searchQuerySub, setSearchQuerySub] = useState(""); //ค้นหา  //คำนวณคะแนน
-  const allowPerD = ["003792", "000274", "002743", "004187"]; //พนักงานที่สามารถแก้ไขสัญญาได้
+
+      //คำนวณคะแนน
+    const allowPerD = ["003792", "000274", "002743", "004187"]; //พนักงานที่สามารถแก้ไขสัญญาได้
 
   // ✅ ฟังก์ชันแปลงคะแนนเครดิตเป็นระดับและความเสี่ยง
   const handleScoreChange = (e) => {
@@ -234,82 +228,12 @@ const AdminSetData_Litemain = () => {
   const [dataCancel, setDataCancel] = useState([]);
   // wait | pass | cancel
 
-  const [searchKeyword, setSearchKeyword] = useState(""); // ค่าที่กดค้นหาจริง
-
-  // const getEmployeeDB_Admin = async (page) => {
-
-  //   const params = {
-  //     _page: page,
-  //     _limit: limit,
-  //     activeTab,
-  //     search: searchQuery, // ⭐ ส่ง keyword
-  //   };
-
-  //   // console.log(params);
-  //   // return
-  //   setLoading(true); // ⭐ เริ่มโหลดทันที
-
-  //   try {
-  //     const { data } = await apiClient.get(
-  //       `/api/insurances/datacustomers_Admin`,
-  //       {
-  //         params,
-  //       }
-  //     );
-
-  //     // ❌ ห้ามใช้ currentPage ชื่อชนกับ state
-  //     const {
-  //       status,
-  //       sqlDataCustomers,
-  //       totalPages,
-  //       // currentPage: apiCurrentPage,
-  //     } = data;
-
-  //     if (status) {
-  //       // console.log(data);
-  //       setProbationaryEmployees(sqlDataCustomers);
-  //       setTotalPages(totalPages);
-  //       // ✅ จำนวนข้อมูลทั้งหมด
-  //       setTotalItemsWite(sqlDataCustomers.length);
-
-  //       setTotalItemsWite(sqlDataCustomers.length);
-
-  //       if (activeTab === "wait") {
-  //         setDataWait(sqlDataCustomers);
-  //       }
-  //       if (activeTab === "pass") {
-  //         setDataPass(sqlDataCustomers);
-  //       }
-  //       if (activeTab === "cancel") {
-  //         setDataCancel(sqlDataCustomers);
-  //       }
-
-  //       if (activeTab === "approved") {
-  //         setDataCancel(sqlDataCustomers);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error.message);
-  //   } finally {
-  //     setLoading(false); // ⭐ โหลดเสร็จแน่นอน (success / error)
-  //   }
-  // };
-
-  //เปิดไฟล์เป็น PDF
-
-  const getEmployeeDB_Admin = async (
-    page,
-    searchQuerySub = "",
-    searchType = "",
-  ) => {
-    //  console.log(keyword);
-
+  const getEmployeeDB_Admin = async (page) => {
     const params = {
       _page: page,
       _limit: limit,
       activeTab,
-      search: searchQuerySub, // ⭐ ส่ง keyword
-      searchKeyword: searchType, // ✅ ใช้ตัวนี้เท่านั้น
+      search: searchQuery, // ⭐ ส่ง keyword
     };
 
     // console.log(params);
@@ -321,7 +245,7 @@ const AdminSetData_Litemain = () => {
         `/api/insurances/datacustomers_Admin`,
         {
           params,
-        },
+        }
       );
 
       // ❌ ห้ามใช้ currentPage ชื่อชนกับ state
@@ -362,6 +286,8 @@ const AdminSetData_Litemain = () => {
     }
   };
 
+  //เปิดไฟล์เป็น PDF
+
   const openImageBase64AsPDF = (base64String) => {
     if (!base64String) {
       alert("ไม่พบข้อมูลไฟล์");
@@ -393,7 +319,6 @@ const AdminSetData_Litemain = () => {
   };
 
   const handleStatusClick = async (idForm) => {
-    // alert(idForm);
     setSelectedItem(idForm);
 
     const params = {
@@ -405,14 +330,14 @@ const AdminSetData_Litemain = () => {
         "/api/insurances/datacustomers_AdminSingle",
         {
           params,
-        },
+        }
       );
 
       const { status, result, message } = data;
 
       if (status === 200) {
         // console.log("✅ ดึงข้อมูล PDF สำเร็จ");
-        console.log("📦 result จากหลังบ้าน:", message);
+        // console.log("📦 result จากหลังบ้าน:", result);
         setgetDataShow(result[0]);
         setChkDataEdit(result[0].Form_status_Edit); //เช็คว่าเคยแก้ไขมาใหม่
       } else {
@@ -450,7 +375,6 @@ const AdminSetData_Litemain = () => {
     const newItem = {
       status: "",
       amount: "",
-      detel: "",
       isNew: true,
     };
 
@@ -460,81 +384,9 @@ const AdminSetData_Litemain = () => {
 
   // ✅ อัปเดตค่าช่อง
   const handleChange = (index, field, value) => {
-    setAccounts((prev) =>
-      prev.map((acc, i) => (i === index ? { ...acc, [field]: value } : acc)),
-    );
-  };
-
-  const ACCOUNT_STATUS_MAP = {
-    10: "มีสถานะบัญชี (10) - ปกติ (ไม่มีหนี้ค้างชำระหรือไม่เกิน 90 วัน)",
-    11: "มีสถานะบัญชี (11) - ปิดบัญชี",
-    12: "มีสถานะบัญชี (12) - พักชำระหนี้ตามนโยบายของสมาชิก",
-    13: "มีสถานะบัญชี (13) - พักชำระหนี้ตามนโยบายของรัฐ",
-    14: "มีสถานะบัญชี (14) - พักชำระหนี้เกษตรกรตามนโยบายของรัฐ",
-    15: "มีสถานะบัญชี (15) - อยู่ระหว่างชำระหนี้ในกระบวนการไกล่เกลี่ยก่อนฟ้อง",
-    16: "มีสถานะบัญชี (16) - ปกติ โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพ",
-    20: "มีสถานะบัญชี (20) - หนี้ค้างชำระเกิน 90 วัน",
-    21: "มีสถานะบัญชี (21) - หนี้ค้างชำระเกิน 90 วันเนื่องจากได้รับผลกระทบจากสถานการณ์ไม่ปกติ",
-    26: "มีสถานะบัญชี (26) - หนี้ค้างชำระเกิน 90 วัน โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพ",
-
-    30: "มีสถานะบัญชี (30) - อยู่ในกระบวนการทางกฎหมาย",
-    31: "มีสถานะบัญชี (31) - อยู่ระหว่างชำระหนี้ตามคำพิพากษาตามยอม",
-    32: "มีสถานะบัญชี (32) - ศาลพิพากษายกฟ้องเนื่องจากขาดอายุความหรือเหตุอื่นฯ",
-    33: "มีสถานะบัญชี (33) - ปิดบัญชีเนื่องจากตัดหนี้สูญ",
-    36: "มีสถานะบัญชี (36) - ปกติ โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพและอยู่ในกระบวนการทางกฎหมาย",
-
-    40: "มีสถานะบัญชี (40) - อยู่ระหว่างชำระสินเชื่อเพื่อปิดบัญชี",
-    41: "มีสถานะบัญชี (41) - อยู่ระหว่างตรวจสอบรายการ",
-    42: "มีสถานะบัญชี (42) - โอนหรือขายหนี้ที่ไม่เป็นสถานะบัญชีปกติ",
-    43: "มีสถานะบัญชี (43) - โอนหรือขายหนี้และชำระหนี้เสร็จสิ้น",
-    44: "มีสถานะบัญชี (44) - โอนหรือขายหนี้ที่เป็นสถานะบัญชีปกติ",
-    51: "มีสถานะบัญชี (51) - หยุดนำส่งข้อมูล เนื่องจากมีการบอกเลิกสัญญา",
-    52: "มีสถานะบัญชี (52) - หนี้ค้างชำระเกิน 90 วัน โดยยังไม่ได้ยื่นฟ้อง และหยุดนำส่งข้อมูล",
-    53: "มีสถานะบัญชี (53) - หนี้ค้างชำระเกิน 90 วันโดยอยู่ในกระบวนการทางกฎหมาย และหยุดนำส่งข้อมูล",
-  };
-
-  const CREDIT_REASON_MAP = {
-    "00": "00 : ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)",
-    "011":
-      "011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง ",
-    "012": "012 : ไม่ได้ใช้งาน",
-    "013":
-      "013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง",
-    "014": "014 : ยอดหนี้รวมคงค้าง ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง",
-    "015": "015 : ประวัติข้อมูลเครดิตที่ดี ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด",
-    "016": "016 : ไม่ได้ใช้งาน",
-    "017":
-      "017 : ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ ที่ปรากฏในรายงานข้อมูลเครดิต",
-    "018": "018 : วงเงินคงเหลือ ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย ",
-    "019":
-      "019 : ประวัติข้อมูลเครดิต ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด ",
-    "020":
-      "020 : ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต",
-    "021":
-      "021 : ประวัติสินเชื่อที่ดี ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น",
-    "022": "022 : ยอดหนี้ที่ค้างชำระ ที่ปรากฏในรายงานข้อมูลเครดิต",
-    "023": "023 : ประวัติการค้างชำระ ที่ปรากฏในรายงานข้อมูลเครดิต ",
-    "024":
-      "024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร ที่ปรากฏในรายงานข้อมูลเครดิต",
-
-    "025":
-      "025 : ความหลากหลายของประเภทสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิตน้อย",
-    "026": "026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสูง",
-    "027": "027 : ไม่ได้ใช้งาน",
-    "028": "028 : การสืบค้นล่าสุด ที่ปรากฏในรายงานข้อมูลเครดิต ",
-    "029": "029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต",
-    "030":
-      "030 : จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ ที่ปรากฏในรายงานข้อมูลเครดิต",
-    "031":
-      "031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด ที่ปรากฏในรายงานข้อมูลเครดิต",
-    "032": "032 : ไม่ได้ใช้งาน",
-
-    TT: "TT : ปัจจุบันค้างชำระเกิน 90 วัน  หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย ",
-    VV: "VV : บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล",
-    WW: "WW : บัญชีมีการโต้แย้ง หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล",
-    XX: "XX : ไม่มีบัญชี แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่  มากกว่า หรือเท่ากับ 5 ครั้ง",
-    YY: "YY : ไม่มีบัญชี แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่  น้อยกว่า 5 ครั้ง",
-    ZZ: " ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต",
+    const updated = [...accounts];
+    updated[index][field] = value;
+    setAccounts(updated);
   };
 
   // ✅ ลบแถว
@@ -577,30 +429,18 @@ const AdminSetData_Litemain = () => {
   const [joinProject, setJoinProject] = useState("");
   const [reportDate, setReportDate] = useState("");
   const [bankrupt, setBankrupt] = useState("");
-
   const [description, setDescription] = useState("");
-  const [descriptionEdit, setDescriptionEdit] = useState("");
-
   const [valueCredit, setValueCredit] = useState("");
-
   const [ChkDataEdit, setChkDataEdit] = useState("");
 
   const [submitted, setSubmitted] = useState(false);
   const [reportDateError, setReportDateError] = useState("");
-
-  const [joinProjectError, setJoinProjectError] = useState("");
-
-  const [joinStatususe, setJoinStatususe] = useState("");
-
   const [loading, setLoading] = useState(true);
 
   const [showModal, setShowModal] = useState(false);
   const [contractNumber, setContractNumber] = useState("");
   const [contractIdForm, setContractIdForm] = useState("");
   const [currentItem, setCurrentItem] = useState(null);
-
-  //ค้นหา
-  const [searchType, setSearchType] = useState(""); // name | citizen | form
 
   const openContractModal = (item) => {
     setCurrentItem(item);
@@ -628,14 +468,12 @@ const AdminSetData_Litemain = () => {
 
     // textarea
     setDescription("");
-    setDescriptionEdit("");
 
     // accounts (อย่างน้อย 1 แถว)
     setAccounts([
       {
         status: "",
         amount: "",
-        detel: "",
       },
     ]);
 
@@ -656,57 +494,19 @@ const AdminSetData_Litemain = () => {
 
       // 🔴 ดักเฉพาะกรณี "พบข้อมูล"
       if (approval === "approved") {
-        if (!joinProject) {
-          setJoinProjectError("* กรุณาเลือกการเข้าร่วมโครงการ *");
-          return;
-        }
-        if (!valueCredit) {
-          return; // ❌ ยังไม่ให้ส่ง
-        }
-
-        if (!bankrupt) {
-          setJoinStatususe("* กรุณาเลือกการสถานะบุคคล *");
-          return;
-        }
-
-        //แจ้งเตือนกันลืมกรอก
         if (!reportDate || reportDate.trim() === "") {
           setReportDateError("กรุณาระบุวันที่รายงานผล");
           return; // ❌ หยุดการทำงาน
         }
-
-        if (!score) {
-          return; // ❌ ยังไม่ให้ส่ง
-        }
-        if (!bankrupt) {
-          return; // ❌ ยังไม่ให้ส่ง
-        }
-        if (!probabilityInput) {
-          return; // ❌ ยังไม่ให้ส่ง
-        }
-
-        setJoinProjectError("");
-        setJoinStatususe("");
       }
       // -----------------------------
       // 1) Filter ข้อมูลก่อนส่ง
       // -----------------------------
       const filteredAccounts = accounts.filter(
-        (acc) => acc.status.trim() !== "" && acc.amount.trim() !== "",
+        (acc) => acc.status.trim() !== "" && acc.amount.trim() !== ""
       );
 
       const filteredReasons = reasons.filter((r) => r.reason.trim() !== "");
-
-      const mappedAccounts = filteredAccounts.map((acc) => ({
-        ...acc,
-        status_code: acc.status,
-        status_text: ACCOUNT_STATUS_MAP[acc.status] || "",
-      }));
-
-      const mappedReasons = filteredReasons.map((r) => ({
-        reason_code: r.reason,
-        reason_text: CREDIT_REASON_MAP[r.reason] || "",
-      }));
 
       // -----------------------------
       // 2) สร้าง payload ตาม approval
@@ -729,8 +529,8 @@ const AdminSetData_Litemain = () => {
           result,
           risk,
 
-          accounts: mappedAccounts,
-          reasons: mappedReasons,
+          accounts: filteredAccounts,
+          reasons: filteredReasons,
           description,
 
           PerD,
@@ -756,13 +556,13 @@ const AdminSetData_Litemain = () => {
           ChkStatusEdit: ChkDataEdit,
         };
 
-        // console.log(payload);
+        console.log(payload);
       } else if (approval === "pending") {
         payload = {
           ctmId: selectedItem,
           approval,
 
-          descriptionEdit, //คำอธิบายแก้ไข
+          description, //คำอธิบายแก้ไข
 
           PerD,
           PerFuNas,
@@ -772,30 +572,18 @@ const AdminSetData_Litemain = () => {
           ChkStatusEdit: ChkDataEdit,
         };
       } else {
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
-
-        Toast.fire({
-          icon: "warning",
-          title: "กรุณาเลือกสถานะ",
-        });
-
+        alert("ค่า approval ไม่ถูกต้อง");
         return;
       }
 
-      //       console.log("payload:", payload);
-      // return
+      // console.log("payload:", payload);
+
       // -----------------------------
       // 3) ส่งข้อมูลไป API
       // -----------------------------
       const res = await apiClient.post(
         "/api/insurances/datacustomers/addDataCreditscore",
-        { payload: JSON.stringify(payload) },
+        { payload: JSON.stringify(payload) }
       );
 
       if (res.data.status === 200) {
@@ -809,8 +597,7 @@ const AdminSetData_Litemain = () => {
           icon: "success",
           title: "บันทึกสำเร็จ",
           text: "ข้อมูลถูกบันทึกเรียบร้อยแล้ว",
-          showConfirmButton: false, // ❌ ไม่แสดงปุ่ม
-          timer: 2000, // ⏱ ปิดอัตโนมัติ 2 วินาที
+          confirmButtonText: "ตกลง",
         });
 
         // 3️⃣ ล้างค่าฟอร์มทั้งหมด ✅
@@ -958,7 +745,7 @@ const AdminSetData_Litemain = () => {
     try {
       const res = await apiClient.post(
         "/api/insurances/datacustomers/addSwitStatus",
-        { payload: JSON.stringify(payload) },
+        { payload: JSON.stringify(payload) }
       );
       if (res.data.status === 200) {
         console.log(res.data.data);
@@ -994,7 +781,7 @@ const AdminSetData_Litemain = () => {
   const checkLatestBookingStatus = async (formNumber) => {
     const res = await apiClient.post(
       "/api/insurances/datacustomers/checkBookingStatus",
-      { form_id: formNumber },
+      { form_id: formNumber }
     );
 
     if (res.data?.status === 200) {
@@ -1012,12 +799,12 @@ const AdminSetData_Litemain = () => {
       icon: "warning",
       title: "ยืนยันการยกเลิกงานจอง",
       html: `
-            ต้องการ <b style="color:#dc3545">ยกเลิกงานจองตรวจสอบ</b><br/>
-            เลขที่ใบงาน <b>${item.CTM_form_number}</b><br/>
-            <span style="color:#6c757d;font-size:12px">
-              งานจะถูกคืนเข้าสู่คิวกลาง และสามารถถูกจองใหม่ได้
-            </span>
-          `,
+    ต้องการ <b style="color:#dc3545">ยกเลิกงานจองตรวจสอบ</b><br/>
+    เลขที่ใบงาน <b>${item.CTM_form_number}</b><br/>
+    <span style="color:#6c757d;font-size:12px">
+      งานจะถูกคืนเข้าสู่คิวกลาง และสามารถถูกจองใหม่ได้
+    </span>
+  `,
       showCancelButton: true,
       confirmButtonText: "ยกเลิกงานจอง",
       cancelButtonText: "กลับ",
@@ -1041,7 +828,7 @@ const AdminSetData_Litemain = () => {
     try {
       const res = await apiClient.post(
         "/api/insurances/datacustomers/addSwitStatus",
-        { payload: JSON.stringify(payload) },
+        { payload: JSON.stringify(payload) }
       );
       if (res.data.status === 200) {
         console.log(res.data.data);
@@ -1087,17 +874,17 @@ const AdminSetData_Litemain = () => {
     window.open(
       `${base}/${relativePath}`,
       "_blank",
-      "noopener,noreferrer,width=1200,height=800,left=100,top=100",
+      "noopener,noreferrer,width=1200,height=800,left=100,top=100"
     );
   };
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setNow(new Date());
-    }, 1000);
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setNow(new Date());
+  //   }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+  //   return () => clearInterval(timer);
+  // }, []);
 
   //รวมฟังก์ชันนับจำนวน
 
@@ -1111,103 +898,76 @@ const AdminSetData_Litemain = () => {
 
   // 🔔 จำนวนรายการตรวจข้อมูลเครดิต
 
-  // const loadUserNotification1 = async () => {
-  //   try {
-  //     const { data } = await apiClient.get(
-  //       "/api/insurances/datacustomers_Admin_count",
-  //     );
-
-  //     if (data?.status) {
-  //       setContDataMenuChkCD1(data.sqlDataCustomers); // 🔔 จำนวนงานตรวจสอบ
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching notification:", err);
-  //   }
-  // };
-
-  // const loadUserNotification2 = async () => {
-  //   try {
-  //     const { data } = await apiClient.get(
-  //       "/api/insurances/datacustomers_Admin_countApproved", //
-  //     );
-
-  //     if (data?.status) {
-  //       setContDataMenuChkCD2(data.sqlDataCustomers); // 🔔
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching notification:", err);
-  //   }
-  // };
-
-  // const loadUserNotification3 = async () => {
-  //   //Cancel
-  //   try {
-  //     const { data } = await apiClient.get(
-  //       "/api/insurances/datacustomers_Admin_countCancel",
-  //     );
-
-  //     if (data?.status) {
-  //       setContDataMenuChkCD3(data.sqlDataCustomers); // 🔔 จำนวนงานตรวจสอบ
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching notification:", err);
-  //   }
-  // };
-
-  // const loadUserNotification4 = async () => {
-  //   //Cancel
-  //   try {
-  //     const { data } = await apiClient.get(
-  //       "/api/insurances/datacustomers_Admin_countRejected",
-  //     );
-
-  //     if (data?.status) {
-  //       setContDataMenuChkCD4(data.sqlDataCustomers); // 🔔 จำนวนงานตรวจสอบ
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching notification:", err);
-  //   }
-  // };
-
-  // const loadUserNotification5 = async () => {
-  //   //Cancel
-  //   try {
-  //     const { data } = await apiClient.get(
-  //       "/api/insurances/datacustomers_Admin_countPass",
-  //     );
-
-  //     if (data?.status) {
-  //       setContDataMenuChkCD5(data.sqlDataCustomers); // 🔔 จำนวนงานตรวจสอบ
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching notification:", err);
-  //   }
-  // };
-  let loadingN = false;
-
-  const loadSummary = async () => {
-    if (loadingN) return;
-    loadingN = true;
-
+  const loadUserNotification1 = async () => {
     try {
       const { data } = await apiClient.get(
-        "/api/insurances/datacustomers_Admin_summary",
+        "/api/insurances/datacustomers_Admin_count"
       );
 
-      if (data?.status === 200) {
-        setContDataMenuChkCD1(data.data.wait);
-        setContDataMenuChkCD2(data.data.approved);
-        setContDataMenuChkCD3(data.data.cancel);
-        setContDataMenuChkCD4(data.data.rejected);
-        setContDataMenuChkCD5(data.data.pass);
-
-
-        console.log(data)
+      if (data?.status) {
+        setContDataMenuChkCD1(data.sqlDataCustomers); // 🔔 จำนวนงานตรวจสอบ
       }
     } catch (err) {
-      console.error(err);
-    } finally {
-      loadingN = false;
+      console.error("Error fetching notification:", err);
+    }
+  };
+
+  const loadUserNotification2 = async () => {
+    try {
+      const { data } = await apiClient.get(
+        "/api/insurances/datacustomers_Admin_countApproved" //
+      );
+
+      if (data?.status) {
+        setContDataMenuChkCD2(data.sqlDataCustomers); // 🔔
+      }
+    } catch (err) {
+      console.error("Error fetching notification:", err);
+    }
+  };
+
+  const loadUserNotification3 = async () => {
+    //Cancel
+    try {
+      const { data } = await apiClient.get(
+        "/api/insurances/datacustomers_Admin_countCancel"
+      );
+
+      if (data?.status) {
+        setContDataMenuChkCD3(data.sqlDataCustomers); // 🔔 จำนวนงานตรวจสอบ
+      }
+    } catch (err) {
+      console.error("Error fetching notification:", err);
+    }
+  };
+
+  const loadUserNotification4 = async () => {
+    //Cancel
+    try {
+      const { data } = await apiClient.get(
+        "/api/insurances/datacustomers_Admin_countRejected"
+      );
+
+      if (data?.status) {
+        setContDataMenuChkCD4(data.sqlDataCustomers); // 🔔 จำนวนงานตรวจสอบ
+      }
+    } catch (err) {
+      console.error("Error fetching notification:", err);
+    }
+  };
+
+  const loadUserNotification5 = async () => {
+    //Cancel
+    try {
+      const { data } = await apiClient.get(
+        "/api/insurances/datacustomers_Admin_countPass"
+      );
+
+      if (data?.status) {
+        setContDataMenuChkCD5(data.sqlDataCustomers); // 🔔 จำนวนงานตรวจสอบ
+      }
+    } catch (err) {
+      console.error("Error fetching notification:", err);
     }
   };
 
@@ -1241,29 +1001,34 @@ const AdminSetData_Litemain = () => {
 
   // 🔁 เปลี่ยน tab → รีเซ็ตหน้า + โหลด notification
 
-  const openPreviewModal = () => {
-    // console.log("click preview");
-    setShowPreview(true);
-  };
-  const closePreviewModal = () => {
-    setShowPreview(false);
-  };
-
+  //เก่า
   // useEffect(() => {
+  //   setCurrentPage(1);
+
   //   loadUserNotification1();
   //   loadUserNotification2();
   //   loadUserNotification3();
   //   loadUserNotification4();
-  //   loadUserNotification5();
-  // }, []);
+  // }, [activeTab]);
+
+  // useEffect(() => {
+  //   setCurrentPage(1);
+  //   getEmployeeDB_Admin(1);
+  // }, [searchQuery]);
+
+  // // 📦 โหลดข้อมูลตาราง (เปลี่ยน page หรือ tab)
+  // useEffect(() => {
+  //   getEmployeeDB_Admin(currentPage);
+  // }, [currentPage, activeTab]);
+
+  // 🔔 notification โหลดครั้งเดียว
+
   useEffect(() => {
-    loadSummary();
-
-    // const interval = setInterval(() => {
-    //   loadSummary();
-    // }, 10000); // ทุก 10 วิ
-
-    // return () => clearInterval(interval);
+    loadUserNotification1();
+    loadUserNotification2();
+    loadUserNotification3();
+    loadUserNotification4();
+    loadUserNotification5();
   }, []);
 
   // 🔁 reset page เมื่อเปลี่ยน tab
@@ -1302,100 +1067,108 @@ const AdminSetData_Litemain = () => {
 
   const [saving, setSaving] = useState(false);
 
-  const handleSaveContract = async () => {
-    if (contractNumber.length !== 10) {
+ const handleSaveContract = async () => {
+  if (contractNumber.length !== 10) {
+    Swal.fire({
+      icon: "warning",
+      title: "ข้อมูลไม่ถูกต้อง",
+      text: "เลขที่สัญญาต้องมี 10 หลัก",
+    });
+    return;
+  }
+
+  try {
+    setSaving(true);
+
+    const payload = {
+      idForm: contractIdForm,
+      contractNumber,
+    };
+
+    const { data } = await apiClient.post(
+      "/api/insurances/datacustomers/updateData_contractNumber",
+      payload
+    );
+
+ const {status,dataSet} = data;
+    // ✅ สำเร็จ
+    if (status === 200) {
+
+
+    // console.log(dataSet)
+
+
+
+  // 1️⃣ ปิด modal ก่อน
+  setShowModal(false);
+  // 3️⃣ รีเฟรชข้อมูล
+  getEmployeeDB_Admin();
+
+  // 4️⃣ เปลี่ยนแท็บ
+  setActiveTab("approved");
+  // 2️⃣ แสดงแจ้งเตือน (รอให้แสดงจบ)
+  await Swal.fire({
+    icon: "success",
+    title: "บันทึกสำเร็จ",
+    text: data.message || "อัปเดตข้อมูลเรียบร้อยแล้ว",
+    timer: 2000,
+    showConfirmButton: false,
+    timerProgressBar: true,
+  });
+
+
+
+      return;
+    }
+
+    // ❌ เลขสัญญาไม่ถูกต้อง
+    if (data.status === 422) {
       Swal.fire({
         icon: "warning",
-        title: "ข้อมูลไม่ถูกต้อง",
-        text: "เลขที่สัญญาต้องมี 10 หลัก",
+        title: "เลขที่สัญญาไม่ถูกต้อง",
+        text: data.message,
       });
       return;
     }
 
-    try {
-      setSaving(true);
-
-      const payload = {
-        idForm: contractIdForm,
-        contractNumber,
-      };
-
-      const { data } = await apiClient.post(
-        "/api/insurances/datacustomers/updateData_contractNumber",
-        payload,
-      );
-
-      const { status, dataSet } = data;
-      // ✅ สำเร็จ
-      if (status === 200) {
-        // console.log(dataSet)
-
-        // 1️⃣ ปิด modal ก่อน
-        setShowModal(false);
-        // 3️⃣ รีเฟรชข้อมูล
-        getEmployeeDB_Admin();
-
-        // 4️⃣ เปลี่ยนแท็บ
-        setActiveTab("approved");
-        // 2️⃣ แสดงแจ้งเตือน (รอให้แสดงจบ)
-        await Swal.fire({
-          icon: "success",
-          title: "บันทึกสำเร็จ",
-          text: data.message || "อัปเดตข้อมูลเรียบร้อยแล้ว",
-          timer: 2000,
-          showConfirmButton: false,
-          timerProgressBar: true,
-        });
-
-        return;
-      }
-
-      // ❌ เลขสัญญาไม่ถูกต้อง
-      if (data.status === 422) {
-        Swal.fire({
-          icon: "warning",
-          title: "เลขที่สัญญาไม่ถูกต้อง",
-          text: data.message,
-        });
-        return;
-      }
-
-      // ❌ เลขสัญญาซ้ำ
-      if (data.status === 409) {
-        Swal.fire({
-          icon: "error",
-          title: "เลขที่สัญญาซ้ำ",
-          text: data.message,
-        });
-        return;
-      }
-
-      // ❌ ไม่พบข้อมูลฟอร์ม
-      if (data.status === 404) {
-        Swal.fire({
-          icon: "error",
-          title: "ไม่พบข้อมูล",
-          text: data.message,
-        });
-        return;
-      }
-
-      // ❌ error อื่น
+    // ❌ เลขสัญญาซ้ำ
+    if (data.status === 409) {
       Swal.fire({
         icon: "error",
-        title: "เกิดข้อผิดพลาด",
-        text: data.message || "ไม่สามารถบันทึกข้อมูลได้",
+        title: "เลขที่สัญญาซ้ำ",
+        text: data.message,
       });
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "ระบบขัดข้อง",
-        text: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้",
-      });
-    } finally {
-      setSaving(false);
+      return;
     }
-  };
+
+    // ❌ ไม่พบข้อมูลฟอร์ม
+    if (data.status === 404) {
+      Swal.fire({
+        icon: "error",
+        title: "ไม่พบข้อมูล",
+        text: data.message,
+      });
+      return;
+    }
+
+    // ❌ error อื่น
+    Swal.fire({
+      icon: "error",
+      title: "เกิดข้อผิดพลาด",
+      text: data.message || "ไม่สามารถบันทึกข้อมูลได้",
+    });
+
+  } catch (err) {
+    Swal.fire({
+      icon: "error",
+      title: "ระบบขัดข้อง",
+      text: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้",
+    });
+  } finally {
+    setSaving(false);
+  }
+};
+
 
   return (
     <div>
@@ -1426,7 +1199,7 @@ const AdminSetData_Litemain = () => {
         <div className="col-md-3 col-sm-12">
           <div
             className={`card-dashboard p-3 shadow-sm d-flex align-items-center
-            ${activeTab === "pass" ? "active-card" : ""}`}
+        ${activeTab === "pass" ? "active-card" : ""}`}
             style={{ backgroundColor: "#F5F7FF", cursor: "pointer" }}
             onClick={() => setActiveTab("pass")}
           >
@@ -1516,7 +1289,7 @@ const AdminSetData_Litemain = () => {
             }}
           >
             {/* ซ้าย: ไอคอน + ข้อความ */}
-            {/* <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: 13, color: "#5b6b82", marginTop: 4 }}>
                   ค้นหาข้อมูลที่ต้องการ
@@ -1552,102 +1325,6 @@ const AdminSetData_Litemain = () => {
                   </InputGroup>
                 </div>
               </div>
-            </div> */}
-
-            <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
-              {/* --- เลือกประเภท --- */}
-              <div>
-                <div
-                  style={{ fontSize: 13, color: "#5b6b82", marginBottom: 4 }}
-                >
-                  เลือกประเภทการค้นหา
-                </div>
-
-                <Form.Select
-                  value={searchType}
-                  onChange={(e) => {
-                    setSearchType(e.target.value);
-                    setSearchQuerySub("");
-                  }}
-                  style={{ fontSize: 13, width: 180, height: 38 }}
-                >
-                  <option value=""> - เลือกประเภท - </option>
-                  <option value="name">ชื่อลูกค้า</option>
-                  <option value="citizen">เลขบัตรประชาชน</option>
-                  <option value="form">เลขที่แบบฟอร์ม</option>
-                  <option value="branch">สาขา / หน่วย</option>
-                </Form.Select>
-              </div>
-
-              {/* --- คำค้น --- */}
-              <div>
-                <div
-                  style={{ fontSize: 13, color: "#5b6b82", marginBottom: 4 }}
-                >
-                  คำค้นหา
-                </div>
-
-                <InputGroup>
-                  <InputGroup.Text
-                    style={{
-                      background: "white",
-                      border: "1px solid #e0e0e0",
-                      borderRight: "none",
-                      borderRadius: "7px 0 0 7px",
-                    }}
-                  >
-                    <FiSearch style={{ color: "#888", fontSize: 16 }} />
-                  </InputGroup.Text>
-
-                  <FormControl
-                    type="search"
-                    disabled={!searchType}
-                    placeholder={
-                      !searchType
-                        ? "กรุณาเลือกประเภทการค้นหา"
-                        : searchType === "name"
-                          ? "ค้นหาชื่อลูกค้า"
-                          : searchType === "citizen"
-                            ? "ค้นหาเลขบัตรประชาชน"
-                            : "ค้นหาเลขที่แบบฟอร์ม"
-                    }
-                    value={searchQuerySub}
-                    onChange={(e) => setSearchQuerySub(e.target.value)}
-                    style={{
-                      borderRadius: "0 7px 7px 0",
-                      fontSize: 13,
-                      border: "1px solid #e0e0e0",
-                      borderLeft: "none",
-                      boxShadow: "none",
-                      width: 320,
-                    }}
-                  />
-                </InputGroup>
-              </div>
-
-              {/* --- ปุ่มค้นหา --- */}
-              <button
-                className="btn btn-primary"
-                disabled={!searchType || !searchQuerySub}
-                onClick={() => {
-                  getEmployeeDB_Admin(1, searchQuerySub, searchType); // ✅ ส่งตรง
-                }}
-              >
-                ค้นหา
-              </button>
-
-              {/* --- ✅ ปุ่มล้าง --- */}
-              <button
-                className="btn btn-secondary"
-                onClick={() => {
-                  setSearchType("");
-                  setSearchQuerySub("");
-                  setSearchKeyword("");
-                  getEmployeeDB_Admin(1); // โหลดข้อมูลทั้งหมดกลับมา
-                }}
-              >
-                ล้าง
-              </button>
             </div>
 
             {/* ขวาสุด: ปุ่ม action */}
@@ -1761,7 +1438,7 @@ const AdminSetData_Litemain = () => {
                           className="doc-btn doc-consent mr-1"
                           onClick={() =>
                             openFileInNewTab(
-                              `img/consent/${item.Form_consent_document}`,
+                              `img/consent/${item.Form_consent_document}`
                             )
                           }
                           title="หนังสือยินยอมเปิดเผยข้อมูล"
@@ -1773,7 +1450,7 @@ const AdminSetData_Litemain = () => {
                           className="doc-btn doc-application mr-1"
                           onClick={() =>
                             openFileInNewTab(
-                              `img/application/${item.Form_application_document}`,
+                              `img/application/${item.Form_application_document}`
                             )
                           }
                           title="แบบฟอร์มคำขอ"
@@ -1785,7 +1462,7 @@ const AdminSetData_Litemain = () => {
                           className="doc-btn doc-idcard mr-2 mt-1"
                           onClick={() =>
                             openFileInNewTab(
-                              `img/idcard/${item.Form_idcard_photo}`,
+                              `img/idcard/${item.Form_idcard_photo}`
                             )
                           }
                           title="รูปบัตรประชาชน"
@@ -1810,7 +1487,7 @@ const AdminSetData_Litemain = () => {
                           {item.Form_status_Edit === "1" && (
                             <button
                               onClick={() =>
-                                setOpenFeeModal(item.SCORE_additional_fee_Edit)
+                                setOpenFeeModal(item.SCORE_additional_fee)
                               }
                               style={{
                                 border: "none",
@@ -1835,14 +1512,9 @@ const AdminSetData_Litemain = () => {
                         style={{ verticalAlign: "middle" }}
                       >
                         {(() => {
-                          const status = getWaitingStatus(item.date_upEvidence);
-                          const waitStatus = getWaitingStatus(
-                            item.date_upEvidence,
-                          );
-                          const { minutes, seconds } = getDiffTime(
-                            item.date_upEvidence,
-                            now,
-                          );
+                          // const waitStatus = getWaitingStatus(
+                          //   item.date_upEvidence
+                          // );
 
                           return (
                             <div
@@ -1865,8 +1537,8 @@ const AdminSetData_Litemain = () => {
                                     padding: "6px 18px",
                                     fontSize: "12px",
                                     fontWeight: 600,
-                                    backgroundColor: waitStatus.color,
-                                    color: waitStatus.textColor,
+                                    backgroundColor: "#f6b72ff5",
+                                    color: "#5a3103ff",
                                     cursor: "pointer",
                                     minWidth: "120px",
                                     boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
@@ -1888,8 +1560,8 @@ const AdminSetData_Litemain = () => {
                                         padding: "6px 18px",
                                         fontSize: "12px",
                                         fontWeight: 600,
-                                        backgroundColor: waitStatus.color,
-                                        color: waitStatus.textColor,
+                                        backgroundColor: "#039201ff",
+                                        color: "#f6f6f6ff",
                                         cursor: "pointer",
                                         minWidth: "120px",
                                         boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
@@ -1927,17 +1599,6 @@ const AdminSetData_Litemain = () => {
                                   )}
                                 </>
                               )}
-                              {/* เวลาเดิน */}
-                              <div
-                                style={{
-                                  fontSize: "11px",
-                                  color: "#6c757d",
-                                  fontVariantNumeric: "tabular-nums",
-                                }}
-                              >
-                                ⏱ {minutes}:
-                                {seconds.toString().padStart(2, "0")}
-                              </div>
 
                               {/* สถานะเวลา */}
 
@@ -1970,10 +1631,10 @@ const AdminSetData_Litemain = () => {
                                   color: "#6c757d",
                                   fontVariantNumeric: "tabular-nums",
                                 }}
-                              >
-                              ⏱ {minutes}:
-                                {seconds.toString().padStart(2, "0")}
-                              </div> */}
+                              > */}
+                              {/* ⏱ {minutes}:
+                                {seconds.toString().padStart(2, "0")} */}
+                              {/* </div> */}
                             </div>
                           );
                         })()}
@@ -2051,14 +1712,11 @@ const AdminSetData_Litemain = () => {
                     <th className="text-center" style={{ width: "2%" }}>
                       ลำดับ
                     </th>
-                    <th className="text" style={{ width: "8%" }}>
+                    <th className="text" style={{ width: "5%" }}>
                       เลขที่แบบฟอร์ม
                     </th>
-                    <th className="text" style={{ width: "12%" }}>
+                    <th className="text" style={{ width: "14%" }}>
                       ชื่อ-นาม สกุลลูกค้า
-                    </th>
-                    <th className="text" style={{ width: "10%" }}>
-                      เลขบัตรประชาชน
                     </th>
 
                     <th className="text" style={{ width: "15%" }}>
@@ -2095,128 +1753,113 @@ const AdminSetData_Litemain = () => {
                     </th>
                   </tr>
                 </thead>
+                {loading ? (
+                  <tr>
+                    <td colSpan={14} className="text-center py-4">
+                      กำลังโหลดข้อมูล...
+                    </td>
+                  </tr>
+                ) : (
+                  <tbody>
+                    {probationaryEmployees.map((item, index) => (
+                      <tr key={item.CTM_form_number}>
+                        <td className="text-center">
+                          {(currentPage - 1) * limit + (index + 1)}
+                        </td>
 
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan={14} className="text-center py-4">
-                        กำลังโหลดข้อมูล...
-                      </td>
-                    </tr>
-                  ) : (
-                    <>
-                      {probationaryEmployees.map((item, index) => (
-                        <tr key={index}>
-                          <td className="text-center">
-                            {(currentPage - 1) * limit + (index + 1)}
-                          </td>
+                        <td>{item.CTM_form_number}</td>
+                        <td>
+                          <div style={{ fontWeight: 600, color: "#0f3d78" }}>
+                            {item.CTM_title_name}
+                            {item.CTM_firstname} {item.CTM_lastname}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
+                          </div>
+                        </td>
 
-                          <td>{item.CTM_form_number}</td>
-                          <td>
-                            <div style={{ fontWeight: 600, color: "#0f3d78" }}>
-                              {item.CTM_title_name}
-                              {item.CTM_firstname} {item.CTM_lastname}
-                            </div>
-                            {/* <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                              {item.CTM_citizen_id || "-"}
-                            </div> */}
-                          </td>
-                          <td>
-                            <center>
-                              <div className="citizen-cell">
-                                {item.CTM_Old_status === "1" ? (
-                                  <span className="citizen-badge-old">
-                                    {item.CTM_citizen_id}
-                                  </span>
-                                ) : (
-                                  <span>{item.CTM_citizen_id}</span>
-                                )}
-                              </div>
-                            </center>
-                          </td>
-                          <td>
-                            <div>{item.CTM_recorder_fullname}</div>
-                            <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                              ตำแหน่ง: {item.CTM_position || "-"}
-                            </div>
-                          </td>
-                          <td> {item.CTM_business_zone || "-"}</td>
-                          <td> {item.CTM_branch || "-"}</td>
-                          <td> {item.CTM_business_region || "-"}</td>
-                          <td className="text">
-                            <button
-                              className="doc-btn doc-consent mr-1"
-                              onClick={() =>
-                                openFileInNewTab(
-                                  `img/consent/${item.Form_consent_document}`,
-                                )
-                              }
-                              title="หนังสือยินยอมเปิดเผยข้อมูล"
-                            >
-                              <BsFiletypeDoc />
-                            </button>
+                        <td>
+                          <div>{item.CTM_recorder_fullname}</div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            ตำแหน่ง: {item.CTM_position || "-"}
+                          </div>
+                        </td>
+                        <td> {item.CTM_business_zone || "-"}</td>
+                        <td> {item.CTM_branch || "-"}</td>
+                        <td> {item.CTM_business_region || "-"}</td>
+                        <td className="text">
+                          <button
+                            className="doc-btn doc-consent mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/consent/${item.Form_consent_document}`
+                              )
+                            }
+                            title="หนังสือยินยอมเปิดเผยข้อมูล"
+                          >
+                            <BsFiletypeDoc />
+                          </button>
 
-                            <button
-                              className="doc-btn doc-application mr-1"
-                              onClick={() =>
-                                openFileInNewTab(
-                                  `img/application/${item.Form_application_document}`,
-                                )
-                              }
-                              title="แบบฟอร์มคำขอ"
-                            >
-                              <IoDocumentTextOutline />
-                            </button>
+                          <button
+                            className="doc-btn doc-application mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/application/${item.Form_application_document}`
+                              )
+                            }
+                            title="แบบฟอร์มคำขอ"
+                          >
+                            <IoDocumentTextOutline />
+                          </button>
 
-                            <button
-                              className="doc-btn doc-idcard mr-2 mt-1"
-                              onClick={() =>
-                                openFileInNewTab(
-                                  `img/idcard/${item.Form_idcard_photo}`,
-                                )
-                              }
-                              title="รูปบัตรประชาชน"
-                            >
-                              <FaRegIdCard />
-                            </button>
-                          </td>
-                          <td>{convertToThaiDate(item.date_upEvidence)}</td>
+                          <button
+                            className="doc-btn doc-idcard mr-2 mt-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/idcard/${item.Form_idcard_photo}`
+                              )
+                            }
+                            title="รูปบัตรประชาชน"
+                          >
+                            <FaRegIdCard />
+                          </button>
+                        </td>
+                        <td>{convertToThaiDate(item.date_upEvidence)}</td>
 
-                          <td>{item.Form_Name_Inspector}</td>
-                          <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
-                          <td className="text">
-                            {/* {["rejected", "approved"].includes(item.Form_Approval_results) && ( */}
-                            <center>
-                              <div>
-                                <button
-                                  className="btn-icon"
-                                  onClick={() => handleView(item)}
-                                  title="รายงานผล"
-                                >
-                                  <AiOutlineFileSearch />
-                                </button>
-                              </div>
-                            </center>
-                          </td>
-
-                          <td className="text">
-                            <center>
-                              <span
-                                className="status-badge status-pass"
-                                // onClick={() =>
-                                //   handleStatusClick(item.CTM_form_number)
-                                // }
-                                style={{ cursor: "pointer" }}
+                        <td>{item.Form_Name_Inspector}</td>
+                        <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
+                        <td className="text">
+                          {/* {["rejected", "approved"].includes(item.Form_Approval_results) && ( */}
+                          <center>
+                            <div>
+                              <button
+                                className="btn-icon"
+                                onClick={() => handleView(item)}
+                                title="รายงานผล"
                               >
-                                ตรวจแล้ว
-                              </span>
-                            </center>
-                          </td>
-                        </tr>
-                      ))}
-                    </>
-                  )}
-                </tbody>
+                                <AiOutlineFileSearch />
+                              </button>
+                            </div>
+                          </center>
+                        </td>
+
+                        <td className="text">
+                          <center>
+                            <span
+                              className="status-badge status-pass"
+                              // onClick={() =>
+                              //   handleStatusClick(item.CTM_form_number)
+                              // }
+                              style={{ cursor: "pointer" }}
+                            >
+                              ตรวจแล้ว
+                            </span>
+                          </center>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
               </table>
               {totalPages > 1 ? (
                 <div className="card-footer clearfix">
@@ -2240,14 +1883,11 @@ const AdminSetData_Litemain = () => {
                     <th className="text-center" style={{ width: "2%" }}>
                       ลำดับ
                     </th>
-                    <th className="text" style={{ width: "8%" }}>
+                    <th className="text" style={{ width: "5%" }}>
                       เลขที่แบบฟอร์ม
                     </th>
-                    <th className="text" style={{ width: "12%" }}>
+                    <th className="text" style={{ width: "14%" }}>
                       ชื่อ-นาม สกุลลูกค้า
-                    </th>
-                    <th className="text" style={{ width: "10%" }}>
-                      เลขบัตรประชาชน
                     </th>
 
                     <th className="text" style={{ width: "15%" }}>
@@ -2287,97 +1927,82 @@ const AdminSetData_Litemain = () => {
                     </th>
                   </tr>
                 </thead>
+                {loading ? (
+                  <tr>
+                    <td colSpan={14} className="text-center py-4">
+                      กำลังโหลดข้อมูล...
+                    </td>
+                  </tr>
+                ) : (
+                  <tbody>
+                    {probationaryEmployees.map((item, index) => (
+                      <tr key={item.CTM_form_number}>
+                        <td className="text-center">
+                          {(currentPage - 1) * limit + (index + 1)}
+                        </td>
 
-                <tbody>
-                  {loading ? (
-                    <tr>
-                      <td colSpan={14} className="text-center py-4">
-                        กำลังโหลดข้อมูล...
-                      </td>
-                    </tr>
-                  ) : (
-                    <>
-                      {probationaryEmployees.map((item, index) => (
-                        <tr key={index}>
-                          <td className="text-center">
-                            {(currentPage - 1) * limit + (index + 1)}
-                          </td>
+                        <td>{item.CTM_form_number}</td>
+                        <td>
+                          <div style={{ fontWeight: 600, color: "#0f3d78" }}>
+                            {item.CTM_title_name}
+                            {item.CTM_firstname} {item.CTM_lastname}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
+                          </div>
+                        </td>
 
-                          <td>{item.CTM_form_number}</td>
-                          <td>
-                            <div style={{ fontWeight: 600, color: "#0f3d78" }}>
-                              {item.CTM_title_name}
-                              {item.CTM_firstname} {item.CTM_lastname}
-                            </div>
-                            {/* <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                              เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
-                            </div> */}
-                          </td>
-                          <td>
-                            <center>
-                              <div className="citizen-cell">
-                                {item.CTM_Old_status === "1" ? (
-                                  <span className="citizen-badge-old">
-                                    {item.CTM_citizen_id}
-                                  </span>
-                                ) : (
-                                  <span>{item.CTM_citizen_id}</span>
-                                )}
-                              </div>
-                            </center>
-                          </td>
+                        <td>
+                          <div>{item.CTM_recorder_fullname}</div>
+                          <div style={{ fontSize: "12px", color: "#6c757d" }}>
+                            ตำแหน่ง: {item.CTM_position || "-"}
+                          </div>
+                        </td>
+                        <td> {item.CTM_business_zone || "-"}</td>
+                        <td> {item.CTM_branch || "-"}</td>
+                        <td> {item.CTM_business_region || "-"}</td>
+                        <td className="text">
+                          <button
+                            className="doc-btn doc-consent mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/consent/${item.Form_consent_document}`
+                              )
+                            }
+                            title="หนังสือยินยอมเปิดเผยข้อมูล"
+                          >
+                            <BsFiletypeDoc />
+                          </button>
 
-                          <td>
-                            <div>{item.CTM_recorder_fullname}</div>
-                            <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                              ตำแหน่ง: {item.CTM_position || "-"}
-                            </div>
-                          </td>
-                          <td> {item.CTM_business_zone || "-"}</td>
-                          <td> {item.CTM_branch || "-"}</td>
-                          <td> {item.CTM_business_region || "-"}</td>
-                          <td className="text">
-                            <button
-                              className="doc-btn doc-consent mr-1"
-                              onClick={() =>
-                                openFileInNewTab(
-                                  `img/consent/${item.Form_consent_document}`,
-                                )
-                              }
-                              title="หนังสือยินยอมเปิดเผยข้อมูล"
-                            >
-                              <BsFiletypeDoc />
-                            </button>
+                          <button
+                            className="doc-btn doc-application mr-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/application/${item.Form_application_document}`
+                              )
+                            }
+                            title="แบบฟอร์มคำขอ"
+                          >
+                            <IoDocumentTextOutline />
+                          </button>
 
-                            <button
-                              className="doc-btn doc-application mr-1"
-                              onClick={() =>
-                                openFileInNewTab(
-                                  `img/application/${item.Form_application_document}`,
-                                )
-                              }
-                              title="แบบฟอร์มคำขอ"
-                            >
-                              <IoDocumentTextOutline />
-                            </button>
+                          <button
+                            className="doc-btn doc-idcard mr-2 mt-1"
+                            onClick={() =>
+                              openFileInNewTab(
+                                `img/idcard/${item.Form_idcard_photo}`
+                              )
+                            }
+                            title="รูปบัตรประชาชน"
+                          >
+                            <FaRegIdCard />
+                          </button>
+                        </td>
+                        <td>{convertToThaiDate(item.date_upEvidence)}</td>
 
-                            <button
-                              className="doc-btn doc-idcard mr-2 mt-1"
-                              onClick={() =>
-                                openFileInNewTab(
-                                  `img/idcard/${item.Form_idcard_photo}`,
-                                )
-                              }
-                              title="รูปบัตรประชาชน"
-                            >
-                              <FaRegIdCard />
-                            </button>
-                          </td>
-                          <td>{convertToThaiDate(item.date_upEvidence)}</td>
-
-                          <td>{item.Form_Name_Inspector}</td>
-                          <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
-                          {/* <td className="text">
+                        <td>{item.Form_Name_Inspector}</td>
+                        <td>{convertToThaiDate(item.Form_date_inspertor)}</td>
+                        {/* <td className="text">
                         <center>
                           <div className="">
                             <button
@@ -2390,49 +2015,48 @@ const AdminSetData_Litemain = () => {
                         </center>
                       </td> */}
 
-                          <td className="text">
-                            {item.Form_verification_status === "Lv0" && (
-                              <span
-                                className="status-badge status-wait"
-                                onClick={() =>
-                                  handleStatusClick(item.CTM_form_number)
-                                }
-                                style={{ cursor: "pointer" }}
-                              >
-                                0w - รอตรวจสอบข้อมูล
-                              </span>
+                        <td className="text">
+                          {item.Form_verification_status === "Lv0" && (
+                            <span
+                              className="status-badge status-wait"
+                              onClick={() =>
+                                handleStatusClick(item.CTM_form_number)
+                              }
+                              style={{ cursor: "pointer" }}
+                            >
+                              0w - รอตรวจสอบข้อมูล
+                            </span>
+                          )}
+                          {item.Form_verification_status >= "Lv1" &&
+                            item.Form_verification_status != "Lv1N" && (
+                              <center>
+                                <span
+                                  className="status-badge status-pass"
+                                  onClick={() =>
+                                    handleStatusClick(item.CTM_form_number)
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  ตรวจแล้ว
+                                </span>
+                              </center>
                             )}
-                            {item.Form_verification_status >= "Lv1" &&
-                              item.Form_verification_status != "Lv1N" && (
-                                <center>
-                                  <span
-                                    className="status-badge status-pass"
-                                    onClick={() =>
-                                      handleStatusClick(item.CTM_form_number)
-                                    }
-                                    style={{ cursor: "pointer" }}
-                                  >
-                                    ตรวจแล้ว
-                                  </span>
-                                </center>
-                              )}
-                            {item.Form_verification_status === "Lv1N" && (
-                              <span
-                                className="status-badge status-cancel"
-                                // onClick={() =>
-                                //   handleStatusClick(item.CTM_form_number)
-                                // }
-                                style={{ cursor: "pointer" }}
-                              >
-                                1N ยกเลิกรายการตรวจสอบ
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </>
-                  )}
-                </tbody>
+                          {item.Form_verification_status === "Lv1N" && (
+                            <span
+                              className="status-badge status-cancel"
+                              // onClick={() =>
+                              //   handleStatusClick(item.CTM_form_number)
+                              // }
+                              style={{ cursor: "pointer" }}
+                            >
+                              1N ยกเลิกรายการตรวจสอบ
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
               </table>
               {totalPages > 1 ? (
                 <div className="card-footer clearfix">
@@ -2459,7 +2083,7 @@ const AdminSetData_Litemain = () => {
                     <th className="text" style={{ width: "8%" }}>
                       เลขที่แบบฟอร์ม
                     </th>
-                    <th className="text" style={{ width: "14%" }}>
+                    <th className="text" style={{ width: "13%" }}>
                       ชื่อ-นาม สกุลลูกค้า
                     </th>
 
@@ -2488,7 +2112,7 @@ const AdminSetData_Litemain = () => {
                     <th className="text-center" style={{ width: "5%" }}>
                       สถานะ
                     </th>
-                    <th className="text-center" style={{ width: "10%" }}>
+                    <th className="text-center" style={{ width: "15%" }}>
                       SMS
                     </th>
                     <th>หมายเหตุ</th>
@@ -2503,7 +2127,7 @@ const AdminSetData_Litemain = () => {
                 ) : (
                   <tbody>
                     {probationaryEmployees.map((item, index) => (
-                      <tr key={index}>
+                      <tr key={item.CTM_form_number}>
                         <td className="text-center">
                           {" "}
                           {(currentPage - 1) * limit + (index + 1)}
@@ -2515,16 +2139,7 @@ const AdminSetData_Litemain = () => {
                             {item.CTM_firstname} {item.CTM_lastname}
                           </div>
                           <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                            {item.CTM_Old_status === "1" ? (
-                              <span style={{ color: "red" }}>
-                                เลขบัตรประชาชน: {item.CTM_citizen_id}
-                              </span>
-                            ) : (
-                              <span>
-                                {" "}
-                                เลขบัตรประชาชน: {item.CTM_citizen_id}
-                              </span>
-                            )}
+                            เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
                           </div>
                           <div style={{ fontSize: "12px", color: "#6c757d" }}>
                             วัน/เดือน/ปี เกิด:{" "}
@@ -2556,7 +2171,7 @@ const AdminSetData_Litemain = () => {
                             className="doc-btn doc-consent mr-1"
                             onClick={() =>
                               openFileInNewTab(
-                                `img/consent/${item.Form_consent_document}`,
+                                `img/consent/${item.Form_consent_document}`
                               )
                             }
                             title="หนังสือยินยอมเปิดเผยข้อมูล"
@@ -2568,7 +2183,7 @@ const AdminSetData_Litemain = () => {
                             className="doc-btn doc-application mr-1"
                             onClick={() =>
                               openFileInNewTab(
-                                `img/application/${item.Form_application_document}`,
+                                `img/application/${item.Form_application_document}`
                               )
                             }
                             title="แบบฟอร์มคำขอ"
@@ -2580,7 +2195,7 @@ const AdminSetData_Litemain = () => {
                             className="doc-btn doc-idcard mr-2 mt-1"
                             onClick={() =>
                               openFileInNewTab(
-                                `img/idcard/${item.Form_idcard_photo}`,
+                                `img/idcard/${item.Form_idcard_photo}`
                               )
                             }
                             title="รูปบัตรประชาชน"
@@ -2709,7 +2324,7 @@ const AdminSetData_Litemain = () => {
                 ) : (
                   <tbody>
                     {probationaryEmployees.map((item, index) => (
-                      <tr key={index}>
+                      <tr key={item.CTM_form_number}>
                         <td className="text-center">
                           {" "}
                           {(currentPage - 1) * limit + (index + 1)}
@@ -2721,16 +2336,7 @@ const AdminSetData_Litemain = () => {
                             {item.CTM_firstname} {item.CTM_lastname}
                           </div>
                           <div style={{ fontSize: "12px", color: "#6c757d" }}>
-                            {item.CTM_Old_status === "1" ? (
-                              <span style={{ color: "red" }}>
-                                เลขบัตรประชาชน: {item.CTM_citizen_id}
-                              </span>
-                            ) : (
-                              <span>
-                                {" "}
-                                เลขบัตรประชาชน: {item.CTM_citizen_id}
-                              </span>
-                            )}
+                            เลขบัตรประชาชน: {item.CTM_citizen_id || "-"}
                           </div>
                           <div style={{ fontSize: "12px", color: "#6c757d" }}>
                             วัน/เดือน/ปี เกิด:{" "}
@@ -2762,7 +2368,7 @@ const AdminSetData_Litemain = () => {
                             className="doc-btn doc-consent mr-1"
                             onClick={() =>
                               openFileInNewTab(
-                                `img/consent/${item.Form_consent_document}`,
+                                `img/consent/${item.Form_consent_document}`
                               )
                             }
                             title="หนังสือยินยอมเปิดเผยข้อมูล"
@@ -2774,7 +2380,7 @@ const AdminSetData_Litemain = () => {
                             className="doc-btn doc-application mr-1"
                             onClick={() =>
                               openFileInNewTab(
-                                `img/application/${item.Form_application_document}`,
+                                `img/application/${item.Form_application_document}`
                               )
                             }
                             title="แบบฟอร์มคำขอ"
@@ -2786,7 +2392,7 @@ const AdminSetData_Litemain = () => {
                             className="doc-btn doc-idcard mr-2 mt-1"
                             onClick={() =>
                               openFileInNewTab(
-                                `img/idcard/${item.Form_idcard_photo}`,
+                                `img/idcard/${item.Form_idcard_photo}`
                               )
                             }
                             title="รูปบัตรประชาชน"
@@ -2827,28 +2433,31 @@ const AdminSetData_Litemain = () => {
                             textAlign: "center",
                           }}
                         >
-                          <div>{item.Form_Contract_number}</div>
-                          {allowPerD.includes(PerD) && (
-                            <>
-                              {item.Form_Contract_number ? (
-                                <>
-                                  <button
-                                    className="btn-link-edit"
-                                    onClick={() => openContractModal(item)}
-                                  >
-                                    แก้ไข
-                                  </button>
-                                </>
-                              ) : (
-                                <button
-                                  className="btn-add-contract"
-                                  onClick={() => openContractModal(item)}
-                                >
-                                  + เพิ่มเลขที่สัญญา
-                                </button>
-                              )}
-                            </>
-                          )}
+        <div>{item.Form_Contract_number}</div>
+                         {allowPerD.includes(PerD) && (
+  <>
+    {item.Form_Contract_number ? (
+      <>
+
+        <button
+          className="btn-link-edit"
+          onClick={() => openContractModal(item)}
+        >
+          แก้ไข
+        </button>
+      </>
+    ) : (
+      <button
+        className="btn-add-contract"
+        onClick={() => openContractModal(item)}
+      >
+        + เพิ่มเลขที่สัญญา
+      </button>
+    )}
+  </>
+)}
+
+
                         </td>
                       </tr>
                     ))}
@@ -2873,7 +2482,7 @@ const AdminSetData_Litemain = () => {
 
       {/* 🔹 Popup แสดงข้อมูล */}
       {showPopup && selectedItem && (
-        <div className="modal-overlay sarabun-modal">
+        <div className="modal-overlay3 sarabun-modal">
           <div className="modal-content3">
             {/* 🔹 หัวเรื่อง */}
             <h3
@@ -2930,7 +2539,7 @@ const AdminSetData_Litemain = () => {
                         style={{ color: "#4a90e2", cursor: "pointer" }}
                         onClick={() =>
                           openFileInNewTab(
-                            `img/consent/${getDataShow?.Form_consent_document}`,
+                            `img/consent/${getDataShow?.Form_consent_document}`
                           )
                         }
                         title="หนังสือยินยอมเปิดเผยข้อมูล"
@@ -2944,7 +2553,7 @@ const AdminSetData_Litemain = () => {
                         style={{ color: "#4a90e2", cursor: "pointer" }}
                         onClick={() =>
                           openFileInNewTab(
-                            `img/application/${getDataShow?.Form_application_document}`,
+                            `img/application/${getDataShow?.Form_application_document}`
                           )
                         }
                         title="แบบฟอร์มคำขอ"
@@ -2958,7 +2567,7 @@ const AdminSetData_Litemain = () => {
                         style={{ color: "#4a90e2", cursor: "pointer" }}
                         onClick={() =>
                           openFileInNewTab(
-                            `img/idcard/${getDataShow?.Form_idcard_photo}`,
+                            `img/idcard/${getDataShow?.Form_idcard_photo}`
                           )
                         }
                         title="รูปบัตรประชาชน"
@@ -2975,7 +2584,7 @@ const AdminSetData_Litemain = () => {
             <div className="card recorder-card full-width">
               <div className="card-title2">ข้อมูลลูกค้า</div>
 
-              <div className="rec-grid3">
+              <div className="rec-grid3"> 
                 {" "}
                 <div>
                   <strong>ชื่อ - นามสกุลลูกค้า :</strong>{" "}
@@ -3001,7 +2610,7 @@ const AdminSetData_Litemain = () => {
                     {copied ? "คัดลอกแล้ว" : "คัดลอก"}
                   </button>
                 </div>
-                <div>
+                  <div>
                   <strong>วันเดือนปีเกิด :</strong>{" "}
                   {convertToThaiDate1(getDataShow?.CTM_birthdate || "-")}
                 </div>
@@ -3108,10 +2717,7 @@ const AdminSetData_Litemain = () => {
                                 name="joinProject"
                                 value="no"
                                 checked={joinProject === "no"}
-                                onChange={() => {
-                                  setJoinProject("no");
-                                  setJoinProjectError("");
-                                }}
+                                onChange={() => setJoinProject("no")}
                               />
                               ไม่เข้าร่วม
                             </label>
@@ -3123,42 +2729,24 @@ const AdminSetData_Litemain = () => {
                                 name="joinProject"
                                 value="yes"
                                 checked={joinProject === "yes"}
-                                onChange={() => {
-                                  setJoinProject("yes");
-                                  setJoinProjectError("");
-                                }}
+                                onChange={() => setJoinProject("yes")}
                               />
                               เข้าร่วม
                             </label>
-                            {submitted && joinProjectError && (
-                              <label
-                                style={{
-                                  color: "red",
-                                  fontSize: "20px",
-                                  marginTop: "6px",
-                                }}
-                              >
-                                {joinProjectError}
-                              </label>
-                            )}
                           </div>
                         </div>
 
                         {/* 🔹 รายได้ */}
                       </div>
-
                       <label className="form-label-inline">
                         1. มีสินเชื่อส่วนบุคคลภายใต้การกำกับ จำนวน{" "}
                         <span className="required">*</span> :{" "}
                         <label>
                           <input
-                            type="text"
+                            type="number"
                             placeholder="กรุณากรอก"
-                            className={`input-normal ${
-                              submitted && !valueCredit ? "input-error" : ""
-                            }`}
+                            className="input-normal"
                             value={valueCredit}
-                            min={0}
                             onChange={(e) => setValueCredit(e.target.value)}
                           />
                         </label>
@@ -3169,7 +2757,6 @@ const AdminSetData_Litemain = () => {
                           </span>
                         </label>
                       </label>
-
                       <div className="credit-row">
                         {/* 🔹 สถานะบุคคลล้มละลาย */}
                         <div className="form-group-inline">
@@ -3183,10 +2770,7 @@ const AdminSetData_Litemain = () => {
                                 name="bankrupt"
                                 value="no"
                                 checked={bankrupt === "no"}
-                                onChange={() => {
-                                  setBankrupt("no");
-                                  setJoinStatususe("");
-                                }}
+                                onChange={() => setBankrupt("no")}
                               />{" "}
                               ไม่เป็น
                             </label>
@@ -3197,24 +2781,10 @@ const AdminSetData_Litemain = () => {
                                 name="bankrupt"
                                 value="yes"
                                 checked={bankrupt === "yes"}
-                                onChange={() => {
-                                  setBankrupt("yes");
-                                  setJoinStatususe("");
-                                }}
+                                onChange={() => setBankrupt("yes")}
                               />{" "}
                               เป็น
                             </label>
-                            {submitted && joinStatususe && (
-                              <label
-                                style={{
-                                  color: "red",
-                                  fontSize: "16px",
-                                  marginTop: "6px",
-                                }}
-                              >
-                                {joinStatususe}
-                              </label>
-                            )}
                             {/* 🔹 วันที่ข้อมูล NCB สิ้นงวด */}
                             <label className="mr-1 ml-3">
                               {" "}
@@ -3257,10 +2827,8 @@ const AdminSetData_Litemain = () => {
                               คะแนนเครดิต <span className="required">*</span>
                             </h5>
                             <input
-                              type="text"
-                              className={`input-normal2 ${
-                                submitted && !score ? "input-error" : ""
-                              }`}
+                              type="number"
+                              className="input-normal"
                               placeholder="กรอกคะแนนเครดิต"
                               value={score}
                               onChange={handleScoreChange}
@@ -3274,7 +2842,7 @@ const AdminSetData_Litemain = () => {
                             </h5>
                             <input
                               type="text"
-                              className="input-normal2"
+                              className="input-normal"
                               value={level}
                               disabled
                               readOnly
@@ -3289,19 +2857,15 @@ const AdminSetData_Litemain = () => {
                               <span className="required">*</span>
                             </h5>
                             <input
-                              type="text"
-                              className={`input-normal2 ${
-                                submitted && !probabilityInput
-                                  ? "input-error"
-                                  : ""
-                              }`}
+                              type="number"
+                              className="input-normal"
                               placeholder="กรอกตัวเลข (0-10000)"
                               value={probabilityInput}
                               onChange={handleProbabilityChange}
                             />
                             <input
                               type="text"
-                              className="input-normal2"
+                              className="input-normal"
                               style={{ marginTop: "6px" }}
                               value={probabilityPercent}
                               readOnly
@@ -3318,7 +2882,7 @@ const AdminSetData_Litemain = () => {
                             </h5>
                             <input
                               type="text"
-                              className="input-normal2"
+                              className="input-normal"
                               value={result}
                               readOnly
                               style={{
@@ -3326,8 +2890,8 @@ const AdminSetData_Litemain = () => {
                                   result === "ผ่าน"
                                     ? "#0f8f2d" // สีเขียว
                                     : result === "ไม่ผ่าน"
-                                      ? "#c91414" // สีแดง
-                                      : "black",
+                                    ? "#c91414" // สีแดง
+                                    : "black",
                                 fontWeight: "bold",
                               }}
                               placeholder="ผลตรวจสอบข้อมูลเครดิตจะแสดงอัตโนมัติ"
@@ -3339,10 +2903,10 @@ const AdminSetData_Litemain = () => {
                                   risk === "ความเสี่ยงต่ำ"
                                     ? "#0f8f2d" // เขียว
                                     : risk === "ความเสี่ยงปานกลาง"
-                                      ? "#f0ad00" // เหลือง
-                                      : risk === "ความเสี่ยงสูง"
-                                        ? "#c91414" // แดง
-                                        : "black",
+                                    ? "#f0ad00" // เหลือง
+                                    : risk === "ความเสี่ยงสูง"
+                                    ? "#c91414" // แดง
+                                    : "black",
                                 fontWeight: "bold",
                               }}
                             >
@@ -3386,109 +2950,139 @@ const AdminSetData_Litemain = () => {
                               - เลือกสถานะบัญชี ({index + 1}) -
                             </option>
 
-                            <option value="10">
+                            <option
+                              value="มีสถานะบัญชี (10) - ปกติ
+                              (ไม่มีหนี้ค้างชำระหรือมีหนี้ค้างชำระไม่เกิน 90
+                              วัน)"
+                            >
                               มีสถานะบัญชี (10) - ปกติ
                               (ไม่มีหนี้ค้างชำระหรือมีหนี้ค้างชำระไม่เกิน 90
                               วัน)
                             </option>
 
-                            <option value="11">
+                            <option value="มีสถานะบัญชี (11) - ปิดบัญชี">
                               มีสถานะบัญชี (11) - ปิดบัญชี
                             </option>
 
-                            <option value="12">
+                            <option value="มีสถานะบัญชี (12) - พักชำระหนี้ตามนโยบายของสมาชิก">
                               มีสถานะบัญชี (12) - พักชำระหนี้ตามนโยบายของสมาชิก
                             </option>
 
-                            <option value="13">
+                            <option value="มีสถานะบัญชี (13) - พักชำระหนี้ตามนโยบายของรัฐ">
                               มีสถานะบัญชี (13) - พักชำระหนี้ตามนโยบายของรัฐ
                             </option>
 
-                            <option value="14">
+                            <option
+                              value="มีสถานะบัญชี (14) -
+                              พักชำระหนี้เกษตรกรตามนโยบายของรัฐ"
+                            >
                               มีสถานะบัญชี (14) -
                               พักชำระหนี้เกษตรกรตามนโยบายของรัฐ
                             </option>
 
-                            <option value="15">
-                              มีสถานะบัญชี (15) -
-                              อยู่ระหว่างชำระหนี้ในกระบวนการไกล่เกลี่ยก่อนฟ้อง
-                            </option>
-                            <option value="16">
-                              มีสถานะบัญชี (16) - ปกติ
-                              โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพ
+                            <option
+                              value="มีสถานะบัญชี (15) - ปกติ
+                              (ไม่มีหนี้ค้างชำระหรือมีหนี้ค้างชำระไม่เกิน 90 วัน
+                              ตามข้อตกลงหรือสัญญาประนีประนอมยอมความ)"
+                            >
+                              มีสถานะบัญชี (15) - ปกติ
+                              (ไม่มีหนี้ค้างชำระหรือมีหนี้ค้างชำระไม่เกิน 90 วัน
+                              ตามข้อตกลงหรือสัญญาประนีประนอมยอมความ)
                             </option>
 
-                            <option value="20">
+                            <option value="มีสถานะบัญชี (20) - หนี้ค้างชำระเกิน 90 วัน">
                               มีสถานะบัญชี (20) - หนี้ค้างชำระเกิน 90 วัน
                             </option>
 
-                            <option value="21">
-                              มีสถานะบัญชี (21) - หนี้ค้างชำระเกิน 90 วัน
+                            <option
+                              value="มีสถานะบัญชี (21) - หนี้ค้างชำระเกิน 90 วัน
+                              จากเหตุการณ์ไม่ปกติ"
+                            >
+                              มีสถานะบัญชี (21)-หนี้ค้างชำระเกิน 90 วัน
                               เนื่องจากได้รับผลกระทบจากสถานการณ์ไม่ปกติ
                             </option>
-                            <option value="26">
-                              มีสถานะบัญชี (26) - หนี้ค้างชำระเกิน 90 วัน
-                              โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพ
-                            </option>
 
-                            <option value="30">
+                            <option value="มีสถานะบัญชี (30) - อยู่ในกระบวนการทางกฎหมาย">
                               มีสถานะบัญชี (30) - อยู่ในกระบวนการทางกฎหมาย
                             </option>
 
-                            <option value="31">
+                            <option
+                              value="มีสถานะบัญชี (31) -
+                              อยู่ระหว่างชำระหนี้ตามคำพิพากษาตามยอม"
+                            >
                               มีสถานะบัญชี (31) -
                               อยู่ระหว่างชำระหนี้ตามคำพิพากษาตามยอม
                             </option>
 
-                            <option value="32">
-                              มีสถานะบัญชี (32) - ศาลพิพากษายกฟ้อง
+                            <option
+                              value="มีสถานะบัญชี (32) - ศาลพิพากษายกฟ้อง
+                              (ขาดอายุความหรือเหตุอื่น)"
+                            >
+                              มีสถานะบัญชี (32)-ศาลพิพากษายกฟ้อง
                               เนื่องจากขาดอายุความหรือเหตุอื่นฯ
                             </option>
 
-                            <option value="33">
+                            <option value="มีสถานะบัญชี (33) - ปิดบัญชีเนื่องจากตัดหนี้สูญ">
                               มีสถานะบัญชี (33) - ปิดบัญชีเนื่องจากตัดหนี้สูญ
                             </option>
-                            <option value="36">
-                              มีสถานะบัญชี (36) - ปกติ
-                              โดยอยู่ระหว่างชำระหนี้กับเจ้าหนี้ที่รับซื้อหรือรับโอนหนี้ด้อยคุณภาพและอยู่ในกระบวนการทางกฎหมาย
-                            </option>
 
-                            <option value="40">
+                            <option
+                              value="มีสถานะบัญชี (40) -
+                              อยู่ระหว่างชำระสินเชื่อเพื่อปิดบัญชี"
+                            >
                               มีสถานะบัญชี (40) -
                               อยู่ระหว่างชำระสินเชื่อเพื่อปิดบัญชี
                             </option>
 
-                            <option value="41">
+                            <option value="มีสถานะบัญชี (41) - อยู่ระหว่างตรวจสอบรายการ">
                               มีสถานะบัญชี (41) - อยู่ระหว่างตรวจสอบรายการ
                             </option>
 
-                            <option value="42">
-                              มีสถานะบัญชี (42) -
-                              โอนหรือขายหนี้ที่ไม่เป็นสถานะบัญชีปกติ
+                            <option
+                              value="มีสถานะบัญชี (42) - โอนหรือขายหนี้ที่ค้างชำระเกิน
+                              90 วัน"
+                            >
+                              มีสถานะบัญชี (42) - โอนหรือขายหนี้ที่ค้างชำระเกิน
+                              90 วัน
                             </option>
 
-                            <option value="43">
+                            <option
+                              value="มีสถานะบัญชี (43) -
+                              โอนหรือขายหนี้และชำระหนี้เสร็จสิ้น"
+                            >
                               มีสถานะบัญชี (43) -
                               โอนหรือขายหนี้และชำระหนี้เสร็จสิ้น
                             </option>
 
-                            <option value="44">
+                            <option
+                              value="มีสถานะบัญชี (44) -
+                              โอนหรือขายหนี้ที่เป็นสถานะบัญชีปกติ"
+                            >
                               มีสถานะบัญชี (44) -
                               โอนหรือขายหนี้ที่เป็นสถานะบัญชีปกติ
                             </option>
 
-                            <option value="51">
+                            <option
+                              value="มีสถานะบัญชี (51) - หยุดนำส่งข้อมูล
+                              เนื่องจากมีการบอกเลิกสัญญา"
+                            >
                               มีสถานะบัญชี (51) - หยุดนำส่งข้อมูล
                               เนื่องจากมีการบอกเลิกสัญญา
                             </option>
 
-                            <option value="52">
+                            <option
+                              value="มีสถานะบัญชี (52) - หนี้ค้างชำระเกิน 90 วัน
+                              โดยยังไม่ได้ยื่นฟ้อง และหยุดนำส่งข้อมูล"
+                            >
                               มีสถานะบัญชี (52) - หนี้ค้างชำระเกิน 90 วัน
                               โดยยังไม่ได้ยื่นฟ้อง และหยุดนำส่งข้อมูล
                             </option>
 
-                            <option value="53">
-                              มีสถานะบัญชี (53) - หนี้ค้างชำระเกิน 90 วัน
+                            <option
+                              value="มีสถานะบัญชี (53) - หนี้ค้างชำระเกิน 90 วัน
+                              อยู่ในกระบวนการทางกฎหมาย และหยุดนำส่งข้อมูล"
+                            >
+                              มีสถานะบัญชี (53)-หนี้ค้างชำระเกิน 90 วัน
                               โดยอยู่ในกระบวนการทางกฎหมาย และหยุดนำส่งข้อมูล
                             </option>
                           </select>
@@ -3496,22 +3090,12 @@ const AdminSetData_Litemain = () => {
                           {/* 🔹 จำนวนบัญชี */}
 
                           <input
-                            type="text"
+                            type="number"
                             className="input-normal"
-                            style={{ width: "100px" }}
                             placeholder="กรอกจำนวนบัญชี"
                             value={acc.amount}
                             onChange={(e) =>
                               handleChange(index, "amount", e.target.value)
-                            }
-                          />
-                          <input
-                            type="text"
-                            className="input-normal"
-                            placeholder="คำอธิบายเพิ่มเติม"
-                            value={acc.detel}
-                            onChange={(e) =>
-                              handleChange(index, "detel", e.target.value)
                             }
                           />
 
@@ -3561,149 +3145,301 @@ const AdminSetData_Litemain = () => {
 
                       {reasons.map((r, index) => (
                         <div key={index} className="credit-row">
-                          <select
-                            className="select-account-status2"
-                            value={r.reason}
-                            onChange={(e) =>
-                              handleChangeReason(index, e.target.value)
-                            }
-                          >
-                            <option>
-                              - เลือกเหตุผลประกอบคะแนนเครดิต ({index + 1}) -
-                            </option>
-                            <option value="00">
-                              {" "}
-                              00 :ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต
-                              (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)
-                            </option>
-                            <option value="011">
-                              {" "}
-                              011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี
-                              ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง{" "}
-                            </option>
-                            <option value="012"> 012 : ไม่ได้ใช้งาน</option>
-                            <option value="013">
-                              {" "}
-                              013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน
-                              ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง{" "}
-                            </option>
-                            <option value="014">
-                              {" "}
-                              014 : ยอดหนี้รวมคงค้าง
-                              ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง{" "}
-                            </option>
-                            <option value="015">
-                              {" "}
-                              015 : ประวัติข้อมูลเครดิตที่ดี
-                              ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด{" "}
-                            </option>
-                            <option value="016"> 016 : ไม่ได้ใช้งาน</option>
-                            <option value="017">
-                              {" "}
-                              017 : ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ
-                              ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                            </option>
-                            <option value="018">
-                              {" "}
-                              018 : วงเงินคงเหลือ
-                              ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย{" "}
-                            </option>
-                            <option value="019">
-                              {" "}
-                              019 : ประวัติข้อมูลเครดิต
-                              ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด{" "}
-                            </option>
-                            <option value="020">
-                              {" "}
-                              020 :
-                              ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต{" "}
-                            </option>
-                            <option value="021">
-                              {" "}
-                              021 : ประวัติสินเชื่อที่ดี
-                              ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น{" "}
-                            </option>
-                            <option value="022">
-                              {" "}
-                              022 : ยอดหนี้ที่ค้างชำระ
-                              ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                            </option>
-                            <option value="023">
-                              {" "}
-                              023 : ประวัติการค้างชำระ
-                              ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                            </option>
-                            <option value="024">
-                              {" "}
-                              024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร
-                              ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                            </option>
+                          {/* 🔹 แสดง select ถ้าไม่ใช่รายการใหม่ */}
+                          {!r.isNew ? (
+                            <select
+                              className="select-account-status2"
+                              value={r.reason}
+                              onChange={(e) =>
+                                handleChangeReason(index, e.target.value)
+                              }
+                            >
+                              <option>
+                                - เลือกเหตุผลประกอบคะแนนเครดิต ({index + 1}) -
+                              </option>
+                              <option>
+                                00 :
+                                ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต
+                                (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)
+                              </option>
+                              <option>
+                                {" "}
+                                011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>012 : ไม่ได้ใช้งาน</option>
+                              <option>
+                                {" "}
+                                013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>
+                                {" "}
+                                014 : ยอดหนี้รวมคงค้าง
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>
+                                {" "}
+                                015 : ประวัติข้อมูลเครดิตที่ดี
+                                ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด
+                              </option>
+                              <option>016 : ไม่ได้ใช้งาน</option>
+                              <option>
+                                {" "}
+                                017 :
+                                ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                018 : วงเงินคงเหลือ
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย
+                              </option>
+                              <option>
+                                {" "}
+                                019 : ประวัติข้อมูลเครดิต
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด
+                              </option>
+                              <option>
+                                {" "}
+                                020 :
+                                ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                021 : ประวัติสินเชื่อที่ดี
+                                ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น
+                              </option>
+                              <option>
+                                {" "}
+                                022 : ยอดหนี้ที่ค้างชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                023 : ประวัติการค้างชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
 
-                            <option value="025">
-                              {" "}
-                              025 : ความหลากหลายของประเภทสินเชื่อ
-                              ที่ปรากฏในรายงานข้อมูลเครดิตน้อย{" "}
-                            </option>
-                            <option value="026">
-                              {" "}
-                              026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต
-                              ค่อนข้างสูง{" "}
-                            </option>
-                            <option value="027"> 027 : ไม่ได้ใช้งาน</option>
-                            <option value="028">
-                              {" "}
-                              028 : การสืบค้นล่าสุด
-                              ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                            </option>
-                            <option value="029">
-                              {" "}
-                              029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                            </option>
-                            <option value="030">
-                              {" "}
-                              030 :
-                              จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ
-                              ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                            </option>
-                            <option value="031">
-                              {" "}
-                              031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด
-                              ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
-                            </option>
-                            <option value="032"> 032 : ไม่ได้ใช้งาน</option>
+                              <option>
+                                {" "}
+                                025 : ความหลากหลายของประเภทสินเชื่อ
+                                ที่ปรากฏในรายงานข้อมูลเครดิตน้อย
+                              </option>
+                              <option>
+                                {" "}
+                                026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต
+                                ค่อนข้างสูง
+                              </option>
+                              <option>027 : ไม่ได้ใช้งาน</option>
+                              <option>
+                                {" "}
+                                028 : การสืบค้นล่าสุด
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
+                              </option>
+                              <option>
+                                {" "}
+                                030 :
+                                จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>032 : ไม่ได้ใช้งาน</option>
 
-                            <option value="TT">
-                              {" "}
-                              TT : ปัจจุบันค้างชำระเกิน 90 วัน
-                              หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย{" "}
-                            </option>
-                            <option value="VV">
-                              {" "}
-                              VV :
-                              บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล{" "}
-                            </option>
-                            <option value="WW">
-                              {" "}
-                              WW : บัญชีมีการโต้แย้ง
-                              หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล{" "}
-                            </option>
-                            <option value="XX">
-                              {" "}
-                              XX : ไม่มีบัญชี
-                              แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
-                              มากกว่า หรือเท่ากับ 5 ครั้ง{" "}
-                            </option>
-                            <option value="YY">
-                              {" "}
-                              YY : ไม่มีบัญชี
-                              แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
-                              น้อยกว่า 5 ครั้ง{" "}
-                            </option>
-                            <option value="ZZ">
-                              {" "}
-                              ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต
-                            </option>
-                          </select>
+                              <option>
+                                {" "}
+                                TT : ปัจจุบันค้างชำระเกิน 90 วัน
+                                หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย
+                              </option>
+                              <option>
+                                {" "}
+                                VV :
+                                บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล
+                              </option>
+                              <option>
+                                {" "}
+                                WW : บัญชีมีการโต้แย้ง
+                                หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล
+                              </option>
+                              <option>
+                                {" "}
+                                XX : ไม่มีบัญชี
+                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
+                                มากกว่า หรือเท่ากับ 5 ครั้ง{" "}
+                              </option>
+                              <option>
+                                {" "}
+                                YY : ไม่มีบัญชี
+                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
+                                น้อยกว่า 5 ครั้ง{" "}
+                              </option>
+
+                              <option>
+                                {" "}
+                                ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต{" "}
+                              </option>
+                            </select>
+                          ) : (
+                            // 🔹 input text ถ้าเป็นแถวที่เพิ่มใหม่
+                            <select
+                              className="select-account-status2"
+                              value={r.reason}
+                              onChange={(e) =>
+                                handleChangeReason(index, e.target.value)
+                              }
+                            >
+                              <option>
+                                - เลือกเหตุผลประกอบคะแนนเครดิต ({index + 1}) -
+                              </option>
+                              <option>
+                                00 :
+                                ไม่พบประวัติสินเชื่อลูกค้าในรายงานข้อมูลเครดิต
+                                (ไม่มีข้อมูลการเป็นหนี้หรือประวัติชำระหนี้ในระบบ)
+                              </option>
+                              <option>
+                                {" "}
+                                011 : ยอดหนี้ค้างเฉลี่ยต่อบัญชี
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>012 : ไม่ได้ใช้งาน</option>
+                              <option>
+                                {" "}
+                                013 : สัดส่วนยอดหนี้คงเหลือ ต่อวงเงิน
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>
+                                {" "}
+                                014 : ยอดหนี้รวมคงค้าง
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างสูง
+                              </option>
+                              <option>
+                                {" "}
+                                015 : ประวัติข้อมูลเครดิตที่ดี
+                                ที่ปรากฎในรายงานข้อมูลเครดิตจำกัด
+                              </option>
+                              <option>016 : ไม่ได้ใช้งาน</option>
+                              <option>
+                                {" "}
+                                017 :
+                                ยอดหนี้รวมคงค้างของบัญชีสินเชื่อแบบผ่อนชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                018 : วงเงินคงเหลือ
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างน้อย
+                              </option>
+                              <option>
+                                {" "}
+                                019 : ประวัติข้อมูลเครดิต
+                                ที่ปรากฏในรายงานข้อมูลเครดิตค่อนข้างจำกัด
+                              </option>
+                              <option>
+                                {" "}
+                                020 :
+                                ประวัติการค้างชำระของสินเชื่อเพื่อการเกษตรในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                021 : ประวัติสินเชื่อที่ดี
+                                ที่ปรากฏในรายงานข้อมูลเครดิต ค่อนข้างสั้น
+                              </option>
+                              <option>
+                                {" "}
+                                022 : ยอดหนี้ที่ค้างชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                023 : ประวัติการค้างชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                024 : ยอดหนี้ของสินเชื่อประเภทการเกษตร
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+
+                              <option>
+                                {" "}
+                                025 : ความหลากหลายของประเภทสินเชื่อ
+                                ที่ปรากฏในรายงานข้อมูลเครดิตน้อย
+                              </option>
+                              <option>
+                                {" "}
+                                026 : ภาระสินเชื่อ ที่ปรากฏในรายงานข้อมูลเครดิต
+                                ค่อนข้างสูง
+                              </option>
+                              <option>027 : ไม่ได้ใช้งาน</option>
+                              <option>
+                                {" "}
+                                028 : การสืบค้นล่าสุด
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                029 : การสืบค้น ที่ปรากฏในรายงานข้อมูลเครดิต{" "}
+                              </option>
+                              <option>
+                                {" "}
+                                030 :
+                                จำนวนบัญชีหรือสัดส่วนบัญชีสินเชื่อแบบผ่อนชำระ
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>
+                                {" "}
+                                031 : จำนวนบัญชีหรือสัดส่วนบัญชีที่เปิดล่าสุด
+                                ที่ปรากฏในรายงานข้อมูลเครดิต
+                              </option>
+                              <option>032 : ไม่ได้ใช้งาน</option>
+
+                              <option>
+                                {" "}
+                                TT : ปัจจุบันค้างชำระเกิน 90 วัน
+                                หรือมีสถานะอยู่ในกระบวนการทางกฎหมาย
+                              </option>
+                              <option>
+                                {" "}
+                                VV :
+                                บัญชีอยู่ระหว่างตรวจสอบบัตรประจำตัวประชาชนถูกฉ้อฉล
+                              </option>
+                              <option>
+                                {" "}
+                                WW : บัญชีมีการโต้แย้ง
+                                หรือขอตรวจสอบข้อมูลจากเจ้าของข้อมูล
+                              </option>
+                              <option>
+                                {" "}
+                                XX : ไม่มีบัญชี
+                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
+                                มากกว่า หรือเท่ากับ 5 ครั้ง{" "}
+                              </option>
+                              <option>
+                                {" "}
+                                YY : ไม่มีบัญชี
+                                แต่มีประวัติการถูกเรียกดูเพื่ออนุมัติสินเชื่อใหม่
+                                น้อยกว่า 5 ครั้ง{" "}
+                              </option>
+
+                              <option>
+                                {" "}
+                                ZZ : ข้อมูลไม่เพียงพอต่อการให้คะแนนเครดิต{" "}
+                              </option>
+                            </select>
+                          )}
 
                           {/* 🔹 ปุ่มลบ — ห้ามแสดงบนแถวแรก */}
                           {index !== 0 && (
@@ -3777,8 +3513,8 @@ const AdminSetData_Litemain = () => {
                       <h5>หมายเหตุ</h5>
                       <textarea
                         className="input-normal"
-                        value={descriptionEdit}
-                        onChange={(e) => setDescriptionEdit(e.target.value)}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                       ></textarea>
                     </div>
                   </div>
@@ -3787,21 +3523,7 @@ const AdminSetData_Litemain = () => {
             </div>
 
             {/* 🔹 Footer */}
-
             <div className="popup-footer">
-              {/* ปุ่มซ้ายสุด */}
-
-              {approval === "approved" && (
-                <button
-                  className="btn-submit-modern"
-                  type="button"
-                  onClick={openPreviewModal}
-                  style={{ marginRight: "auto", background: "#f78b4c" }}
-                >
-                  <HiDocumentSearch style={{ marginRight: "6px" }} />
-                  ดูตัวอย่างเอกสาร
-                </button>
-              )}
               <button className="btn-cancel-modern" onClick={closePopup}>
                 ยกเลิก
               </button>
@@ -3817,7 +3539,6 @@ const AdminSetData_Litemain = () => {
           </div>
         </div>
       )}
-
       {openFeeModal && (
         <div
           style={{
@@ -3850,7 +3571,7 @@ const AdminSetData_Litemain = () => {
                 color: "#3056d2",
               }}
             >
-              รายละเอียดข้อมูลที่ปรับแก้
+              รายละเอียดข้อมูลที่ปรับแก้ {}
             </div>
 
             {/* Content */}
@@ -3886,8 +3607,8 @@ const AdminSetData_Litemain = () => {
       )}
 
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ width: "360px" }}>
+        <div className="modal-overlay3">
+          <div className="modal-content3" style={{ width: "360px" }}>
             <h4 style={{ marginBottom: "10px" }}>
               {contractNumber ? "แก้ไขเลขที่สัญญา" : "เพิ่มเลขที่สัญญา"}
             </h4>
@@ -3922,224 +3643,6 @@ const AdminSetData_Litemain = () => {
                 onClick={() => handleSaveContract()}
               >
                 บันทึก
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showPreview && (
-        <div className="preview-overlay">
-          <div className="preview-modal-large">
-            <div className="preview-header">
-              <h6>
-                <FcViewDetails /> ข้อมูลเอกสารผลการตรวจเครดิต
-              </h6>
-            </div>
-
-            <div className="preview-body">
-              <center>
-                {joinProject === "yes" && (
-                  <span
-                    style={{
-                      color: "red",
-                      fontWeight: "bold",
-                      fontSize: "18px",
-                    }}
-                  >
-                    ลูกค้าเข้าร่วมโครงการ "คุณสู้ เราช่วย"
-                  </span>
-                )}
-              </center>
-
-              <table className="section-table">
-                <tbody>
-                  <tr>
-                    <td style={{ fontSize: "14px" }}>
-                      <b>1. มีสินเชื่อส่วนบุคคลภายใต้การกำกับ จำนวน</b>{" "}
-                      {valueCredit} แห่ง
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontSize: "14px" }}>
-                      <b>2. สถานะการเป็นบุคคลล้มละลาย : </b>{" "}
-                      {bankrupt === "no"
-                        ? "ไม่เป็น (อ้างอิงข้อมูลบุคคลล้มละลายจากกรมบังคับคดี)"
-                        : "เป็น (อ้างอิงข้อมูลบุคคลล้มละลายจากกรมบังคับคดี)"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontSize: "14px" }}>
-                      <b>3. คะแนนเครดิต</b>
-                      <table className="section-table">
-                        <thead>
-                          <tr>
-                            <th>
-                              <center
-                                style={{ fontSize: "20px", fontWeight: "bold" }}
-                              >
-                                คะแนนเครดิต
-                              </center>
-                            </th>
-                            <th>
-                              <center
-                                style={{ fontSize: "20px", fontWeight: "bold" }}
-                              >
-                                ระดับคะแนนเครดิต
-                              </center>
-                            </th>
-                            <th>
-                              <center
-                                style={{ fontSize: "20px", fontWeight: "bold" }}
-                              >
-                                ความน่าจะเป็นในการชำระหนี้คืน
-                              </center>
-                            </th>
-                            <th>
-                              <center
-                                style={{ fontSize: "20px", fontWeight: "bold" }}
-                              >
-                                ผลการตรวจสอบข้อมูลเครดิต
-                              </center>
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody style={{ border: "none" }}>
-                          <tr style={{ border: "none" }}>
-                            <td style={{ border: "none" }}>
-                              <center
-                                style={{ fontSize: "40px", fontWeight: "bold" }}
-                              >
-                                {score}
-                              </center>
-                            </td>
-
-                            <td style={{ border: "none" }}>
-                              <center
-                                style={{ fontSize: "40px", fontWeight: "bold" }}
-                              >
-                                {level}
-                              </center>
-                            </td>
-
-                            <td style={{ border: "none" }}>
-                              <center
-                                style={{ fontSize: "40px", fontWeight: "bold" }}
-                              >
-                                {probabilityPercent}
-                              </center>
-                            </td>
-
-                            <td
-                              style={{ border: "none" }}
-                              className={
-                                result === "ผ่าน"
-                                  ? "passed-green"
-                                  : "passed-red"
-                              }
-                            >
-                              <center>
-                                <span
-                                  style={{ fontSize: "30px", fontWeight: 800 }}
-                                >
-                                  {result}
-                                </span>
-                                <br />
-                                <span style={{ fontSize: "15px" }}>
-                                  ( {risk} )
-                                </span>
-                              </center>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      {/* REASONS */}
-                      <div className="reason-block">
-                        <b style={{ color: "red" }}>
-                          3.1 เหตุผลประกอบเพิ่มเติม
-                        </b>
-
-                        <div className="reason-content">
-                          {accounts && accounts.length > 0 ? (
-                            accounts
-                              .filter((item) => item && item.status) // กันข้อมูลว่าง
-                              .map((item, index) => (
-                                <div
-                                  key={index}
-                                  style={{
-                                    fontSize: "14px",
-                                    marginBottom: "8px",
-                                  }}
-                                  className="reason-item"
-                                >
-                                  <span
-                                    style={{
-                                      display: "inline-block",
-                                      minWidth: "650px",
-                                    }}
-                                  >
-                                    {ACCOUNT_STATUS_MAP[item.status]}
-                                    {item.amount ? (
-                                      <> จำนวน {item.amount} บัญชี</>
-                                    ) : null}
-                                  </span>
-
-                                  <span style={{ fontWeight: "bold" }}>
-                                    {item.detel ? item.detel : "-"}
-                                  </span>
-                                </div>
-                              ))
-                          ) : (
-                            <div className="reason-item">-</div>
-                          )}
-                        </div>
-
-                        <b> 3.2 เหตุผลประกอบคะแนนเครดิต</b>
-
-                        <div className="reason-content">
-                          {reasons &&
-                          reasons.filter((r) => r?.reason).length > 0 ? (
-                            reasons
-                              .filter((r) => r?.reason) // กรอง reason ว่าง
-                              .map((item, index) => (
-                                <div
-                                  key={index}
-                                  className="reason-item"
-                                  style={{ fontSize: "14px" }}
-                                >
-                                  {CREDIT_REASON_MAP[item.reason]}
-                                </div>
-                              ))
-                          ) : (
-                            <div className="reason-item">-</div>
-                          )}
-                        </div>
-                      </div>
-                      {/* FOOT NOTE */}
-                      <div className="footer-date" style={{ fontSize: "14px" }}>
-                        ข้อมูล ณ วันที่ {convertToThaiDate1(reportDate)}
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="form-group pt-3">
-                <h6>คำอธิบายเพิ่มเติม </h6>
-                <textarea
-                  className="input-normal"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                ></textarea>
-              </div>
-            </div>
-
-            <div className="preview-footer">
-              <button
-                className="btn-close"
-                style={{ background: "#0f3d78", borderRadius: 7 }}
-                onClick={closePreviewModal}
-              >
-                ปิด
               </button>
             </div>
           </div>

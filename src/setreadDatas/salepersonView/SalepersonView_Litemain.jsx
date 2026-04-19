@@ -9,6 +9,7 @@ import { FaRegFilePdf } from "react-icons/fa6";
 import { MdNoteAdd } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
 import { BiMessageRoundedDetail } from "react-icons/bi";
+import { Row, Col, Form, Table, Modal } from "react-bootstrap";
 import {
   AiOutlineFileSearch,
   AiOutlineCloudDownload,
@@ -41,6 +42,64 @@ const SalepersonView_Litemain = () => {
   const _PerPhotoProfile_N = Base64.decode(getstore.PerPhotoProfile_N);
   const PerLV = Base64.decode(getstore.PerPST_LV);
   const PerPST = Base64.decode(getstore.PerPST);
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRound, setSelectedRound] = useState("");
+  const [tableData, setTableData] = useState([]);
+  const [formData, setFormData] = useState({
+    branch: "",
+    date_submit: "",
+    customer_name: "",
+    employee_name: "",
+  });
+
+  const handleAddRow = () => {
+    if (!formData.branch || !formData.date_submit || !formData.customer_name) {
+      alert("กรอกข้อมูลให้ครบก่อน");
+      return;
+    }
+
+    setTableData([...tableData, formData]);
+
+    // reset form
+    setFormData({
+      branch: "",
+      date_submit: "",
+      customer_name: "",
+      employee_name: "",
+    });
+  };
+
+  const handleSaveAll = async () => {
+    try {
+      await apiClient.post("/api/saveConsentBatch", {
+        data: tableData,
+      });
+
+      alert("บันทึกสำเร็จ");
+      setShowModal(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleOpenModal = async (round) => {
+    setSelectedRound(round);
+    setShowModal(true);
+
+    try {
+      // 🔥 เรียก API ตามรอบวัน
+      const { data } = await apiClient.get("/api/getConsentList", {
+        params: { round }, // เช่น "wednesday" / "friday"
+      });
+
+      if (data.status === 200) {
+        setTableData(data.data);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const getEmployeeDB_Admin = async (page) => {
     const params = {
@@ -316,6 +375,7 @@ const SalepersonView_Litemain = () => {
       }, 5000);
     }
   }, [location.state]);
+
   return (
     <>
       <div className="pt-2">
@@ -324,13 +384,11 @@ const SalepersonView_Litemain = () => {
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between", // ดันซ้าย-ขวา
+              justifyContent: "space-between",
               width: "100%",
             }}
           >
-            {/* ขวาสุด: ปุ่ม action */}
-
-            {/* ซ้าย: ไอคอน + ข้อความ */}
+            {/* ซ้าย */}
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <NavLink
                 to="/Sale_inputDataCredit"
@@ -353,8 +411,49 @@ const SalepersonView_Litemain = () => {
                   <FaPlusCircle /> เพิ่มหนังสือให้ความยินยอมในการเปิดเผยข้อมูล
                 </Button>
               </NavLink>
+          
+              {/* <div>
+                <span style={{ fontWeight: 600, marginLeft: 10 }}>
+                  สร้างใบนำส่งต้นฉบับหนังสือให้ความยินยอม :{" "}
+                </span>
+              </div> */}
+              {/* <Button
+                className="glow-button"
+                style={{
+                  background: "#f1f5f9",
+                  color: "#022d58",
+                  border: "none",
+                  borderRadius: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 12px",
+                  fontWeight: 500,
+                }}
+                onClick={() => handleOpenModal("wednesday")}
+              >
+                <MdNoteAdd style={{ fontSize: "16px" }} /> รอบวันพุธ
+              </Button>{" "} */}
+              {/* <Button
+                className="glow-button"
+                style={{
+                  background: "#f1f5f9",
+                  color: "#022d58",
+                  border: "none",
+                  borderRadius: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 12px",
+                  fontWeight: 500,
+                }}
+                onClick={() => handleOpenModal("friday")}
+              >
+                <MdNoteAdd style={{ fontSize: "16px" }} /> รอบวันศุกร์
+              </Button> */}
             </div>
 
+            {/* ขวา */}
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               <Button
                 onClick={handleRefresh}
@@ -1131,6 +1230,239 @@ const SalepersonView_Litemain = () => {
           </span>
         </div>
       </div>
+
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        size="xl"
+        centered
+      >
+        {/* HEADER */}
+        <Modal.Header
+          style={{
+            borderBottom: "1px solid #e5e7eb",
+          }}
+        >
+          <Modal.Title
+            style={{
+              width: "100%",
+              textAlign: "center",
+              lineHeight: 1.6,
+            }}
+          >
+            {/* 🔷 หัวเรื่องหลัก */}
+            <div
+              style={{
+                fontSize: 18,
+                fontWeight: 600,
+                color: "#1f2937",
+              }}
+            >
+              ใบนำส่ง ฝ่ายตรวจสอบข้อมูลเครดิต
+            </div>
+
+            {/* 🔷 sub title */}
+            <div
+              style={{
+                fontSize: 14,
+                color: "#4b5563",
+                marginTop: 4,
+              }}
+            >
+              หนังสือให้ความยินยอมเปิดเผยข้อมูล (CONSENT NCB)
+            </div>
+
+            {/* 🔷 เส้นคั่นบางๆ (เพิ่มความโปร) */}
+            {/* <div
+              style={{
+                width: "100%",
+                height: 2,
+                background: "#e5e7eb",
+                margin: "8px auto",
+                borderRadius: 2,
+              }}
+            /> */}
+
+            {/* 🔷 info */}
+            <div
+              style={{
+                fontSize: 13,
+                color: "#9ca3af",
+              }}
+            >
+              สังกัดสาขา ............. &nbsp;&nbsp;|&nbsp;&nbsp; ภาค
+              .............
+            </div>
+          </Modal.Title>
+        </Modal.Header>
+
+        {/* BODY */}
+        <Modal.Body style={{ background: "#ffffff", padding: "20px 24px" }}>
+          <div style={{ padding: 20, background: "#f6f7f8" }}>
+            {/* 🔷 TABLE SECTION */}
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: 14,
+                padding: 16,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              }}
+            >
+              <Table hover style={{ marginBottom: 0 }}>
+                <thead style={{ background: "#f9fafb" }}>
+                  <tr style={{ fontSize: 13, color: "#6b7280" }}>
+                    <th>ลำดับ</th>
+                    <th>สาขา</th>
+                    <th>วันที่</th>
+                    <th>ชื่อ-สกุล ลูกค้า</th>
+                    <th>ชื่อ-สกุล พนักงาน</th>
+                    <th>การจัดการ</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {tableData.map((item, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td>{item.branch}</td>
+                      <td>{convertToThaiDate(item.date_submit)}</td>
+                      <td>{item.customer_name}</td>
+                      <td>{item.employee_name}</td>
+                      <td>
+                        <Button
+                          size="sm"
+                          style={{
+                            background: "#fee2e2",
+                            color: "#b91c1c",
+                            border: "none",
+                            padding: 0.2,
+                            borderRadius: 8,
+                          }}
+                          onClick={() => {
+                            const newData = tableData.filter(
+                              (_, i) => i !== index,
+                            );
+                            setTableData(newData);
+                          }}
+                        >
+                          ลบ
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+
+            {/* 🔷 FORM ADD */}
+            <div
+              style={{
+                marginTop: 16,
+                background: "#fff",
+                borderRadius: 14,
+                padding: 16,
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 14,
+                  color: "#4b5563",
+                  marginTop: 4,
+                  marginBottom: 5,
+                }}
+              >
+                กรณีเพิ่มเติมจากของเดิม
+              </div>
+
+              <Row className="g-2">
+                <Col md={3}>
+                  <Form.Control
+                    placeholder="สาขา"
+                    value={formData.branch}
+                    onChange={(e) =>
+                      setFormData({ ...formData, branch: e.target.value })
+                    }
+                  />
+                </Col>
+
+                <Col md={3}>
+                  <Form.Control
+                    type="date"
+                    value={formData.date_submit}
+                    onChange={(e) =>
+                      setFormData({ ...formData, date_submit: e.target.value })
+                    }
+                  />
+                </Col>
+
+                <Col md={3}>
+                  <Form.Control
+                    placeholder="ชื่อลูกค้า"
+                    value={formData.customer_name}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        customer_name: e.target.value,
+                      })
+                    }
+                  />
+                </Col>
+
+                <Col md={3}>
+                  <Form.Control
+                    placeholder="ชื่อพนักงาน"
+                    value={formData.employee_name}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        employee_name: e.target.value,
+                      })
+                    }
+                  />
+                </Col>
+              </Row>
+
+              <Button
+                className="mt-3"
+                style={{
+                  background: "#5586f0",
+                  color: "#ffff",
+                  border: "none",
+                  borderRadius: 10,
+                  width: "100%",
+                }}
+                onClick={handleAddRow}
+              >
+                + เพิ่มรายการ
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+
+        {/* FOOTER */}
+        <Modal.Footer style={{ borderTop: "1px solid #e5e7eb" }}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowModal(false)}
+            style={{ borderRadius: 8 }}
+          >
+            ปิด
+          </Button>
+
+          <Button
+            onClick={handleSaveAll}
+            style={{
+              background: "#16a34a",
+              color: "#ffff",
+              border: "none",
+              borderRadius: 8,
+            }}
+          >
+            บันทึกทั้งหมด
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

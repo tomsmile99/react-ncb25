@@ -805,8 +805,8 @@ const AdminManagement = () => {
 
       {/* 🔹 Popup แสดงข้อมูล */}
       {showPopup && selectedItem && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay" > 
+          <div className="modal-content" >
             <h3
               className="card-title"
               style={{

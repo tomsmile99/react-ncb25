@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { BASE_URL_Dashboardd } from "../../apiUrl/Api_Url";
+import { AiOutlineFileProtect } from "react-icons/ai";
+import { TbArrowBack } from "react-icons/tb";
 import { NavLink } from "react-router-dom";
-import SalepersonView_DataCustomer from "../../setreadDatas/salepersonView/SalepersonView_DataCustomer";
-
+import SalepersonView_addDataOutside from "../../setreadDatas/salepersonView/SalepersonView_addDataOutside";
+import apiClient from "../../recoilstore/userStores";
 //ฟังก์ชันสร้างเลขที่แบบฟอร์ม
 const generateFormNo = (prefix = "CTM-NCB") => {
   const d = new Date();
@@ -16,33 +18,40 @@ const generateFormNo = (prefix = "CTM-NCB") => {
   const rnd = Math.floor(10000 + Math.random() * 90000); // 5-digit random
   return `${prefix}-${datestamp}-${rnd}`;
 };
-
-const Sale_EditDataCustomer = () => {
-
-  const { CTM_Idnumber } = useParams();
+ 
+const Sale_CheckCredit = () => {
 
 
-  // console.log("✅ รับค่าฟอร์ม:", CTM_Idnumber);
-  const [formNo, setFormNo] = useState(() => generateFormNo("CTM-NCB"));
-
-
-  // useEffect(() => {
-  //   console.log("✅ CTM_Idnumber ที่รับมา:", CTM_Idnumber); 
-  // }, []);
-
-  const handleRegenerate = () => {
-    setFormNo(generateFormNo("CTM-NCB"));
-  };
-
-  const handleCopy = async () => {
+const [formNo, setFormNo] = useState("");
+const getEmployeeDB_Admin = async (page) => {
+   
     try {
-      await navigator.clipboard.writeText(formNo);
-      alert("คัดลอกแล้ว: " + formNo);
-    } catch (e) {
-      alert("คัดลอกไม่สำเร็จ — กรุณาลองอีกครั้ง");
+      const { data } = await apiClient.get(`/api/insurances/dataDataGencode`);
+
+      const {
+        status,
+        customer_code,
+      } = data;
+
+      if (status) {
+
+        // console.log(customer_code);
+        setFormNo(customer_code);
+      
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
     }
   };
 
+
+
+  useEffect(() => {
+    getEmployeeDB_Admin();
+  }, []);
+  
+
+   
   return (
     <>
       <div>
@@ -50,7 +59,7 @@ const Sale_EditDataCustomer = () => {
           <div className="container-fluid">
             <div className="row mb-2 mt-2">
               <div className="col-sm-12 col-md-4">
-                <NavLink to="/Salesperson">
+                <NavLink to="/SalepersonView_Litemain_Outside">
                   <b>
                     <i className="fas fa-reply"></i> ย้อนกลับ
                   </b>
@@ -63,8 +72,8 @@ const Sale_EditDataCustomer = () => {
                       <i className="fas fa-home"></i> หน้าหลัก
                     </a> */}
                   </li>
-                  <li className="">
-                    ฟอร์มแจ้งขอตรวจสอบข้อมูลเครดิตลูกค้า เลขที่แบบฟอร์ม{" "}
+                  <li className=""> 
+                    {/* ฟอร์มแจ้งขอตรวจสอบข้อมูลเครดิตลูกค้า เลขที่แบบฟอร์ม{" "}
                     <span
                       style={{
                         color: "#022D58",
@@ -74,8 +83,8 @@ const Sale_EditDataCustomer = () => {
                         background: "#f2f3f3ff",
                       }}
                     >
-                     {CTM_Idnumber}
-                    </span>
+                      {formNo}
+                    </span> */}
                   </li>
                   {/* <li className="breadcrumb-item active">...</li> */}
                   {/* <li className="breadcrumb-item active">ข้อมูล..</li> */}
@@ -85,8 +94,7 @@ const Sale_EditDataCustomer = () => {
             <hr />
             <div className="row mb-2 fadeIn">
               <div className="col-md-12">
-
-                <SalepersonView_DataCustomer idForm={CTM_Idnumber}  />
+                <SalepersonView_addDataOutside  idForm={formNo}/>
               </div>
             </div>
           </div>
@@ -97,4 +105,4 @@ const Sale_EditDataCustomer = () => {
   );
 };
 
-export default Sale_EditDataCustomer;
+export default Sale_CheckCredit;

@@ -1162,13 +1162,15 @@ tbody tr {
   padding: 10px 20px 0.1px;
 }
 
+
 .card {
   background: #ffffff;
   border: 14px;
-  border-radius: 14px;
+  border-radius: 20px;
   padding: 24px 28px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.11);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
 }
+
 
 .card-title {
   font-size: 17px;
@@ -1176,6 +1178,14 @@ tbody tr {
   color: #1e293b;
   margin-bottom: 18px;
   border-left: 4px solid #1d4ed8;
+  padding-left: 10px;
+}
+
+.card-titles {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  border-left: 4px solid #d82d1d;
   padding-left: 10px;
 }
 
@@ -1518,6 +1528,7 @@ tbody tr {
   align-items: center;
   z-index: 2000;
 
+
   /* 🔒 ป้องกัน scroll ทะลุ */
   overscroll-behavior: contain;
 }
@@ -1526,6 +1537,16 @@ tbody tr {
   max-height: 85vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+
+.modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto; /* ✅ เลื่อนดูได้ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
@@ -1556,7 +1577,7 @@ tbody tr {
   justify-content: center;
   align-items: center;
 
-  backdrop-filter: blur(3px); /* ให้พื้นหลังเบลอเล็กน้อย */
+
   cursor: default;
   z-index: 99999;
 }
@@ -1568,7 +1589,7 @@ tbody tr {
   justify-content: center;
   align-items: center;
 
-  backdrop-filter: blur(3px); /* ให้พื้นหลังเบลอเล็กน้อย */
+  
   cursor: default;
   z-index: 2000;
 }
@@ -2623,6 +2644,7 @@ input[type="date"]:focus {
 
 
 
+
 .hand-tap-icon {
   color: #c32828;
   margin-right: 6px;
@@ -3507,4 +3529,225 @@ input[type="date"]:focus {
   font-family: "THSarabunPSK", sans-serif;
   font-size: 20px;       /* ขนาดหลัก */
   line-height: 1.6;      /* อ่านง่าย */
+}
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 30px;
+}
+
+.rec-item {
+  font-size: 14px;
+  display: flex;
+  gap: 6px;
+}
+
+.rec-item strong {
+  color: #334155;
+}
+
+.rec-item span {
+  color: #1e293b;
+}
+
+.rec-full {
+  grid-column: span 4;
+}
+.minimal-form{
+  max-width:800px;
+}
+
+.form-row{
+  display:flex;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.form-row label{
+  width:190px;
+  font-weight:500;
+  color:#334155;
+}
+
+.form-row input,
+.form-row select{
+  flex:1;
+  padding:6px 10px;
+  border:1px solid #d1d5db;
+  border-radius:6px;
+  font-size:14px;
+}
+
+.form-row input:focus,
+.form-row select:focus{
+  outline:none;
+  border-color:#2563eb;
+}
+
+.birthday-group{
+  display:flex;
+  gap:8px;
+}
+.btn-witness {
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+
+.btn-witness:hover {
+  background: #357ab8;
+}
+.form-header-modern {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* SWITCH */
+.switch-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+/* ซ่อน checkbox จริง */
+.switch-container input {
+  display: none;
+}
+
+/* label */
+.switch-label {
+  font-size: 14px;
+  color: #555;
+}
+
+/* slider */
+.switch-slider {
+  width: 44px;
+  height: 24px;
+  background: #ddd;
+  border-radius: 50px;
+  position: relative;
+  transition: 0.3s;
+}
+
+/* วงกลม */
+.switch-slider::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: 0.3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* ตอน ON */
+.switch-container input:checked + .switch-slider {
+  background: #4a90e2;
+}
+
+.switch-container input:checked + .switch-slider::before {
+  transform: translateX(20px);
+}
+/* .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+} */
+
+.modal-content {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 100%;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.form-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+
+/* ตัวอย่างการ์ดแสดงผล */
+
+
+.modern-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 12px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 12px 0;
 }

@@ -11,6 +11,7 @@ import { HiClipboardList } from "react-icons/hi";
 import { IoPersonCircle } from "react-icons/io5";
 import { BiSolidMessageSquareEdit } from "react-icons/bi";
 import { FiEdit3 } from "react-icons/fi";
+import { RiChatFollowUpFill } from "react-icons/ri";
 import { TbReportAnalytics } from "react-icons/tb";
 import { TbReportSearch } from "react-icons/tb";
 import { RiFileExcel2Fill } from "react-icons/ri";
@@ -21,24 +22,18 @@ import { AiOutlineFileProtect } from "react-icons/ai";
 import { TbDeviceIpadCancel } from "react-icons/tb";
 import { MdOutlineCancel } from "react-icons/md";
 import { RiTeamLine } from "react-icons/ri";
+import { BsFillSendCheckFill } from "react-icons/bs";
+import { FaCheckDouble } from "react-icons/fa";
 // icons
-import {
-  FcDownLeft,
-  FcAdvertising,
-  FcCalendar,
-  FcCollaboration,
-  FcIdea,
-  FcBullish,
-  FcKindle,
-  FcApproval,
-  FcOk,
-  FcSurvey,
-  FcPodiumWithSpeaker,
-} from "react-icons/fc";
-
-const Navbar = ({ FullnamePer,contDataMenuChkCD1, contDataMenuChkCD2, getcountidea }) => {
-
-
+import { FcDownLeft } from "react-icons/fc";
+import { FaOutdent } from "react-icons/fa";
+const Navbar = ({
+  FullnamePer,
+  contDataMenuChkCD1,
+  contDataMenuChkCD2,
+  contDataMenuChkCD3,
+  contDataMenuChkCD4,
+}) => {
   const getstore = useRecoilValue(userToken);
 
   const _AgU = Base64.decode(getstore.AgU);
@@ -47,109 +42,13 @@ const Navbar = ({ FullnamePer,contDataMenuChkCD1, contDataMenuChkCD2, getcountid
   const _PerPhotoProfile_N = Base64.decode(getstore.PerPhotoProfile_N);
   const PerLV = Base64.decode(getstore.PerPST_LV);
   const PerPST = Base64.decode(getstore.PerPST);
+  const PerPST_LV = Base64.decode(getstore.PerPST_LV);
 
-  const ifshowmenu = getcountidea;
-  const [dateType, setDateType] = useState("");
+  // role หัวหน้าหน่วย ผจก.สาขา ผู้ช่วย
+  const allowRoles = ["Lv007", "Lv0016", "Lv017", "LV021", "LV023"];
+  // role ผจก.เขต
+  const ApproverRoles = ["LV006", "LV023"];
 
-  // =========================
-  // Helpers: สิทธิ์/บทบาท
-  // =========================
-
-  // 1) กลุ่ม PerD ที่เห็นทุกเมนู (SuperViewers)
-  const SUPER_VIEW_PERD = new Set([
-    "003792", // เพิ่ม PerD ที่ต้องการให้เห็นทุกเมนูได้ที่นี่
-    "002367",
-    // "002530",
-  ]);
-
-  let getemployee_contain_Counts = 2;
-
-  const isSuperView = (perD) => SUPER_VIEW_PERD.has(perD);
-
-  // 2) ตรวจ role จาก PerWP + PerD (เช่น admin)
-  function getRoleFromPerWP(perWP, perD) {
-    if (
-      ["WP1031", "WP9999", "WP8888"].includes(perWP) &&
-      ["003792", "002367"].includes(perD)
-    ) {
-      return "admin";
-    }
-    return "user";
-  }
-  const userRole = getRoleFromPerWP(_PerWP, PerD);
-
-  // 3) ช็อตคัตสิทธิ์พื้นฐาน
-  const isAdminLike = _AgU === "AGAD" || userRole === "admin";
-  const levelNum = parseInt(PerLV.replace("LV", ""), 10);
-
-  // =========================
-  // กลุ่มสิทธิ์ของแต่ละหมวดเมนู (อ่านง่าย ใช้ซ้ำ)
-  // ถ้าเป็น SuperView จะ true ทุกกลุ่ม
-  // =========================
-
-  // กลุ่ม "พนักงานทดลองงาน"
-  const canSeeProbationGroup =
-    isSuperView(PerD) || isAdminLike || dateType === "0";
-
-  // กลุ่ม "ประเมินผลการปฏิบัติ (พี่เลี้ยง)"
-  const canSeeMentorGroup =
-    isSuperView(PerD) || ((isAdminLike || dateType === "1") && levelNum >= 6);
-
-  // กลุ่ม "อนุมัติผลการประเมิน (หัวหน้า/ผจก.สาขา)"
-  const canSeeLeaderApproveGroup =
-    isSuperView(PerD) ||
-    ((isAdminLike || dateType === "1") && levelNum > 10 && levelNum < 23);
-
-  // กลุ่ม "ผู้จัดการเขต / ผช.กก.ผู้จัดการ"
-  const canSeeDirectorGroup =
-    isSuperView(PerD) || ((isAdminLike || dateType === "1") && levelNum < 10);
-  // &&
-  // levelNum > 6;
-
-  // กลุ่ม "ผู้จัดการฝ่ายบุคคล"
-  const canSeeHRManagerGroup =
-    isSuperView(PerD) ||
-    ((isAdminLike || dateType === "1") && levelNum < 10 && levelNum > 6);
-
-  // กลุ่ม "เจ้าหน้าที่งานสรรหาและประเมิน" WP0011 ฝ่ายบุคคล
-  const canSeeRecruitAdminGroup =
-    isSuperView(PerD) ||
-    isAdminLike ||
-    (_PerWP === "WP0011" && dateType === "1");
-
-  // กลุ่ม "ผู้บริหาร"  PerPST
-  const canSeeExecutiveGroup = [
-    "002530",
-    "002367",
-    "003792",
-    "000016",
-  ].includes(PerD);
-
-  // =========================
-  // Fetch ประเภทพนักงาน
-  // =========================
-  // const ReadData_personnel = async () => {
-  //   try {
-  //     const { data } = await apiClient.get(`/chk_person_level?PerD=${PerD}`);
-  //     const { status, result } = data;
-  //     if (status) setDateType(result?.[0]?.type_PSN ?? "");
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error.message);
-  //   }
-  // };
-
-  // ปุ่ม (กจ.) เฉพาะ PerD ตามกำหนด
-  const canSeePresidentItem =
-    isSuperView(PerD) || ["002530", "003792", "002367"].includes(PerD);
-
-  // กลุ่ม "เจ้าหน้าที่งานสรรหาและประเมิน" WP0011 ฝ่ายบุคคล
-  const chkhead = isSuperView(PerD) || ["003791", "000016"].includes(PerD);
-
-  // useEffect(() => {
-  //   ReadData_personnel();
-  // }, []);
-
-  // =========================
   // UI Helpers
   // =========================
   const navClass = ({ isActive }) =>
@@ -251,6 +150,20 @@ const Navbar = ({ FullnamePer,contDataMenuChkCD1, contDataMenuChkCD2, getcountid
               </NavLink>
             </li>
 
+            <li className="nav-item">
+              <NavLink
+                to="/SalepersonView_Litemain_Outside"
+                className={navClass}
+              >
+                <BsFillSendCheckFill
+                  className="nav-item"
+                  style={{ color: "#06407aff" }}
+                />
+                <p style={{ fontSize: "13px" }}> แจ้งตรวจสอบนอกหลักเกณฑ์</p>
+                {/* <Badge count={contDataMenuChkCD1} /> */}
+              </NavLink>
+            </li>
+
             <li
               className="nav-header header-minimal"
               style={{
@@ -295,7 +208,7 @@ const Navbar = ({ FullnamePer,contDataMenuChkCD1, contDataMenuChkCD2, getcountid
                 <p style={{ fontSize: "13px" }}>ไม่ผ่านการอนุมัติสินเชื่อ</p>
                 {/* <Badge count={getemployee_contain_Counts} /> */}
               </NavLink>
-            </li> 
+            </li>
 
             <li className="nav-item">
               <NavLink to="/Sale_ExaminationCredit_Cancel" className={navClass}>
@@ -307,11 +220,17 @@ const Navbar = ({ FullnamePer,contDataMenuChkCD1, contDataMenuChkCD2, getcountid
                 {/* <Badge count={getemployee_contain_Counts} /> */}
               </NavLink>
             </li>
+             <li className="nav-item">
+              <NavLink to="/Sale_CheckCredit_Outsidefinish" className={navClass}>
+                <RiChatFollowUpFill
+                  className="nav-item"
+                  style={{ color: "#06407aff", fontSize: "14px" }}
+                />
+                <p style={{ fontSize: "13px" }}>ติดตามสถานะตรวจนอกหลักเกณฑ์</p>
+                {/* <Badge count={getemployee_contain_Counts} /> */}
+              </NavLink>
+            </li>
 
-          
-          
-         
-            
             <li
               className="nav-header header-minimal"
               style={{
@@ -337,15 +256,17 @@ const Navbar = ({ FullnamePer,contDataMenuChkCD1, contDataMenuChkCD2, getcountid
               <span>รายงาน</span>
             </li>
 
-              <li className="nav-item">
+            <li className="nav-item">
               <NavLink to="/ReportNCBLiteMainOutSum" className={navClass}>
-                <RiFileExcel2Fill className="" style={{ color: "#06407aff" ,fontSize: "19px" }} />
+                <RiFileExcel2Fill
+                  className=""
+                  style={{ color: "#06407aff", fontSize: "19px" }}
+                />
                 <p>รายงานสรุปการยื่นขอสืบค้น</p>
                 {/* <Badge count={getemployee_contain_Counts} /> */}
               </NavLink>
             </li>
- 
-          
+
             <li className="nav-item">
               <NavLink to="/ReportNCBLiteMainOut" end className={navClass}>
                 <RiTeamLine
@@ -357,8 +278,88 @@ const Navbar = ({ FullnamePer,contDataMenuChkCD1, contDataMenuChkCD2, getcountid
               </NavLink>
             </li>
 
+           
+            {allowRoles.includes(PerPST_LV) && (
+              <li className="nav-item">
+                 <li
+              className="nav-header header-minimal"
+              style={{
+                background:
+                  "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
+                color: "#fff",
+                padding: "8px 14px",
+                borderRadius: "14px",
+                marginBottom: "10px",
+                fontWeight: "600",
+                fontSize: "13px",
+                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
+              }}
+            >
+              <FaOutdent
+                style={{
+                  color: "#fff",
+                  fontSize: "13px",
+                  flexShrink: 0, // ป้องกันการบิดขนาด
+                  marginRight: "5",
+                }}
+              />
+              <span>รับรองผลการยื่นนอกหลักเกณฑ์</span>
+            </li>
 
-            
+                <NavLink
+                  to="/SalepersonView_Litemain_OutsideHead"
+                  className={navClass}
+                >
+                  <FaCheckDouble
+                    className="nav-item"
+                    style={{ color: "#06407aff" }}
+                  />
+                  <p style={{ fontSize: "13px" }}>รายการรับทราบ</p>
+                  <Badge count={contDataMenuChkCD3} />
+                </NavLink>
+              </li>
+            )}
+            {ApproverRoles.includes(PerPST_LV) && (
+              <li className="nav-item">
+                
+                 <li
+              className="nav-header header-minimal"
+              style={{
+                background:
+                  "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
+                color: "#fff",
+                padding: "8px 14px",
+                borderRadius: "14px",
+                marginBottom: "10px",
+                fontWeight: "600",
+                fontSize: "13px",
+                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
+              }}
+            >
+              <FaOutdent
+                style={{
+                  color: "#fff",
+                  fontSize: "13px",
+                  flexShrink: 0, // ป้องกันการบิดขนาด
+                  marginRight: "5",
+                }}
+              />
+              <span>อนุมัติผลการยื่นนอกหลักเกณฑ์</span>
+            </li>
+
+                <NavLink
+                  to="/SalepersonView_Litemain_OutsideDistrict"
+                  className={navClass}
+                >
+                  <FaCheckDouble
+                    className="nav-item"
+                    style={{ color: "#06407aff" }}
+                  />
+                  <p style={{ fontSize: "13px" }}>รายการอนุมัติ</p>
+                  <Badge count={contDataMenuChkCD4} />
+                </NavLink>
+              </li>
+            )}
             {/* <li
               className="nav-header header-minimal"
               style={{
@@ -394,7 +395,6 @@ const Navbar = ({ FullnamePer,contDataMenuChkCD1, contDataMenuChkCD2, getcountid
               
               </NavLink>
             </li> */}
-   
           </ul>
         </nav>
       </div>

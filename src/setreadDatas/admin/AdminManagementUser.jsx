@@ -1,24 +1,24 @@
 import React, { useRef, useState, useEffect, useContext } from "react";
 import apiClient from "../../recoilstore/userStores";
 
-import { FormControl, Form } from "react-bootstrap";
+import { FormControl, Form, InputGroup, Modal, Button } from "react-bootstrap";
 import { Base64 } from "js-base64";
 import { useRecoilValue } from "recoil";
 import { userToken } from "../../recoilstore/userStores";
 import { MdSchedule } from "react-icons/md";
-import { FaSearch, FaSyncAlt, FaDownload, FaCalendarAlt } from "react-icons/fa";
-import { InputGroup } from "react-bootstrap";
+
 import { FiSearch } from "react-icons/fi";
 import { FaFileSignature } from "react-icons/fa";
 import { BsSend } from "react-icons/bs";
 
 import { BsFiletypeDoc } from "react-icons/bs";
-
+import { MdEditLocationAlt } from "react-icons/md";
 import Swal from "sweetalert2";
 import { AiOutlineFileSearch } from "react-icons/ai";
 import { IoDocumentTextOutline } from "react-icons/io5";
-
+import { FaEdit } from "react-icons/fa";
 import { FaRegIdCard } from "react-icons/fa";
+
 const convertToThaiDate = (dateString) => {
   const date = new Date(dateString);
 
@@ -80,7 +80,6 @@ const convertToThaiDateTime = (dateString) => {
   return `${day} ${month} ${year} ${hours}:${minutes}:${seconds} น.`;
 };
 
-
 const convertToThaiDate1 = (dateString) => {
   const date = new Date(dateString);
 
@@ -109,6 +108,8 @@ const convertToThaiDate1 = (dateString) => {
 const AdminManagement = () => {
   const getstore = useRecoilValue(userToken);
   const _PerWP = Base64.decode(getstore.PerWP);
+  const PerD = Base64.decode(getstore.PerD);
+  const canEdit = ["003792","000274","002743","004187"].includes(PerD);
 
   const [currentPage, setCurrentPage] = useState(1); // หน้าที่
   const [totalPages, setTotalPages] = useState(0); // มีทั้งหมด ... หน้า
@@ -135,6 +136,10 @@ const AdminManagement = () => {
   const [hasSearched, setHasSearched] = useState(false);
 
   const [searchKeyword, setSearchKeyword] = useState(""); // ค่าที่กดค้นหาจริง
+  const [showModal, setShowModal] = useState(false);
+  const [selectedData, setSelectedData] = useState(null);
+  const [contractError, setContractError] = useState(false);
+  const [zoneList, setZoneList] = useState([]);
 
   const thaiMonths = [
     "มกราคม",
@@ -266,35 +271,28 @@ const AdminManagement = () => {
     });
   };
 
-  //   if (!base64String) {
-  //     alert("ไม่พบข้อมูลไฟล์");
-  //     return;
-  //   }
+  const handleOpenModal = async (data) => {
+    setSelectedData(data);
+    setShowModal(true);
+    // console.log(data.CTM_business_zone_id)
 
-  //   // base64String = "data:image/png;base64,....."
-  //   const pdf = new jsPDF({
-  //     orientation: "portrait",
-  //     unit: "px",
-  //     format: "a4",
-  //   });
+    try {
+      const res = await apiClient.get("/api/insurances/selectWorkplace", {
+        params: {
+          branch_id: data.CTM_business_zone_id, // รหัสสาขา /หน่วย
+        },
+      });
 
-  //   const imgProps = pdf.getImageProperties(base64String);
+      const { status, result, message } = res;
 
-  //   // คำนวณขนาดรูปให้เหมาะกับ A4
-  //   const pageWidth = pdf.internal.pageSize.getWidth();
-  //   const ratio = imgProps.height / imgProps.width;
-  //   const imgWidth = pageWidth - 40; // margin ซ้ายขวา 20px
-  //   const imgHeight = imgWidth * ratio;
-
-  //   pdf.addImage(base64String, imgProps.fileType, 20, 20, imgWidth, imgHeight);
-
-  //   // เปิด PDF ในแท็บใหม่
-  //   const pdfBlob = pdf.output("blob");
-  //   const pdfURL = URL.createObjectURL(pdfBlob);
-
-  //   window.open(pdfURL, "_blank");
-  // };
-
+      if (status === 200) {
+        setZoneList(res.data.data);
+        // console.log(res.data)
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const openFileInNewTab = (relativePath) => {
     const base = import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB;
     window.open(`${base}/${relativePath}`, "_blank");
@@ -420,7 +418,45 @@ const AdminManagement = () => {
     window.open(url, "_blank");
   };
 
-  const [contractError, setContractError] = useState(false);
+  const handleSave = async () => {
+    try {
+      const payload = {
+        CTM_form_number: selectedData.CTM_form_number,
+        CTM_business_zone_id: selectedData.CTM_business_zone_id,
+        CTM_business_zone: selectedData.CTM_business_zone,
+        Form_Contract_number: selectedData.Form_Contract_number,
+        idperson: PerD,
+      };
+
+      // console.log(payload);
+
+      const { data } = await apiClient.post(
+        "/api/insurances/updateBusinessZone",
+        payload,
+      );
+
+      const { status, result, message } = data;
+
+      if (status) {
+        // ✅ Toast สำเร็จ
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "success",
+
+          text: message || "แก้ไขข้อมูลเรียบร้อย",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
+
+        setShowModal(false);
+        getEmployeeDB_Admin();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     if (showPopup && getDataShow) {
@@ -433,12 +469,11 @@ const AdminManagement = () => {
     if (!hasSearched) return;
     getEmployeeDB_Admin(currentPage, query);
   }, [currentPage]);
-  
 
   return (
     <div>
       <div className="pt-2">
-        <div className="cartcustom p-3 shadow-sm">
+        <div className="p-3 shadow-sm">
           <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
             {/* --- เลือกประเภท --- */}
             <div>
@@ -607,7 +642,7 @@ const AdminManagement = () => {
                       <th className="text" style={{ width: "10%" }}>
                         ผู้ขอสืบค้น
                       </th>
-                        
+
                       <th className="text" style={{ width: "7%" }}>
                         สาขา/หน่วย
                       </th>
@@ -617,29 +652,24 @@ const AdminManagement = () => {
                       <th className="text" style={{ width: "4%" }}>
                         ภาค
                       </th>
-                    
-
 
                       <th className="text" style={{ width: "8%" }}>
                         เอกสารประกอบ
                       </th>
-                       
-                      
+
                       <th className="text" style={{ width: "7%" }}>
                         วันที่/เวลา ที่ยื่นเรื่อง
                       </th>
-                        <th className="text" style={{ width: "10%" }}>
+                      <th className="text" style={{ width: "10%" }}>
                         ผู้รายงานผลตรวจ
                       </th>
-                     
+
                       <th className="text" style={{ width: "5%" }}>
                         วัน/เวลา ตรวจสอบ
                       </th>
- <th className="text-center" style={{ width: "3%" }}>
+                      <th className="text-center" style={{ width: "3%" }}>
                         รายงานผล
                       </th>
-                     
-                    
 
                       {/* <th className="text" style={{ width: "5%" }}>
                         วันที่รายงานผลตรวจ
@@ -648,6 +678,12 @@ const AdminManagement = () => {
                       <th className="text-center" style={{ width: "10%" }}>
                         สถานะ
                       </th>
+
+                      {canEdit && (
+                        <th className="text" style={{ width: "1%" }}>
+                          แก้ไข
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -690,7 +726,9 @@ const AdminManagement = () => {
                         {probationaryEmployees.map((item, index) => (
                           <tr key={index}>
                             <td className="text-center">{index + 1}</td>
-                            <td>{item.CTM_form_number}</td>
+                            <td style={{ textAlign: "center" }}>
+                              {item.CTM_form_number}
+                            </td>
                             <td>
                               <div
                                 style={{ fontWeight: 600, color: "#0f3d78" }}
@@ -716,48 +754,33 @@ const AdminManagement = () => {
                               </div> */}
                             </td>
                             <td>
-                             <div className="citizen-cell">
-                            {item.CTM_Old_status === "1" ? (
-                              <span className="citizen-badge-old">
-                                {item.CTM_citizen_id}
-                              </span>
-                            ) : (
-                              <span>{item.CTM_citizen_id}</span>
-                            )}
-                          </div>
+                              <div className="citizen-cell">
+                                {item.CTM_Old_status === "1" ? (
+                                  <span className="citizen-badge-old">
+                                    {item.CTM_citizen_id}
+                                  </span>
+                                ) : (
+                                  <span>{item.CTM_citizen_id}</span>
+                                )}
+                              </div>
                             </td>
-                            
                             <td>
                               <div>{item.CTM_recorder_fullname}</div>{" "}
-                               <div
+                              <div
                                 style={{ fontSize: "12px", color: "#6c757d" }}
                               >
-                             {item.CTM_position || "-"}
-                              </div>
-                            </td>
-                          
-                            <td>
-                              <div
-                              
-                              >
-                               {item.CTM_business_zone || "-"}
+                                {item.CTM_position || "-"}
                               </div>
                             </td>
                             <td>
-                              <div
-                              
-                              >
-                                {item.CTM_branch || "-"}
-                              </div>
+                              <div>{item.CTM_business_zone || "-"}</div>
+                            </td>
+                            <td>
+                              <div>{item.CTM_branch || "-"}</div>
                             </td>{" "}
                             <td>
-                              <div
-                              
-                              >
-                                {item.CTM_business_region || "-"}
-                              </div>
+                              <div>{item.CTM_business_region || "-"}</div>
                             </td>
-                           
                             <td className="text">
                               <button
                                 className="doc-btn doc-consent mr-1"
@@ -795,12 +818,14 @@ const AdminManagement = () => {
                                 <FaRegIdCard />
                               </button>
                             </td>
-                           
-                               <td>{convertToThaiDateTime(item.date_upEvidence)}</td>
-                          
+                            <td>
+                              {convertToThaiDateTime(item.date_upEvidence)}
+                            </td>
                             <td>
                               <center>
-                               <span style={{ fontSize : "12px" }}>{item.Form_Name_Inspector || "-"}{" "}</span> 
+                                <span style={{ fontSize: "12px" }}>
+                                  {item.Form_Name_Inspector || "-"}{" "}
+                                </span>
                                 <div
                                   style={{ fontSize: "12px", color: "#6c757d" }}
                                 >
@@ -817,13 +842,15 @@ const AdminManagement = () => {
                                 </div>
                               </center>
                             </td>
-                              <td>{convertToThaiDateTime(item.Form_date_inspertor)}</td>
-                               <td className="text-center">
+                            <td>
+                              {convertToThaiDateTime(item.Form_date_inspertor)}
+                            </td>
+                            <td className="text-center">
                               <button
                                 className="btn-icon"
                                 title="รายงานผล"
                                 onClick={() => {
-                                  if (item.Form_verification_status === "Lv0" ) {
+                                  if (item.Form_verification_status === "Lv0") {
                                     Swal.fire({
                                       icon: "info",
                                       title: "รายการนี้รอการตรวจสอบ",
@@ -834,7 +861,9 @@ const AdminManagement = () => {
                                     return;
                                   }
 
-                                  if (item.Form_verification_status === "Lv1E" ) {
+                                  if (
+                                    item.Form_verification_status === "Lv1E"
+                                  ) {
                                     Swal.fire({
                                       icon: "info",
                                       title: "อยู่ระหว่างการแก้ไข",
@@ -844,9 +873,10 @@ const AdminManagement = () => {
                                     });
                                     return;
                                   }
-                                  
 
-                                  if (item.Form_verification_status === "Lv1N" ) {
+                                  if (
+                                    item.Form_verification_status === "Lv1N"
+                                  ) {
                                     Swal.fire({
                                       icon: "info",
                                       title: "รายการนี้ถูกยกเลิก",
@@ -859,13 +889,12 @@ const AdminManagement = () => {
                                   handleView(item);
                                 }}
                               >
-                                <AiOutlineFileSearch /> 
+                                <AiOutlineFileSearch />
                               </button>
                             </td>
                             {/* <td>{item.Form_Inspector}</td> */}
                             <td className="text-center">
                               <center>
-
                                 {item.Form_verification_status == "Lv1E" && (
                                   <center>
                                     <span
@@ -880,7 +909,6 @@ const AdminManagement = () => {
                                   </center>
                                 )}
 
-                                
                                 {item.Form_verification_status == "Lv0" && (
                                   <center>
                                     <span
@@ -895,17 +923,17 @@ const AdminManagement = () => {
                                   </center>
                                 )}
 
-                                  {item.Form_verification_status === "Lv1N" && (
-                              <span
-                                className="status-badge status-cancel"
-                                // onClick={() =>
-                                //   handleStatusClick(item.CTM_form_number)
-                                // }
-                                style={{ cursor: "pointer" }}
-                              >
-                                1N ยกเลิกรายการตรวจสอบ
-                              </span>
-                            )}
+                                {item.Form_verification_status === "Lv1N" && (
+                                  <span
+                                    className="status-badge status-cancel"
+                                    // onClick={() =>
+                                    //   handleStatusClick(item.CTM_form_number)
+                                    // }
+                                    style={{ cursor: "pointer" }}
+                                  >
+                                    1N ยกเลิกรายการตรวจสอบ
+                                  </span>
+                                )}
 
                                 {item.Form_verification_status == "Lv1" &&
                                   item.Form_verification_status != "Lv1N" && (
@@ -957,6 +985,19 @@ const AdminManagement = () => {
                                 {item.Form_note_approval}
                               </div>
                             </td>
+                              {canEdit && (
+                            <td>
+                                   
+                  
+                              <FaEdit
+                                style={{
+                                  marginLeft: 8,
+                                  cursor: "pointer",
+                                  color: "#01337f",
+                                }}
+                                onClick={() => handleOpenModal(item)}
+                              />
+                            </td>    )}
                           </tr>
                         ))}
                       </>
@@ -972,523 +1013,205 @@ const AdminManagement = () => {
         </div>
       </div>
 
-      {/* 🔹 Popup แสดงข้อมูล */}
-      {showPopup && selectedItem && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3
-              className="card-title"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "16px",
-                fontWeight: "600",
-                color: "#0f3d78", // น้ำเงินสุภาพมาตรฐาน SAK
-                marginBottom: "10px",
-              }}
-            >
-              <FaFileSignature
-                style={{ color: "#023672ff", fontSize: "18px" }}
-              />
-              แก้ไขข้อมูล
-            </h3>
-            <div className="layout-wrapper3">
-              {/* 🔹 การ์ดที่ 1 : รายละเอียดผู้บันทึก */}
-              <div className="card recorder-card">
-                <div className="card-title1" style={{ fontSize: "14px" }}>
-                  ส่วนที่ 1 : รายละเอียดผู้ขอสืบค้น
-                </div>
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        size="xl"
+      >
+        <div className="section-title">
+          {" "}
+          <MdEditLocationAlt /> การแก้ไขข้อมูล
+        </div>
 
-                <div className="rec-profile-row">
-                  <div className="rec-info">
-                    <div className="">
-                      <strong>แบบฟอร์มเลขที่ : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.CTM_form_number || "-"}
+        <Modal.Body>
+          {selectedData && (
+            <Form>
+              <div className="row">
+                {/* ================== ส่วนที่ 1 ================== */}
+                <div className="modern-card mr-2">
+                  <div className="section-title">
+                    ส่วนที่ 1 : รายละเอียดผู้ขอสืบค้น
+                  </div>
+
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <span className="label">แบบฟอร์มเลขที่</span>
+                      <span className="value">
+                        {selectedData.CTM_form_number || "-"}
                       </span>
                     </div>
 
-                    <div className="">
-                      <strong>ผู้ขอสืบค้น : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.CTM_recorder_fullname || "-"}
+                    <div className="info-item">
+                      <span className="label">ผู้ขอสืบค้น</span>
+                      <span className="value">
+                        {selectedData.CTM_recorder_fullname || "-"}
                       </span>
                     </div>
 
-                    <div className="">
-                      <strong>ตำแหน่ง : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.CTM_position || "-"}
+                    <div className="info-item">
+                      <span className="label">ตำแหน่ง</span>
+                      <span className="value">
+                        {selectedData.CTM_position || "-"}
                       </span>
                     </div>
 
-                    <div className="">
-                      <strong>สาขา/หน่วย : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.CTM_branch || "-"}
+                    <div className="info-item">
+                      <span className="label">สาขา/หน่วย</span>
+                      <span className="value">
+                        {selectedData.CTM_business_zone || "-"}
                       </span>
                     </div>
 
-                    <div className="">
-                      <strong>วัน/เวลาที่ ยื่นขอสืบค้น : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {convertToThaiDate(getDataShow?.CTM_created_at) || "-"}
+                    <div className="info-item">
+                      <span className="label">สังกัด</span>
+                      <span className="value">
+                        {selectedData.CTM_branch || "-"}
                       </span>
                     </div>
 
-                    <div className="pt-1">
-                      <strong>เอกสารประกอบ </strong>
-                      <ul
-                        style={{
-                          paddingLeft: "18px",
-                          lineHeight: "1.8",
-                        }}
-                      >
-                        <li>
-                          <span
-                            style={{
-                              color: "#4a90e2",
-                              cursor: "pointer",
-                              fontWeight: "100",
-                            }}
-                            onClick={() =>
-                              openFileInNewTab(
-                                `img/consent/${getDataShow?.Form_consent_document}`,
-                              )
-                            }
-                          >
-                            หนังสือให้ความยินยอมเปิดเผยข้อมูลส่วนตัว
-                          </span>
-                        </li>
-
-                        <li>
-                          <span
-                            style={{
-                              color: "#4a90e2",
-                              cursor: "pointer",
-                              fontWeight: "100",
-                            }}
-                            onClick={() =>
-                              openFileInNewTab(
-                                `img/application/${getDataShow?.Form_application_document}`,
-                              )
-                            }
-                          >
-                            ใบสมัครขอสินเชื่อ
-                          </span>
-                        </li>
-
-                        <li>
-                          <span
-                            style={{
-                              color: "#4a90e2",
-                              cursor: "pointer",
-                              fontWeight: "100",
-                            }}
-                            onClick={() =>
-                              openFileInNewTab(
-                                `img/idcard/${getDataShow?.Form_idcard_photo}`,
-                              )
-                            }
-                          >
-                            สำเนาบัตรประชาชน
-                          </span>
-                        </li>
-                      </ul>
+                    <div className="info-item">
+                      <span className="label">วัน/เวลาที่ ยื่นขอสืบค้น</span>
+                      <span className="value">
+                        {convertToThaiDate(selectedData.CTM_created_at) || "-"}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="card recorder-card">
-                <div className="card-title2" style={{ fontSize: "14px" }}>
-                  ส่วนที่ 2 : ข้อมูลลูกค้า
-                </div>
+                {/* ================== ส่วนที่ 2 ================== */}
+                <div className="modern-card">
+                  <div className="section-title">ส่วนที่ 2 : ข้อมูลลูกค้า</div>
 
-                <div className="rec-profile-row">
-                  <div className="rec-info">
-                    <div className="">
-                      <strong>ชื่อ - นามสกุลลูกค้า : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.CTM_title_name}
-                        {getDataShow?.CTM_firstname} {getDataShow?.CTM_lastname}
+                  <div className="info-grid">
+                    <div className="info-item">
+                      <span className="label">ชื่อ - นามสกุล</span>
+                      <span className="value">
+                        {selectedData.CTM_title_name}
+                        {selectedData.CTM_firstname} {selectedData.CTM_lastname}
                       </span>
                     </div>
 
-                    <div className="">
-                      <strong>วัน/เดือน/ปีเกิด : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {convertToThaiDate1(getDataShow?.CTM_birthdate) || "-"}
+                    <div className="info-item">
+                      <span className="label">วันเกิด</span>
+                      <span className="value">
+                        {convertToThaiDate1(selectedData.CTM_birthdate) || "-"}
                       </span>
                     </div>
 
-                    <div className="">
-                      <strong>หมายเลขบัตรประชาชน : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.CTM_citizen_id || "-"}
+                    <div className="info-item">
+                      <span className="label">เลขบัตรประชาชน</span>
+                      <span className="value">
+                        {selectedData.CTM_citizen_id || "-"}
                       </span>
                     </div>
 
-                    <div className="">
-                      <strong>หมายเลขโทรศัพท์ : </strong>
-
-                      <input
-                        className={`input-normal ${
-                          phoneError ? "input-error" : ""
-                        }`}
-                        style={{ width: "220px", marginLeft: "8px" }}
-                        value={editPhone}
-                        onChange={(e) => {
-                          const value = e.target.value
-                            .replace(/\D/g, "")
-                            .slice(0, 10);
-                          setEditPhone(value);
-                          if (value.length === 10) setPhoneError(false);
-                        }}
-                        placeholder="กรอกเบอร์โทร 10 หลัก"
-                        maxLength={10}
-                        inputMode="numeric"
-                      />
-
-                      {phoneError && (
-                        <small style={{ color: "#e5533d", marginLeft: "8px" }}>
-                          กรุณากรอกเบอร์โทรให้ครบ 10 หลัก
-                        </small>
-                      )}
-                    </div>
-
-                    <div className="">
-                      <strong>ประเภทสินเชื่อที่ลูกค้าสมัคร : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.LTNL_Name || "-"}
+                    <div className="info-item">
+                      <span className="label">เบอร์โทร</span>
+                      <span className="value">
+                        {selectedData.CTM_phone || "-"}
                       </span>
                     </div>
 
-                    <div className="">
-                      <strong>วงเงินขอสินเชื่อ : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.Form_loan_amount
+                    <div className="info-item">
+                      <span className="label">ประเภทสินเชื่อ</span>
+                      <span className="value">
+                        {selectedData.LTNL_Name || "-"}
+                      </span>
+                    </div>
+
+                    <div className="info-item">
+                      <span className="label">วงเงิน</span>
+                      <span className="value">
+                        {selectedData.Form_loan_amount
                           ? Number(
-                              getDataShow.Form_loan_amount,
+                              selectedData.Form_loan_amount,
                             ).toLocaleString()
                           : "-"}{" "}
                         บาท
                       </span>
                     </div>
-                    <div className="">
-                      <strong>ประเภทลูกค้า : </strong>
-                      <span style={{ fontWeight: "100" }}>
-                        {getDataShow?.CMTN_Name || "-"}
-                      </span>
-                    </div>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">ประเภทลูกค้า</span>
+                    <span className="value">
+                      {selectedData.CMTN_Name || "-"}
+                    </span>
                   </div>
                 </div>
               </div>
+              {/* ================== ส่วนแก้ไข ================== */}
+              <div className="modern-card">
+                <div className="section-title">แก้ไขข้อมูล</div>
 
-              <div className="card recorder-card">
-                <div className="card-title3" style={{ fontSize: "14px" }}>
-                  ส่วนที่ 3 : ผู้รายงานผลการตรวจสอบข้อมูลเครดิต (NCB)
-                </div>
-
-                <div className="rec-profile-row">
-                  <div className="rec-info">
-                    <div className="rec-row">
-                      <strong>สรุปผลการรายงาน :</strong>
-
-                      <center>
-                        {getDataShow?.Form_verification_status === "Lv1" && (
-                          <span
-                            className="status-badge status-wait"
-                            style={{ cursor: "pointer" }}
-                          >
-                            รอรายงานผลการให้สินเชื่อ
-                          </span>
-                        )}
-                        {getDataShow?.Form_verification_status === "Lv2" && (
-                          <span
-                            className="status-badge status-pass"
-                            style={{ cursor: "pointer" }}
-                          >
-                            ตรวจแล้ว
-                          </span>
-                        )}
-                        {getDataShow?.Form_verification_status === "Lv3" && (
-                          <span
-                            className="status-badge status-cancel"
-                            style={{ cursor: "pointer" }}
-                          >
-                            ยกเลิก
-                          </span>
-                        )}
-                      </center>
-                    </div>
-
-                    <div className="rec-row">
-                      <strong>รายละเอียดเพิ่มเติม:</strong>
-                      {getDataShow?.CMTN_Name}
-                    </div>
-                    <hr />
-                    <div className="rec-row">
-                      <strong>ผู้รายงานผล :</strong>
-                      {getDataShow?.Form_Name_Inspector}
-                    </div>
-
-                    <div className="rec-row">
-                      <strong>ตำแหน่ง :</strong>
-                      {getDataShow?.Form_Name_Positon}
-                    </div>
-
-                    <div className="rec-row">
-                      <strong>วัน/เวลาที่ รายงานผล :</strong>
-                      {convertToThaiDate(getDataShow?.Form_date_inspertor)}
-                    </div>
-
-                    <div className="rec-row pt-2">
-                      <strong>
-                        รายงานผลการตรวจสอบข้อมูลเครดิต :{" "}
-                        <button
-                          className="btn-icon"
-                          onClick={() =>
-                            handleViewModel(getDataShow?.CTM_form_number)
-                          }
-                        >
-                          <AiOutlineFileSearch />
-                        </button>
-                      </strong>
-                      {/* {getDataShow?.CMTN_Name } */}
-                    </div>
+                <div className="row">
+                  <div className="col-md-6">
+                    <Form.Label>เลขฟอร์ม</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={selectedData.CTM_form_number}
+                      readOnly
+                    />
                   </div>
-                </div>
-              </div>
-              {/* 🔹 การ์ดที่ 1 : รายละเอียดผู้บันทึก */}
-              <div className="card recorder-card">
-                <div className="card-title4" style={{ fontSize: "14px" }}>
-                  ส่วนที่ 4 : เลือกสถานะการอนุมัติสินเชื่อ
-                </div>
 
-                <form className="approval-form">
-                  <div className="form-group">
-                    <label className="form-label">
-                      ผลการอนุมัติสินเชื่อ <span className="required">*</span> :
-                    </label>
+                  <div className="col-md-6">
+                    <Form.Label>พื้นที่ปฏิบัติงาน</Form.Label>
+                    <br />
+                    <Form.Select
+                      style={{ width: "100%" }}
+                      value={selectedData.CTM_business_zone_id || ""}
+                      onChange={(e) => {
+                        const selected = zoneList.find(
+                          (z) => z.WP_code === e.target.value,
+                        );
 
-                    <div className="radio-group">
-                      <label
-                        className="radio-option mr-3"
-                        style={{ fontSize: "14px" }}
-                      >
-                        <input
-                          type="radio"
-                          name="approval"
-                          value="approved"
-                          style={{ marginRight: 12 }}
-                          checked={approval === "approved"}
-                          onChange={() => {
-                            setApproval("approved");
-                            setReasons([]); // ✅ ล้างเหตุผลทันที
-                          }}
-                        />
-                        <span className="custom-radio approved"></span>
-                        ผ่านการอนุมัติ
-                      </label>
-
-                      <label
-                        className="radio-option"
-                        style={{ fontSize: "14px" }}
-                      >
-                        <input
-                          type="radio"
-                          name="approval"
-                          value="rejected"
-                          style={{ marginRight: 12 }}
-                          checked={approval === "rejected"}
-                          onChange={() => {
-                            setApproval("rejected");
-                            setContractNumber("");
-                          }}
-                        />
-                        <span className="custom-radio rejected"></span>
-                        ไม่ผ่านการอนุมัติ
-                      </label>
-                    </div>
-                  </div>
-                  {/* ✅ แสดงรายการเหตุผลเมื่อเลือก "ไม่ผ่าน" */}
-                  {approval === "rejected" && (
-                    <div
-                      style={{
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        padding: "10px 16px",
-                        background: "#f9fafc",
-                        width: "fit-content",
+                        setSelectedData({
+                          ...selectedData,
+                          CTM_business_zone_id: selected?.WP_code || "",
+                          CTM_business_zone: selected?.workplace || "",
+                        });
                       }}
                     >
-                      <p
-                        style={{
-                          marginBottom: "6px",
-                          fontWeight: 600,
-                          color: "red",
+                      <option value="">-- เลือกพื้นที่ --</option>
+                      {zoneList.map((zone) => (
+                        <option key={zone.WP_code} value={zone.WP_code}>
+                          {zone.workplace}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </div>
+                  {"Form_Contract_number" in selectedData && (
+                    <div className="col-md-6 mt-1">
+                      <Form.Label>รหัสสัญญา</Form.Label>
+                      <Form.Control
+                        type="text"
+                        value={selectedData.Form_Contract_number || ""}
+                        maxLength={10}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          setSelectedData({
+                            ...selectedData,
+                            Form_Contract_number: value,
+                          });
                         }}
-                      >
-                        โปรดเลือกเหตุผลที่ไม่ผ่าน * :
-                      </p>
-
-                      <label style={{ display: "block", marginBottom: "4px" }}>
-                        <input
-                          type="checkbox"
-                          value="1"
-                          onChange={handleReasonChange}
-                          checked={reasons.includes("1")}
-                        />
-                        <span style={{ marginLeft: "6px" }}>
-                          1. เนื่องจากคุณสมบัติไม่ผ่านตามนโยบายของบริษัท
-                        </span>
-                      </label>
-                      <label style={{ display: "block", marginBottom: "4px" }}>
-                        <input
-                          type="checkbox"
-                          value="2"
-                          onChange={handleReasonChange}
-                          checked={reasons.includes("2")}
-                        />
-                        <span style={{ marginLeft: "6px" }}>
-                          2. เนื่องจากลูกค้ายกเลิกการขอสินเชื่อ
-                        </span>
-                      </label>
-                      <label style={{ display: "block", marginBottom: "4px" }}>
-                        <input
-                          type="checkbox"
-                          value="3"
-                          onChange={handleReasonChange}
-                          checked={reasons.includes("3")}
-                        />
-                        <span style={{ marginLeft: "6px" }}>
-                          3. เนื่องจาก ย้ายหน่วยทำสินเชื่อ
-                        </span>
-                      </label>
-
-                      <label style={{ display: "block", marginBottom: "4px" }}>
-                        <input
-                          type="checkbox"
-                          value="4"
-                          onChange={handleReasonChange}
-                          checked={reasons.includes("4")}
-                        />
-                        <span style={{ marginLeft: "6px" }}>
-                          4. เนื่องจากรายงาน ERROR / รายการไม่ถูกต้อง
-                        </span>
-                      </label>
+                      />
                     </div>
                   )}
-
-                  {/* ✅ ตรวจสอบผลลัพธ์ */}
-                  {approval === "rejected" && reasons.length > 0 && (
-                    <div style={{ marginTop: "6px" }}>
-                      <strong>เหตุผลที่เลือก:</strong>
-                      <ol
-                        style={{
-                          marginTop: "6px",
-                          paddingLeft: "18px",
-                          color: "#c03300ff",
-                        }}
-                      >
-                        {reasons.map((r, i) => (
-                          <li key={i} style={{ marginBottom: "4px" }}>
-                            {reasonTextMap[r]}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-
-                  {approval === "approved" && (
-                    <div className="form-group">
-                      <div className="form-sub">
-                        <div className="form-group">
-                          <label>
-                            เลขที่สัญญา
-                            <span style={{ color: "#e5533d", marginLeft: 4 }}>
-                              *
-                            </span>
-                          </label>
-
-                          <input
-                            className={`input-normal ${
-                              contractError ? "input-error" : ""
-                            }`}
-                            value={contractNumber}
-                            onChange={(e) => {
-                              // ✅ เอาเฉพาะตัวเลข และจำกัดไม่เกิน 10 หลัก
-                              const value = e.target.value
-                                .replace(/[^a-zA-Z0-9]/g, "") // ❌ ตัดอักขระพิเศษ
-                                .slice(0, 10); // จำกัด 10 ตัว
-
-                              setContractNumber(value);
-                              setContractError(false); // พอพิมพ์แล้วล้าง error
-                            }}
-                            placeholder="กรอกเลขที่สัญญา (10 หลัก)"
-                            inputMode="numeric"
-                            maxLength={10}
-                          />
-
-                          {contractError && (
-                            <small style={{ color: "#e5533d" }}>
-                              กรุณากรอกเลขที่สัญญา
-                            </small>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </form>
+                </div>
               </div>
-            </div>
+            </Form>
+          )}
+        </Modal.Body>
 
-            {/* 🔹 Footer ปุ่มปิด */}
-            <div
-              className=""
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "10px",
-                marginTop: "20px",
-              }}
-            >
-              {/* ปุ่มยกเลิก */}
-              <button
-                className="btn-cancel-modern"
-                onClick={() => {
-                  setApproval("");
-                  setReasons([]); // (ถ้าต้องการล้างเหตุผลด้วย)
-                  closePopup();
-                }}
-              >
-                ยกเลิก
-              </button>
-
-              {/* ปุ่มส่งข้อมูล */}
-              <button
-                className="btn-submit-modern"
-                style={{
-                  background: "#1296a7", // เขียวเข้มสุภาพ
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "6px 18px",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  transition: "all 0.25s ease",
-                  cursor: "pointer",
-                }}
-                onClick={handleSubmitReport}
-              >
-                <BsSend /> รายงานผล
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            ปิด
+          </Button>
+          <Button className="ml-2" variant="danger" onClick={handleSave}>
+            แก้ไขข้อมูล
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
