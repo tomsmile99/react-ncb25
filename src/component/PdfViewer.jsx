@@ -64,15 +64,12 @@ const PdfViewer = () => {
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
-
-   
   };
 
   useEffect(() => {
     fetchData(FormOutside_form_number);
   }, []);
 
- 
   if (!probationaryEmployees) return <div>Loading...</div>;
 
   return (
@@ -290,47 +287,51 @@ const PdfViewer = () => {
 
             <div>{probationaryEmployees.FormOutside_approver_name}</div>
             <div>{probationaryEmployees.FormOutside_approver_position}</div>
-            <div style={{ fontSize: "16px" }}>
-              {convertToThaiDate(
-                probationaryEmployees.FormOutside_approve_datetime,
-              )}
-            </div>
+            {probationaryEmployees.FormOutside_approve_datetime && (
+              <div style={{ fontSize: "16px" }}>
+                {convertToThaiDate(
+                  probationaryEmployees.FormOutside_approve_datetime,
+                )}
+              </div>
+            )}
           </div>
 
-            {/* 🔥 เจ้หน้าที่  */}
-        {probationaryEmployees?.FormOutside_Ncb_status && (
-  <div style={{ textAlign: "center", width: "45%" }}>
-    <div
-      style={{
-        fontWeight: "bold",
-        color:
-          probationaryEmployees.FormOutside_Ncb_status === "pending"
-            ? "#eead3d"
-            : probationaryEmployees.FormOutside_Ncb_status === "Y"
-            ? "green"
-            : probationaryEmployees.FormOutside_Ncb_status === "rejected"
-            ? "red"
-            : "black",
-      }}
-    >
-      {probationaryEmployees.FormOutside_Ncb_status === "pending"
-        ? "รอการอนุมัติ"
-        : probationaryEmployees.FormOutside_Ncb_status === "Y"
-        ? "รับทราบ"
-        : probationaryEmployees.FormOutside_Ncb_status === "rejected"
-        ? "ไม่อนุมัติ"
-        : "-"}
-    </div>
+          {/* 🔥 เจ้หน้าที่  */}
+          {probationaryEmployees?.FormOutside_Ncb_status && (
+            <div style={{ textAlign: "center", width: "45%" }}>
+              <div
+                style={{
+                  fontWeight: "bold",
+                  color:
+                    probationaryEmployees.FormOutside_Ncb_status === "pending"
+                      ? "#eead3d"
+                      : probationaryEmployees.FormOutside_Ncb_status === "Y"
+                        ? "green"
+                        : probationaryEmployees.FormOutside_Ncb_status ===
+                            "rejected"
+                          ? "red"
+                          : "black",
+                }}
+              >
+                {probationaryEmployees.FormOutside_Ncb_status === "pending"
+                  ? "รอการอนุมัติ"
+                  : probationaryEmployees.FormOutside_Ncb_status === "Y"
+                    ? "รับทราบ"
+                    : probationaryEmployees.FormOutside_Ncb_status ===
+                        "rejected"
+                      ? "ไม่อนุมัติ"
+                      : "-"}
+              </div>
 
-    <div>{probationaryEmployees.FormOutside_Ncb_name}</div>
-    <div>{probationaryEmployees.FormOutside_Ncb_position}</div>
-    <div style={{ fontSize: "16px" }}>
-      {convertToThaiDate(
-        probationaryEmployees.FormOutside_Ncb_datetime
-      )}
-    </div>
-  </div>
-)}
+              <div>{probationaryEmployees.FormOutside_Ncb_name}</div>
+              <div>{probationaryEmployees.FormOutside_Ncb_position}</div>
+              <div style={{ fontSize: "16px" }}>
+                {convertToThaiDate(
+                  probationaryEmployees.FormOutside_Ncb_datetime,
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

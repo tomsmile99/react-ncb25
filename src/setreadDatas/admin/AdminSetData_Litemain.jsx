@@ -1196,13 +1196,13 @@ const AdminSetData_Litemain = () => {
 
       if (data?.status === 200) {
         setContDataMenuChkCD1(data.data.wait);
-        setContDataMenuChkCD2(data.data.approved);
+        setContDataMenuChkCD2(data.data.pass);
         setContDataMenuChkCD3(data.data.cancel);
         setContDataMenuChkCD4(data.data.rejected);
-        setContDataMenuChkCD5(data.data.pass);
+        setContDataMenuChkCD5(data.data.approved);
 
 
-        console.log(data)
+        // console.log(data)
       }
     } catch (err) {
       console.error(err);

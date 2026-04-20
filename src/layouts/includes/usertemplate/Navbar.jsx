@@ -40,14 +40,14 @@ const Navbar = ({
   const PerD = Base64.decode(getstore.PerD);
   const _PerWP = Base64.decode(getstore.PerWP);
   const _PerPhotoProfile_N = Base64.decode(getstore.PerPhotoProfile_N);
-  const PerLV = Base64.decode(getstore.PerPST_LV);
+  // const PerLV = Base64.decode(getstore.PerPST_LV);
   const PerPST = Base64.decode(getstore.PerPST);
   const PerPST_LV = Base64.decode(getstore.PerPST_LV);
 
   // role หัวหน้าหน่วย ผจก.สาขา ผู้ช่วย
-  const allowRoles = ["Lv007", "Lv0016", "Lv017", "LV021", "LV023"];
+  const allowRoles = ["LV007", "LV016", "LV017", "LV021"];
   // role ผจก.เขต
-  const ApproverRoles = ["LV006", "LV023"];
+  const ApproverRoles = ["LV006"];
 
   // UI Helpers
   // =========================
@@ -71,6 +71,7 @@ const Navbar = ({
 
       {/* Sidebar */}
       <div className="sidebar os-host os-theme-light">
+        
         {/* user */}
         <div className="user-panel mt-3 pb-3 mb-3 d-flex user-minimal">
           <div className="image">
@@ -102,6 +103,90 @@ const Navbar = ({
                 <p>กลับหน้าหลัก </p>
               </a>
             </li>
+
+            
+            {allowRoles.includes(PerPST_LV) && (
+              <li className="nav-item">
+                 <li
+              className="nav-header header-minimal"
+              style={{
+                background:
+                  "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
+                color: "#fff",
+                padding: "8px 14px",
+                borderRadius: "14px",
+                marginBottom: "10px",
+                fontWeight: "600",
+                fontSize: "13px",
+                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
+              }}
+            >
+              <FaOutdent
+                style={{
+                  color: "#fff",
+                  fontSize: "13px",
+                  flexShrink: 0, // ป้องกันการบิดขนาด
+                  marginRight: "5",
+                }}
+              />
+              <span>รับรองผลการยื่นนอกหลักเกณฑ์</span>
+            </li>
+
+                <NavLink
+                  to="/SalepersonView_Litemain_OutsideHead"
+                  className={navClass}
+                >
+                  <FaCheckDouble
+                    className="nav-item"
+                    style={{ color: "#06407aff" }}
+                  />
+                  <p style={{ fontSize: "13px" }}>รายการรับทราบ</p>
+                  <Badge count={contDataMenuChkCD3} />
+                </NavLink>
+              </li>
+            )}
+            {ApproverRoles.includes(PerPST_LV) && (
+              <li className="nav-item">
+                
+                 <li
+              className="nav-header header-minimal"
+              style={{
+                background:
+                  "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
+                color: "#fff",
+                padding: "8px 14px",
+                borderRadius: "14px",
+                marginBottom: "10px",
+                fontWeight: "600",
+                fontSize: "13px",
+                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
+              }}
+            >
+              <FaOutdent
+                style={{
+                  color: "#fff",
+                  fontSize: "13px",
+                  flexShrink: 0, // ป้องกันการบิดขนาด
+                  marginRight: "5",
+                }}
+              />
+              <span>อนุมัติผลการยื่นนอกหลักเกณฑ์</span>
+            </li>
+
+                <NavLink
+                  to="/SalepersonView_Litemain_OutsideDistrict"
+                  className={navClass}
+                >
+                  <FaCheckDouble
+                    className="nav-item"
+                    style={{ color: "#06407aff" }}
+                  />
+                  <p style={{ fontSize: "13px" }}>รายการอนุมัติ</p>
+                  <Badge count={contDataMenuChkCD4} />
+                </NavLink>
+              </li>
+            )}
+           
 
             <li
               className="nav-header header-minimal"
@@ -279,122 +364,6 @@ const Navbar = ({
             </li>
 
            
-            {allowRoles.includes(PerPST_LV) && (
-              <li className="nav-item">
-                 <li
-              className="nav-header header-minimal"
-              style={{
-                background:
-                  "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
-                color: "#fff",
-                padding: "8px 14px",
-                borderRadius: "14px",
-                marginBottom: "10px",
-                fontWeight: "600",
-                fontSize: "13px",
-                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
-              }}
-            >
-              <FaOutdent
-                style={{
-                  color: "#fff",
-                  fontSize: "13px",
-                  flexShrink: 0, // ป้องกันการบิดขนาด
-                  marginRight: "5",
-                }}
-              />
-              <span>รับรองผลการยื่นนอกหลักเกณฑ์</span>
-            </li>
-
-                <NavLink
-                  to="/SalepersonView_Litemain_OutsideHead"
-                  className={navClass}
-                >
-                  <FaCheckDouble
-                    className="nav-item"
-                    style={{ color: "#06407aff" }}
-                  />
-                  <p style={{ fontSize: "13px" }}>รายการรับทราบ</p>
-                  <Badge count={contDataMenuChkCD3} />
-                </NavLink>
-              </li>
-            )}
-            {ApproverRoles.includes(PerPST_LV) && (
-              <li className="nav-item">
-                
-                 <li
-              className="nav-header header-minimal"
-              style={{
-                background:
-                  "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
-                color: "#fff",
-                padding: "8px 14px",
-                borderRadius: "14px",
-                marginBottom: "10px",
-                fontWeight: "600",
-                fontSize: "13px",
-                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
-              }}
-            >
-              <FaOutdent
-                style={{
-                  color: "#fff",
-                  fontSize: "13px",
-                  flexShrink: 0, // ป้องกันการบิดขนาด
-                  marginRight: "5",
-                }}
-              />
-              <span>อนุมัติผลการยื่นนอกหลักเกณฑ์</span>
-            </li>
-
-                <NavLink
-                  to="/SalepersonView_Litemain_OutsideDistrict"
-                  className={navClass}
-                >
-                  <FaCheckDouble
-                    className="nav-item"
-                    style={{ color: "#06407aff" }}
-                  />
-                  <p style={{ fontSize: "13px" }}>รายการอนุมัติ</p>
-                  <Badge count={contDataMenuChkCD4} />
-                </NavLink>
-              </li>
-            )}
-            {/* <li
-              className="nav-header header-minimal"
-              style={{
-                background:
-                  "linear-gradient(135deg, #f38a1bff 0%, #ffb71bff 100%)",
-                color: "#fff",
-                padding: "8px 14px",
-                borderRadius: "14px",
-                marginBottom: "10px",
-                fontWeight: "600",
-                fontSize: "14px",
-                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
-              }}
-            >
-              <IoPersonCircle
-                style={{
-                  color: "#fff",
-                  fontSize: "23px",
-                  flexShrink: 0, // ป้องกันการบิดขนาด
-                  marginRight: "5",
-                }}
-              />
-              <span>เมนูสลับไปเป็นแอดมิน</span>
-            </li>
-
-            <li className="nav-item">
-              <NavLink to="/Admin_CheckCredit" className={navClass}>
-                <BsFillClipboardCheckFill
-                  className="nav-item"
-                  style={{ color: "#06407aff" }}
-                />
-                <p style={{ fontSize: "13px" }}>รอตรวจสอบข้อมูลเครดิต </p>
-              
-              </NavLink>
-            </li> */}
           </ul>
         </nav>
       </div>
