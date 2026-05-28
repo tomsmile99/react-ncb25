@@ -10,7 +10,7 @@ import {
   FaChartBar,
 } from "react-icons/fa";
 
-const reportNCBLite = () => {
+const reportNCBLiteDanger = () => {
   const [reportData, setReportData] = useState([]);
 
   const [dataRegion, setDataRegion] = useState([]);
@@ -189,55 +189,55 @@ const reportNCBLite = () => {
     }
 
     // 3️⃣ ตรวจสถานะ
-    if (!filters.status && !hasMonth && !hasYear) {
-      await Swal.fire({
-        icon: "warning",
-        title: "แจ้งเตือน",
-        text: "กรุณาเลือกสถานะ",
-        confirmButtonText: "ตกลง",
-      });
-      return;
-    }
+    // if (!filters.status && !hasMonth && !hasYear) {
+    //   await Swal.fire({
+    //     icon: "warning",
+    //     title: "แจ้งเตือน",
+    //     text: "กรุณาเลือกสถานะ",
+    //     confirmButtonText: "ตกลง",
+    //   });
+    //   return;
+    // }
 
     // 4️⃣ ตรวจวันที่เริ่ม
-    if (!filters.startDate && !hasMonth && !hasYear) {
-      await Swal.fire({
-        icon: "warning",
-        title: "แจ้งเตือน",
-        text: "กรุณาเลือกวันที่เริ่มต้น",
-        confirmButtonText: "ตกลง",
-      });
-      return;
-    }
+    // if (!filters.startDate && !hasMonth && !hasYear) {
+    //   await Swal.fire({
+    //     icon: "warning",
+    //     title: "แจ้งเตือน",
+    //     text: "กรุณาเลือกวันที่เริ่มต้น",
+    //     confirmButtonText: "ตกลง",
+    //   });
+    //   return;
+    // }
 
     // 5️⃣ ตรวจวันที่สิ้นสุด
-    if (!filters.endDate && !hasMonth && !hasYear) {
-      await Swal.fire({
-        icon: "warning",
-        title: "แจ้งเตือน",
-        text: "กรุณาเลือกวันที่สิ้นสุด",
-        confirmButtonText: "ตกลง",
-      });
-      return;
-    }
+    // if (!filters.endDate && !hasMonth && !hasYear) {
+    //   await Swal.fire({
+    //     icon: "warning",
+    //     title: "แจ้งเตือน",
+    //     text: "กรุณาเลือกวันที่สิ้นสุด",
+    //     confirmButtonText: "ตกลง",
+    //   });
+    //   return;
+    // }
 
     // 6️⃣ ตรวจช่วงวันที่ (กันเลือกสลับ)
-    if (filters.startDate > filters.endDate) {
-      await Swal.fire({
-        icon: "warning",
-        title: "แจ้งเตือน",
-        text: "วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด",
-        confirmButtonText: "ตกลง",
-      });
-      return;
-    }
+    // if (filters.startDate > filters.endDate) {
+    //   await Swal.fire({
+    //     icon: "warning",
+    //     title: "แจ้งเตือน",
+    //     text: "วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด",
+    //     confirmButtonText: "ตกลง",
+    //   });
+    //   return;
+    // }
 
     // ✅ ผ่านทุกเงื่อนไข → ยิง API
     try {
       setLoading(true);
 
       const { data } = await apiClient.get(
-        "/api/insurances/datacustomers_AdminReportExcel",
+        "/api/insurances/datacustomers_AdminReportExcelDanger",
         {
           params: {
             region_id: filters.region || "all",
@@ -254,7 +254,7 @@ const reportNCBLite = () => {
       const { status, sqlDataCustomers } = data;
 
       if (status === 200) {
-        // console.log(sqlDataCustomers)
+        console.log(sqlDataCustomers);
         setReportData(sqlDataCustomers);
       }
     } catch (err) {
@@ -299,7 +299,7 @@ const reportNCBLite = () => {
         : null; //แปลงเป็น คศ
     try {
       const { data } = await apiClient.get(
-        "/api/insurances/datacustomers_AdminReportExcel",
+        "/api/insurances/datacustomers_AdminReportExcelDanger",
         {
           params: {
             region_id: filters.region || "all",
@@ -319,54 +319,101 @@ const reportNCBLite = () => {
       }
 
       // 🔹 เพิ่มคอลัมน์ลำดับ
-      const rows = data.sqlDataCustomers.map((item, index) => ({
-        ลำดับ: index + 1,
-        "วัน/เวลา ที่รับ Consent":
-          formatThaiDateTime(item.date_upEvidence) ?? "",
-        "วัน/เวลา รายงานผล": formatThaiDateTime(item.Form_date_inspertor) ?? "",
-        "Action Time": getActionTime(
-          item.date_upEvidence,
-          item.Form_date_inspertor,
-        ),
-        "ชื่อ-นามสกุล ลูกค้า":
-          `${item.CTM_title_name ?? ""}${item.CTM_firstname ?? ""} ${item.CTM_lastname ?? ""}` ??
-          "",
-        "วัน/เดือน/ปี เกิด": formatThaiDate(item.CTM_birthdate) ?? "-",
-        หมายเลขโทรศัพท์: item.CTM_phone ?? "-",
-        เลขที่บัตรประชาชน: item.CTM_citizen_id ?? "-",
-        ผู้ขอสืบค้น: item.CTM_recorder_fullname ?? "-",
-        "สาขา/หน่วย": item.CTM_business_zone ?? "-",
-        เขต: item.CTM_branch,
-        ภาค: item.CTM_business_region ?? "-",
-        เลขที่อ้างอิง: item.CTM_form_number ?? "-",
-        "ผู้สืบค้น (ผู้รายงานผล)": item.Form_Name_Inspector ?? "-",
-        ประเภทลูกค้า: item.CMTN_Name ?? "-",
-        ประเภทสินเชื่อ: item.LTNL_Name ?? "-",
-        วงเงินขอสินเชื่อ: item.Form_loan_amount ?? "-",
-        คะแนนเครดิต: item.SCORE_credit_score ?? "-",
-        "คุณสู้ เราช่วย":
-          item.SCORE_project_status === "y" ? "เข้าร่วม" : "ไม่เข้าร่วม",
-        บุคคลล้มละลาย: item.SCORE_project_status === "yes" ? "เป็น" : "ไม่เป็น",
-        ผลการพิจารณาการให้สินเชื่อ: renderApprovalResult(item),
-        ระดับคะแนนเครดิต: item.SCORE_credit_level ?? "-",
-        ความน่าจะเป็นในการชำระหนี้: item.SCORE_payment_behavior ?? "-",
-        เปอร์เซ็นต์การชำระหนี้: item.SCORE_percent_behavior ?? "-",
-        ผลการตรวจสอบเครดิต: item.SCORE_credit_check_result ?? "-",
-        ระดับความเสี่ยง: item.SCORE_Risk ?? "-",
-        เลขที่สัญญา: item.Form_Contract_number ?? "-",
-        การแก้ไขข้อมูล: item.Form_status_Edit === "1" ? "มี" : "",
-        รายละเอียดการแก้ไข: item.SCORE_additional_fee_Edit ?? "-",
+      const rows = data.sqlDataCustomers.map((item, index) => {
+        // แยกข้อมูลออกจาก |
+        const reasons = item.credit_reason_all
+          ? item.credit_reason_all.split("|")
+          : [];
 
-        หมายเหตุ: item.SCORE_additional_fee ?? "-",
-        หมายเหตุการขอยกเลิก: item.Form_note_approval ?? "-",
-        "สถานะการส่ง SMS": item.Form_status_SMS ?? "-",
-        วันที่รายงานผล: formatThaiDateTime(item.Form_verification_date) ?? "-",
+        return {
+          ลำดับ: index + 1,
 
-        "เลขอ้างอิง SMS": item.Form_id_SMS ?? "-",
-        "เลขพัสดุ": item.consentTruck_Number ?? "-",
-           "ชืื่อขนส่ง": item.consentTruck_Namepost_office ?? "-",
-      }));
+          // "วัน/เวลา ที่รับ Consent":
+          //   formatThaiDateTime(item.date_upEvidence) ?? "",
 
+          // "วัน/เวลา รายงานผล":
+          //   formatThaiDateTime(item.Form_date_inspertor) ?? "",
+
+          // "Action Time": getActionTime(
+          //   item.date_upEvidence,
+          //   item.Form_date_inspertor,
+          // ),
+
+          "ชื่อ-นามสกุล ลูกค้า": `${item.CTM_title_name ?? ""}${item.CTM_firstname ?? ""} ${item.CTM_lastname ?? ""}`,
+
+          "วัน/เดือน/ปี เกิด": formatThaiDate(item.CTM_birthdate) ?? "-",
+
+          หมายเลขโทรศัพท์: item.CTM_phone ?? "-",
+
+          เลขที่บัตรประชาชน: item.CTM_citizen_id ?? "-",
+
+          ผู้ขอสืบค้น: item.CTM_recorder_fullname ?? "-",
+
+          "สาขา/หน่วย": item.CTM_business_zone ?? "-",
+
+          เขต: item.CTM_branch,
+
+          ภาค: item.CTM_business_region ?? "-",
+
+          เลขที่อ้างอิง: item.CTM_form_number ?? "-",
+
+          "ผู้สืบค้น (ผู้รายงานผล)": item.Form_Name_Inspector ?? "-",
+
+          ประเภทลูกค้า: item.CMTN_Name ?? "-",
+
+          ประเภทสินเชื่อ: item.LTNL_Name ?? "-",
+
+          วงเงินขอสินเชื่อ: item.Form_loan_amount ?? "-",
+
+          คะแนนเครดิต: item.SCORE_credit_score ?? "-",
+
+          "คุณสู้ เราช่วย":
+            item.SCORE_project_status === "y" ? "เข้าร่วม" : "ไม่เข้าร่วม",
+
+          บุคคลล้มละลาย:
+            item.SCORE_project_status === "yes" ? "เป็น" : "ไม่เป็น",
+
+          ผลการพิจารณาการให้สินเชื่อ: renderApprovalResult(item),
+
+          ระดับคะแนนเครดิต: item.SCORE_credit_level ?? "-",
+
+          ความน่าจะเป็นในการชำระหนี้: item.SCORE_payment_behavior ?? "-",
+
+          เปอร์เซ็นต์การชำระหนี้: item.SCORE_percent_behavior ?? "-",
+
+          ผลการตรวจสอบเครดิต: item.SCORE_credit_check_result ?? "-",
+
+          ระดับความเสี่ยง: item.SCORE_Risk ?? "-",
+
+          เลขที่สัญญา: item.Form_Contract_number ?? "-",
+
+          การแก้ไขข้อมูล: item.Form_status_Edit === "1" ? "มี" : "",
+
+          รายละเอียดการแก้ไข: item.SCORE_additional_fee_Edit ?? "-",
+
+          หมายเหตุ: item.SCORE_additional_fee ?? "-",
+
+          หมายเหตุการขอยกเลิก: item.Form_note_approval ?? "-",
+
+          "สถานะการส่ง SMS": item.Form_status_SMS ?? "-",
+
+          วันที่รายงานผล:
+            formatThaiDateTime(item.Form_verification_date) ?? "-",
+
+          "เลขอ้างอิง SMS": item.Form_id_SMS ?? "-",
+
+          เลขพัสดุ: item.consentTruck_Number ?? "-",
+
+          ชืื่อขนส่ง: item.consentTruck_Namepost_office ?? "-",
+
+          // ✅ แตกหลายคอลัมน์
+          "สถานะบัญชี 1": reasons[0] ?? "-",
+          "สถานะบัญชี 2": reasons[1] ?? "-",
+          "สถานะบัญชี 3": reasons[2] ?? "-",
+          "สถานะบัญชี 4": reasons[3] ?? "-",
+          "สถานะบัญชี 5": reasons[4] ?? "-",
+        };
+      });
       // 🔹 สร้าง worksheet
       const worksheet = XLSX.utils.json_to_sheet(rows);
 
@@ -469,7 +516,7 @@ const reportNCBLite = () => {
           </select>
         </div>
 
-        <div className="filter-group">
+        {/* <div className="filter-group">
           <label>สถานะ</label>
           <select name="status" value={filters.status} onChange={handleChange}>
             <option value="">- เลือกสถานะ -</option>
@@ -479,7 +526,7 @@ const reportNCBLite = () => {
             <option value="rejected">2N - ไม่ผ่านการอนุมัติ</option>
             <option value="approved">2Y - ผ่านการอนุมัติ</option>
           </select>
-        </div>
+        </div> */}
 
         <div className="filter-group">
           <label>เลือกวันที่</label>
@@ -505,7 +552,7 @@ const reportNCBLite = () => {
             </div>
           </div>
         </div>
-
+{/* 
         <div className="filter-group">
           <label>
             เดือน / ปี{" "}
@@ -515,7 +562,7 @@ const reportNCBLite = () => {
           </label>
 
           <div className="date-range">
-            {/* เดือน */}
+          
             <select
               name="monthSMS"
               value={filters.monthSMS}
@@ -542,7 +589,7 @@ const reportNCBLite = () => {
               ))}
             </select>
 
-            {/* ปี พ.ศ. */}
+    
             <select
               name="yearSMS"
               value={filters.yearSMS}
@@ -556,7 +603,7 @@ const reportNCBLite = () => {
               ))}
             </select>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* ปุ่มคำสั่ง */}
@@ -715,13 +762,12 @@ const reportNCBLite = () => {
                     สถานะ
                   </th>
 
-                  <th className="text" style={{ width: "10%" }}>
+                  {/* <th className="text" style={{ width: "10%" }}>
                     เลขที่สัญญา
-                  </th>
-                   <th className="text" style={{ width: "10%" }}>
+                  </th> */}
+                  {/* <th className="text" style={{ width: "10%" }}>
                     เลขพัสดุ
-                  </th>
-                
+                  </th> */}
                 </tr>
               </thead>
               <tbody>
@@ -813,12 +859,12 @@ const reportNCBLite = () => {
                       </center>
                     </td>
 
-                    <td className="text-center">
+                    {/* <td className="text-center">
                       {item.Form_Contract_number || "-"}
-                    </td>
-                     <td className="text-center">
+                    </td> */}
+                    {/* <td className="text-center">
                       {item.consentTruck_Number || "-"}
-                    </td>
+                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -830,4 +876,4 @@ const reportNCBLite = () => {
   );
 };
 
-export default reportNCBLite;
+export default reportNCBLiteDanger;

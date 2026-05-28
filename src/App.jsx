@@ -16,6 +16,7 @@ import LayoutUser from "./layouts/LayoutUser";
 // Pages: สาขา/หน่วย
 import AddSolarRoofTopForm from "./setDefaultPages/jobsolarrooftop/Datasolarrooftops/AddForm";
 import Salesperson from "./setDefaultPages/salesperson/sale_CheckCredit";
+import Sale_Send_consent from "./setDefaultPages/salesperson/sale_Send_consent";
 import Sale_inputDataCredit from "./setDefaultPages/salesperson/sale_inputDataCredit";
 import Sale_inputDataCredit_Outside from "./setDefaultPages/salesperson/sale_inputDataCredit_Outside";
 
@@ -27,8 +28,6 @@ import SalepersonView_Litemain_OutsideHead from "./setDefaultPages/salesperson/s
 import SalepersonView_Litemain_OutsideDistrict from "./setDefaultPages/salesperson/sale_CheckCredit_OutsideDistrict"; //ขอตรวจนอกหลักเกณฑ์
 
 import Sale_CheckCredit_Outsidefinish from "./setDefaultPages/salesperson/sale_CheckCredit_Outsidefinish"; //ขอตรวจนอกหลักเกณฑ์
-
-
 
 import Sale_ExaminationCredit_Pass from "./setDefaultPages/salesperson/sale_ExaminationCredit_Pass";
 import Sale_ExaminationCredit_Fail from "./setDefaultPages/salesperson/sale_ExaminationCredit_Fail";
@@ -44,10 +43,11 @@ import Admin_Management from "./setDefaultPages/admin/Admin_Management";
 import Admin_ManagementUser from "./setDefaultPages/admin/Admin_ManagementUser";
 
 import AdminView_Litemain_OutsideNcb from "./setDefaultPages/admin/Admin_CheckCredit_OutsideNcb"; //ขอตรวจนอกหลักเกณฑ์
-
+import Adminfollow_Send_consent from "./setDefaultPages/admin/Adminfollow_Send_consent";
 
 // รายงาน
 import ReportNCBLiteMain from "./setDefaultPages/reportNCBsList/reportNCBLiteMain";
+import ReportNCBLiteMainDanger from "./setDefaultPages/reportNCBsList/reportNCBLiteMainDanger";
 import ReportNCBLiteDSRMain from "./setDefaultPages/reportNCBsList/reportNCBLiteDSRMain";
 import ReportNCBLiteMainOut from "./setDefaultPages/reportNCBsList/reportNCBLiteMainOut";
 import ReportNCBLiteMainOutSum from "./setDefaultPages/reportNCBsList/reportNCBLiteMainOutSum";
@@ -95,6 +95,12 @@ const App = () => {
                   path="/Sale_inputDataCredit"
                   element={<Sale_inputDataCredit />}
                 />
+
+                <Route
+                  path="/Sale_Send_consent"
+                  element={<Sale_Send_consent />}
+                />
+
                 <Route
                   path="/Sale_inputDataCredit_Outside"
                   element={<Sale_inputDataCredit_Outside />}
@@ -103,15 +109,15 @@ const App = () => {
                   path="/SalepersonView_Litemain_Outside"
                   element={<SalepersonView_Litemain_Outside />}
                 />
-                  <Route
+                <Route
                   path="/SalepersonView_Litemain_OutsideHead"
                   element={<SalepersonView_Litemain_OutsideHead />}
                 />
-                 <Route
+                <Route
                   path="/SalepersonView_Litemain_OutsideDistrict"
                   element={<SalepersonView_Litemain_OutsideDistrict />}
                 />
-                 <Route
+                <Route
                   path="/Sale_CheckCredit_Outsidefinish"
                   element={<Sale_CheckCredit_Outsidefinish />}
                 />
@@ -148,6 +154,8 @@ const App = () => {
                   path="/ReportNCBLiteMainOut"
                   element={<ReportNCBLiteMainOut />}
                 />
+
+              
               </Route>
 
               {/* Admin */}
@@ -166,9 +174,14 @@ const App = () => {
                   path="/Admin_ReportTableChkCredit"
                   element={<Admin_ReportTableChkCredit />}
                 />
-                  <Route
+                <Route
                   path="/AdminView_Litemain_OutsideNcb"
                   element={<AdminView_Litemain_OutsideNcb />}
+                />
+
+                <Route
+                  path="/Adminfollow_Send_consent"
+                  element={<Adminfollow_Send_consent />}
                 />
 
                 {/* รายงาน */}
@@ -193,6 +206,11 @@ const App = () => {
                 <Route
                   path="/Admin_ManagementUser"
                   element={<Admin_ManagementUser />}
+                />
+
+                  <Route
+                  path="/ReportNCBLiteMainDanger"
+                  element={<ReportNCBLiteMainDanger />}
                 />
               </Route>
 

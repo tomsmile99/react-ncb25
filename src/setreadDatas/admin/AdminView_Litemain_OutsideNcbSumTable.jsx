@@ -16,6 +16,8 @@ import { FaSyncAlt } from "react-icons/fa";
 import { HiClipboardDocumentList } from "react-icons/hi2";
 import { FaEdit } from "react-icons/fa";
 
+import { AiFillDelete } from "react-icons/ai";
+
 import { FaTimes } from "react-icons/fa";
 import { userToken } from "../../recoilstore/userStores";
 import { FaCheckCircle } from "react-icons/fa";
@@ -350,6 +352,62 @@ const AdminView_Litemain_OutsideNcbSumTable = () => {
     });
   };
 
+  const handleUpdateStatus = async (item) => {
+    const result = await Swal.fire({
+      title: "ยืนยันการลบข้อมูล ?",
+      text: `เลขฟอร์ม ${item.FormOutside_form_number}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#94a3b8",
+      confirmButtonText: "ยืนยันลบ",
+      cancelButtonText: "ยกเลิก",
+      reverseButtons: true,
+
+      customClass: {
+        popup: "rounded-4",
+        confirmButton: "px-4",
+        cancelButton: "px-4",
+      },
+    });
+
+    // ❌ กดยกเลิก
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    try {
+      const payload = {
+        FormOutside_form_number: item.FormOutside_form_number,
+        FormOutside_Status_at: "0",
+        FormOutside_idPer: PerD,
+      };
+
+      const { data } = await apiClient.post(
+        "/api/insurances/updateOutsiteStatus",
+        payload,
+      );
+
+      if (data.status === 200) {
+        Swal.fire({
+          icon: "success",
+          title: "ลบข้อมูลสำเร็จ",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
+        getEmployeeDB_Admin(currentPage);
+      }
+    } catch (error) {
+      console.error(error);
+
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: "ไม่สามารถลบข้อมูลได้",
+      });
+    }
+  };
   const steps = ["ผู้รับรอง", "อนุมัติ", "รับทราบ"];
 
   const getActiveStep = (status) => {
@@ -384,6 +442,7 @@ const AdminView_Litemain_OutsideNcbSumTable = () => {
   // useEffect(() => {
   //   getEmployeeDB_Admin();
   // }, [searchType, searchQuerySub]);
+
   useEffect(() => {
     if (!hasSearched) return;
     getEmployeeDB_Admin(currentPage, query);
@@ -472,7 +531,6 @@ const AdminView_Litemain_OutsideNcbSumTable = () => {
               </InputGroup>
             </div>
 
-            
             {/* --- ปุ่มค้นหา --- */}
             <button
               className="btn btn-primary"
@@ -495,7 +553,7 @@ const AdminView_Litemain_OutsideNcbSumTable = () => {
               }}
             >
               ล้าง
-            </button>    
+            </button>
           </div>
 
           <div className="table-responsive pt-2">
@@ -537,7 +595,7 @@ const AdminView_Litemain_OutsideNcbSumTable = () => {
                     หนังสือรับรอง
                   </th>
                   <th className="text-center" style={{ width: "15%" }}>
-                    สถานะ
+                    การจัดการข้อมูล
                   </th>
                 </tr>
               </thead>
@@ -649,11 +707,27 @@ const AdminView_Litemain_OutsideNcbSumTable = () => {
                       </td>
                       {/* สถานะเอกสาร */}
                       <td className="text-center">
-                        <div
-                          className="d-flex gap-2 justify-content-center"
-                          onClick={() => handleOpenModal(item)}
-                        >
-                          รับทราบแล้ว
+                        <div className="d-flex gap-2 justify-content-center">
+                          <Button
+                            onClick={() => handleUpdateStatus(item)}
+                            sx={{
+                              background: "#fff5f5",
+                              color: "#dc2626",
+                              border: "1px solid #fecaca",
+                              borderRadius: "10px",
+                              textTransform: "none",
+                              fontWeight: 600,
+                              px: 2,
+                              minWidth: "70px",
+
+                              "&:hover": {
+                                background: "#fee2e2",
+                                borderColor: "#fca5a5",
+                              },
+                            }}
+                          >
+                         <AiFillDelete />
+                          </Button>
                         </div>
                       </td>
                     </tr>

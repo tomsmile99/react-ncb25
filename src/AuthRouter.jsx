@@ -19,7 +19,7 @@ export default function AuthRouter() {
   ];
 
   const isPublicRoute = publicRoutes.some((regex) =>
-    regex.test(location.pathname)
+    regex.test(location.pathname),
   );
 
   useEffect(() => {
@@ -60,16 +60,33 @@ export default function AuthRouter() {
       // ✅ เช็คสิทธิ์
       const userRG = ["1", "2", "3", "4", "5"];
 
-      const userPST = ["PST014", "PST015", "PST016", "PST017", "PST018", "PST019", "PST020", "PST025", "PST083","PST084"];
+      const userPST = [
+        "PST014",
+        "PST015",
+        "PST016",
+        "PST017",
+        "PST018",
+        "PST019",
+        "PST020",
+        "PST025",
+        "PST083",
+        "PST084",
+      ];
 
-      const adminWP = ["WP1073", "WP1031", "WP0010"];
+      const adminWP = ["WP1073", "WP1031", "WP1075", "WP0010"];
 
-      const isUser = userRG.includes(_PerRG) && userPST.includes(_PerPST) && _PerST === "1";
+      const isUser =
+        userRG.includes(_PerRG) && userPST.includes(_PerPST) && _PerST === "1";
       const isAdmin =
         adminWP.includes(_PerWP) || (_AgU === "AGAD" && _PerST === "1");
 
+      // ✅ เพิ่ม
+      const isUserOut = _PerWP === "WP1075";
+
       let role = "guest";
-      if (isAdmin) role = "admin";
+      // ✅ เช็คก่อน
+      if (isUserOut) role = "userOut";
+      else if (isAdmin) role = "admin";
       else if (isUser) role = "user";
 
       if (role === "guest") {
@@ -78,7 +95,7 @@ export default function AuthRouter() {
           title: "ไม่มีสิทธิ์เข้าใช้งาน",
           confirmButtonColor: "#005b85",
         });
-        return;
+        return; 
       }
 
       localStorage.setItem("role", role);
@@ -91,15 +108,23 @@ export default function AuthRouter() {
       //   replace: true,
       // });
 
-      if(!hasRedirected.current && location.pathname === "/"){
+      // ✅ กัน redirect มั่ว
+      if (!hasRedirected.current && location.pathname === "/") {
         hasRedirected.current = true;
-        navigate(role === "admin" ? "/Admin_CheckCredit" : "/Salesperson", {
-          replace: true,
-        });
+
+        // navigate
+        navigate(
+          role === "admin"
+            ? "/Admin_CheckCredit"
+            : role === "userOut"
+              ? "/ReportNCBLiteMainDanger"
+              : "/Salesperson",
+          {
+            replace: true,
+          },
+        );
+
       }
-
-
-
     } catch (err) {
       console.error("❌ Token error:", err);
       navigate("/");

@@ -438,8 +438,26 @@ const AdminView_Litemain_OutsideNcb = () => {
                     fontWeight: "bold",
                   }}
                 >
-                  <FaCheckCircle /> รายการที่รับทราบแล้ว
+                  <FaCheckCircle /> ติดตามรายการทั้งหมด
                 </button>
+
+                {/* <button
+                  onClick={() => setActiveTab("all")}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 8,
+                    border: "none",
+                    cursor: "pointer",
+                    background:
+                      activeTab === "all"
+                        ? "linear-gradient(135deg,#28a745,#20c997)"
+                        : "#e9ecef",
+                    color: activeTab === "all" ? "#fff" : "#333",
+                    fontWeight: "bold",
+                  }}
+                >
+                  <FaCheckCircle /> ติดตามรายการทั้งหมด
+                </button> */}
               </div>
             </div>
 

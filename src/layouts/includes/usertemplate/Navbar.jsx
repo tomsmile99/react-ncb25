@@ -5,11 +5,8 @@ import { userToken } from "../../../recoilstore/userStores";
 import { useRecoilValue } from "recoil";
 import { useState, useEffect, useContext } from "react";
 
-import { BsFillClipboardCheckFill } from "react-icons/bs";
-import { TbDevicesCancel } from "react-icons/tb";
-import { HiClipboardList } from "react-icons/hi";
-import { IoPersonCircle } from "react-icons/io5";
-import { BiSolidMessageSquareEdit } from "react-icons/bi";
+import { TbTruckDelivery } from "react-icons/tb";
+import { LuClipboardPlus } from "react-icons/lu";
 import { FiEdit3 } from "react-icons/fi";
 import { RiChatFollowUpFill } from "react-icons/ri";
 import { TbReportAnalytics } from "react-icons/tb";
@@ -248,6 +245,22 @@ const Navbar = ({
                 {/* <Badge count={contDataMenuChkCD1} /> */}
               </NavLink>
             </li>
+              <li className="nav-item">
+              <NavLink
+                to="/Sale_Send_consent"
+                className={navClass}
+              >
+                <TbTruckDelivery
+                  className="nav-item"
+                  style={{ color: "#06407aff" }}
+                />
+                <p style={{ fontSize: "13px" }}> ส่งต้นฉบับหนังสือให้ความยินยอม</p>
+                {/* <Badge count={contDataMenuChkCD1} /> */}
+              </NavLink>
+            </li> 
+
+
+         
 
             <li
               className="nav-header header-minimal"

@@ -91,7 +91,7 @@ const PdfViewer = () => {
           minHeight: "297mm",
           padding: "25mm",
           fontFamily: "THSarabunNew",
-          fontSize: "13pt",
+          fontSize: "20pt",
           lineHeight: 1.8,
           color: "#000",
         }}
@@ -160,8 +160,8 @@ const PdfViewer = () => {
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           ขอตรวจสอบข้อมูลเครดิตลูกค้า ที่ไม่เข้าตามเกณฑ์การตรวจสอบข้อมูลเครดิต
           เลขที่ {probationaryEmployees.FormOutside_number} ลงวันที่{" "}
-          {convertToThaiDate(probationaryEmployees.FormOutside_created_at)}
-          โดยมีรายละเอียดดังนี้
+          {/* {convertToThaiDate(probationaryEmployees.FormOutside_created_at)} */}{" "}
+          31 มี.ค. 2569 โดยมีรายละเอียดดังนี้
         </div>
 
         {/* 🔥 รายละเอียดลูกค้า */}
@@ -170,7 +170,7 @@ const PdfViewer = () => {
             ชื่อ - นามสกุล : {probationaryEmployees.FormOutside_customer_name}
           </div>
           <div>ประเภทลูกค้า : {probationaryEmployees.CMTN_Name}</div>
-          <div>ประเภทสินเชื่อ :{probationaryEmployees.LTNL_Name}</div>
+          <div>ประเภทสินเชื่อ : {probationaryEmployees.LTNL_Name}</div>
           <div>
             วงเงินขอสินเชื่อ :{" "}
             {Number(
@@ -181,16 +181,15 @@ const PdfViewer = () => {
             })}{" "}
             บาท
           </div>
-        </div>
 
-        {/* 🔥 เนื้อหาต่อ */}
-        <div style={{ marginTop: "20px", textAlign: "justify" }}>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          เพื่อให้มีข้อมูลที่เพียงพอต่อการประกอบการวิเคราะห์การให้สินเชื่อ
-          และป้องกันความเสี่ยงในการให้สินเชื่อต่อลูกค้า
-          จึงขอตรวจสอบข้อมูลเครดิตของลูกค้ารายนี้ เป็นกรณีพิเศษ
+          {/* 🔥 เนื้อหาต่อ */}
+          <div style={{ marginTop: "20px", textAlign: "justify" }}>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            เพื่อให้มีข้อมูลที่เพียงพอต่อการประกอบการวิเคราะห์การให้สินเชื่อ
+            และป้องกันความเสี่ยงในการให้สินเชื่อต่อลูกค้า
+            จึงขอตรวจสอบข้อมูลเครดิตของลูกค้ารายนี้ เป็นกรณีพิเศษ
+          </div>
         </div>
-
         <div style={{ marginTop: "20px", marginLeft: "12%" }}>
           จึงเรียนมาเพื่อโปรดพิจารณา
         </div>
@@ -211,7 +210,7 @@ const PdfViewer = () => {
           </center>
           <div>{probationaryEmployees.FormOutside_requester_name}</div>
           <div>{probationaryEmployees.FormOutside_requester_position}</div>
-          <div style={{ fontSize: "16px" }}>
+          <div style={{ fontSize: "25px" }}>
             {" "}
             {convertToThaiDate(probationaryEmployees.FormOutside_created_at)}
           </div>
@@ -253,7 +252,7 @@ const PdfViewer = () => {
             <div>{probationaryEmployees.FormOutside_reviewer_name}</div>
             <div>{probationaryEmployees.FormOutside_reviewer_position}</div>
 
-            <div style={{ fontSize: "16px" }}>
+            <div style={{ fontSize: "25px" }}>
               {convertToThaiDate(
                 probationaryEmployees.FormOutside_request_datetime,
               )}
@@ -288,7 +287,7 @@ const PdfViewer = () => {
             <div>{probationaryEmployees.FormOutside_approver_name}</div>
             <div>{probationaryEmployees.FormOutside_approver_position}</div>
             {probationaryEmployees.FormOutside_approve_datetime && (
-              <div style={{ fontSize: "16px" }}>
+              <div style={{ fontSize: "25px" }}>
                 {convertToThaiDate(
                   probationaryEmployees.FormOutside_approve_datetime,
                 )}

@@ -17,6 +17,8 @@ import { RiFileExcel2Fill } from "react-icons/ri";
 import { BiSolidEditLocation } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
 import { FaCheckCircle } from "react-icons/fa";
+import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
+import { TbLocationPin } from "react-icons/tb";
 // icons
 import {
   FcDownLeft,
@@ -54,8 +56,19 @@ const Navbar = ({
 
   // 🔒 รหัสที่อนุญาตให้เห็นเมนูนี้เท่านั้น
   const allowManagementMenu = ["003792", "000274", "002743"]; // <-- เจ้าหน้าที่เห็นเมนูนีี้เฉพาะบางคน
-
   const canSeeManagementMenu = allowManagementMenu.includes(String(PerD));
+
+  //เมนูหลักแอดมิน
+  const allowManagementMenuWp = ["WP1073", "WP1031"]; // <-- พัฒนาระบบ
+  const canSeeManagementMenuDangerWp = allowManagementMenuWp.includes(
+    String(_PerWP),
+  );
+
+  //เมนูความเสี่ยงสูง
+  const allowManagementMenuDanger = ["003792", "004245", "000274", "002743", "000806"]; // <-- เจ้าหน้าที่เห็นเมนูนีี้เฉพาะบางคน
+  const canSeeManagementMenuDanger = allowManagementMenuDanger.includes(
+    String(PerD),
+  );
 
   const navClass = ({ isActive }) =>
     `nav-link minimal ${isActive ? "active" : ""}`;
@@ -109,197 +122,213 @@ const Navbar = ({
               </a>
             </li>
 
-            <li
-              className="nav-header header-minimal"
-              style={{
-                background:
-                  "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
-                color: "#fff",
-                padding: "8px 14px",
-                borderRadius: "14px",
-                marginBottom: "10px",
-                fontWeight: "600",
-                fontSize: "14px",
-                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
-              }}
-            >
-              <IoPersonCircle
-                style={{
-                  color: "#fff",
-                  fontSize: "23px",
-                  flexShrink: 0, // ป้องกันการบิดขนาด
-                  marginRight: "5",
-                }}
-              />
-              <span>เมนูสำหรับเจ้าหน้าที่</span>
-            </li>
+            {canSeeManagementMenuDangerWp && (
+              <>
+                <li
+                  className="nav-header header-minimal"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
+                    color: "#fff",
+                    padding: "8px 14px",
+                    borderRadius: "14px",
+                    marginBottom: "10px",
+                    fontWeight: "600",
+                    fontSize: "14px",
+                    boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
+                  }}
+                >
+                  <IoPersonCircle
+                    style={{
+                      color: "#fff",
+                      fontSize: "23px",
+                      flexShrink: 0, // ป้องกันการบิดขนาด
+                      marginRight: "5",
+                    }}
+                  />
+                  <span>เมนูสำหรับเจ้าหน้าที่</span>
+                </li>
 
-            {/* <li className="nav-item">
-              <NavLink to="/Salesperson" className={navClass}>
-                <FaBookReader
-                  className="nav-item"
-                  style={{ color: "#06407aff" }}
-                />
-                <p style={{ fontSize: "13px" }}>ยื่นแบบฟอร์ม</p>
-
-              </NavLink>
-            </li> */}
-
-            <li className="nav-item">
-              <NavLink to="/Admin_CheckCredit" className={navClass}>
-                <BsFillClipboardCheckFill
-                  className="nav-item"
-                  style={{ color: "#06407aff" }}
-                />
-                <p style={{ fontSize: "13px" }}>รอตรวจสอบข้อมูลเครดิต</p>
-                <Badge count={contDataMenuChkCD1} />
-              </NavLink>
-            </li>
-           
-            <li className="nav-item">
-              <NavLink to="/Admin_ManagementUser" className={navClass}>
-                <FaSearch
-                  className=""
-                  style={{ color: "#06407aff", fontSize: "13px" }}
-                />
-                <p style={{ fontSize: "13px" }}>ค้นหาข้อมูลเครดิตลูกค้า</p>
-                {/* <Badge count={getemployee_contain_Counts} /> */}
-              </NavLink>
-            </li>
-             <li className="nav-item">
-              <NavLink to="/AdminView_Litemain_OutsideNcb" className={navClass}>
-                <FaCheckCircle
-                  className=""
-                  style={{ color: "#06407aff", fontSize: "13px" }}
-                />
-                <p style={{ fontSize: "12px" }}>คำขอตรวจสอบนอกหลักเกณฑ์</p>
-                <Badge count={contDataMenuChkCD3} />
-              </NavLink>
-            </li>
-
-            {/* <li className="nav-item">
-                  <NavLink to="/Admin_Refuse" className={navClass}>
-                    <TbDevicesCancel
+                <li className="nav-item">
+                  <NavLink to="/Admin_CheckCredit" className={navClass}>
+                    <BsFillClipboardCheckFill
                       className="nav-item"
-                      style={{ color: "#06407aff", fontSize: "20px" }}
+                      style={{ color: "#06407aff" }}
                     />
-                    <p style={{ fontSize: "13px" }}>ออกหนังสือปฏิเสธลูกค้า</p>
-                  
+                    <p style={{ fontSize: "13px" }}>รอตรวจสอบข้อมูลเครดิต</p>
+                    <Badge count={contDataMenuChkCD1} />
                   </NavLink>
-                </li> */}
+                </li>
 
-            {/* <li className="nav-item">
-              <NavLink to="/Admin_ReportTableChkCredit" className={navClass}>
-                <HiClipboardList
-                  className="nav-item"
-                  style={{ color: "#06407aff", fontSize: "20px" }}
-                />
-                <p style={{ fontSize: "13px" }}>รายการตรวจสอบข้อมูลเครดิต</p>
-              
-              </NavLink>
-            </li> */}
-            {/* <li className="nav-item">
-                  <NavLink to="/Admin_Setting_from" className={navClass}>
-                    <FcDocument className="nav-icon" />
-                    <p>การจัดการฟอร์มประเมิน</p>
-                    // <Badge count={getemployee_contain_Counts} />
+                <li className="nav-item">
+                  <NavLink to="/Admin_ManagementUser" className={navClass}>
+                    <FaSearch
+                      className=""
+                      style={{ color: "#06407aff", fontSize: "13px" }}
+                    />
+                    <p style={{ fontSize: "13px" }}>ค้นหาข้อมูลเครดิตลูกค้า</p>
+                    {/* <Badge count={getemployee_contain_Counts} /> */}
                   </NavLink>
-                </li> */}
+                </li>
+                <li className="nav-item">
+                  <NavLink
+                    to="/AdminView_Litemain_OutsideNcb"
+                    className={navClass}
+                  >
+                    <FaCheckCircle
+                      className=""
+                      style={{ color: "#06407aff", fontSize: "13px" }}
+                    />
+                    <p style={{ fontSize: "12px" }}>คำขอตรวจสอบนอกหลักเกณฑ์</p>
+                    <Badge count={contDataMenuChkCD3} />
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink to="/Adminfollow_Send_consent" className={navClass}>
+                    <TbLocationPin
+                      className=""
+                      style={{ color: "#06407aff", fontSize: "13px" }}
+                    />
+                    <p style={{ fontSize: "12px" }}>ติดตามสถานะใบนำส่ง</p>
+                    {/* <Badge count={contDataMenuChkCD3} /> */}
+                  </NavLink>
+                </li>
 
-            {/* เมนูแก้ไข */}
+                {/* เมนูแก้ไข */}
 
-            <li
-              className="nav-header header-minimal"
-              style={{
-                background:
-                  "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
-                color: "#fff",
-                padding: "8px 14px",
-                borderRadius: "14px",
-                marginBottom: "10px",
-                fontWeight: "600",
-                fontSize: "14px",
-                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
-              }}
-            >
-              <FiEdit3
-                style={{
-                  color: "#fff",
-                  fontSize: "20px",
-                  flexShrink: 0, // ป้องกันการบิดขนาด
-                  marginRight: "5",
-                }}
-              />
-              <span>เมนูสำหรับการแก้ไข</span>
-            </li>
+                <li
+                  className="nav-header header-minimal"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
+                    color: "#fff",
+                    padding: "8px 14px",
+                    borderRadius: "14px",
+                    marginBottom: "10px",
+                    fontWeight: "600",
+                    fontSize: "14px",
+                    boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
+                  }}
+                >
+                  <FiEdit3
+                    style={{
+                      color: "#fff",
+                      fontSize: "20px",
+                      flexShrink: 0, // ป้องกันการบิดขนาด
+                      marginRight: "5",
+                    }}
+                  />
+                  <span>เมนูสำหรับการแก้ไข</span>
+                </li>
 
-            <li className="nav-item">
-              <NavLink to="/Admin_CheckCreditEdit" className={navClass}>
-                <BiSolidMessageSquareEdit
-                  className=""
-                  style={{ color: "#06407aff", fontSize: "17px" }}
-                />
-                <p>แจ้งรอการแก้ไขข้อมูล</p>
-                <Badge count={contDataMenuChkCD2} />
-              </NavLink>
-            </li>
+                <li className="nav-item">
+                  <NavLink to="/Admin_CheckCreditEdit" className={navClass}>
+                    <BiSolidMessageSquareEdit
+                      className=""
+                      style={{ color: "#06407aff", fontSize: "17px" }}
+                    />
+                    <p>แจ้งรอการแก้ไขข้อมูล</p>
+                    <Badge count={contDataMenuChkCD2} />
+                  </NavLink>
+                </li>
 
-            {/* เมนูแก้ไข */}
+                {/* เมนูแก้ไข */}
 
-            <li
-              className="nav-header header-minimal"
-              style={{
-                background:
-                  "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
-                color: "#fff",
-                padding: "8px 14px",
-                borderRadius: "14px",
-                marginBottom: "10px",
-                fontWeight: "600",
-                fontSize: "14px",
-                boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
-              }}
-            >
-              <TbReportSearch
-                style={{
-                  color: "#fff",
-                  fontSize: "20px",
-                  flexShrink: 0, // ป้องกันการบิดขนาด
-                  marginRight: "5",
-                }}
-              />
-              <span>รายงาน</span>
-            </li>
+                <li
+                  className="nav-header header-minimal"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
+                    color: "#fff",
+                    padding: "8px 14px",
+                    borderRadius: "14px",
+                    marginBottom: "10px",
+                    fontWeight: "600",
+                    fontSize: "14px",
+                    boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
+                  }}
+                >
+                  <TbReportSearch
+                    style={{
+                      color: "#fff",
+                      fontSize: "20px",
+                      flexShrink: 0, // ป้องกันการบิดขนาด
+                      marginRight: "5",
+                    }}
+                  />
+                  <span>รายงาน</span>
+                </li>
 
-            <li className="nav-item">
-              <NavLink to="/reportNCBLiteMain" className={navClass}>
-                <RiFileExcel2Fill
-                  className=""
-                  style={{ color: "#06407aff", fontSize: "19px" }}
-                />
-                <p  style={{fontSize:"12px"}}>รายงานสรุปการยื่นขอสืบค้น</p>
-                {/* <Badge count={getemployee_contain_Counts} /> */}
-              </NavLink>
-            </li>
+                <li className="nav-item">
+                  <NavLink to="/reportNCBLiteMain" className={navClass}>
+                    <RiFileExcel2Fill
+                      className=""
+                      style={{ color: "#06407aff", fontSize: "19px" }}
+                    />
+                    <p style={{ fontSize: "12px" }}>
+                      รายงานสรุปการยื่นขอสืบค้น
+                    </p>
+                    {/* <Badge count={getemployee_contain_Counts} /> */}
+                  </NavLink>
+                </li>
 
-            <li className="nav-item">
-              <NavLink to="/ReportNCBLiteDSRMain" end className={navClass}>
-                <RiFileExcel2Fill className="" style={{ color: "#06407aff" , fontSize: "19px" }} />
-                <p  style={{fontSize:"12px"}}>สรุปการยื่นขอสืบค้น ( นอกหลักเกณฑ์ )</p>
-                {/* <Badge count={getemployee_contain_Counts} /> */}
-              </NavLink>
-            </li>
+                <li className="nav-item">
+                  <NavLink to="/ReportNCBLiteDSRMain" end className={navClass}>
+                    <RiFileExcel2Fill
+                      className=""
+                      style={{ color: "#06407aff", fontSize: "19px" }}
+                    />
+                    <p style={{ fontSize: "12px" }}>
+                      สรุปการยื่นขอสืบค้น ( นอกหลักเกณฑ์ )
+                    </p>
+                    {/* <Badge count={getemployee_contain_Counts} /> */}
+                  </NavLink>
+                </li>
+              </>
+            )}
 
-            {/* <li className="nav-item">
-              <NavLink to="/ReportNCBLiteMainOut" end className={navClass}>
-                <RiFileExcel2Fill
-                  className=""
-                  style={{ color: "#06407aff", fontSize: "19px" }}
-                />
-                <p style={{ fontSize: "12px" }}>รายงาน ( สำหรับบุคคลภายนอก )</p>
-              
-              </NavLink>
-            </li>  */}
+            {canSeeManagementMenuDanger && (
+              <>
+                <li
+                  className="nav-header header-minimal"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #0158bbff 0%, #002b57 100%)",
+                    color: "#fff",
+                    padding: "8px 14px",
+                    borderRadius: "14px",
+                    marginBottom: "10px",
+                    fontWeight: "600",
+                    fontSize: "14px",
+                    boxShadow: "0 2px 6px rgba(0, 0, 50, 0.06)",
+                  }}
+                >
+                  <PiMicrosoftExcelLogoFill
+                    style={{
+                      color: "#fff",
+                      fontSize: "20px",
+                      flexShrink: 0, // ป้องกันการบิดขนาด
+                      marginRight: "5",
+                    }}
+                  />
+                  <span>รายงานความเสี่ยงสูง</span>
+                </li>
+
+                <li className="nav-item">
+                  <NavLink to="/ReportNCBLiteMainDanger" className={navClass}>
+                    <PiMicrosoftExcelLogoFill
+                      className=""
+                      style={{ color: "#06407aff", fontSize: "19px" }}
+                    />
+                    <p style={{ fontSize: "12px" }}>
+                      สรุปการยื่นขอสืบค้นกลุ่มเสี่ยงสูง
+                    </p>
+                    {/* <Badge count={getemployee_contain_Counts} /> */}
+                  </NavLink>
+                </li>
+              </>
+            )}
+
             {canSeeManagementMenu && (
               <>
                 <li
