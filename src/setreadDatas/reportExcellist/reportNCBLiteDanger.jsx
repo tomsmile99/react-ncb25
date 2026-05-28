@@ -12,7 +12,8 @@ import {
 
 const reportNCBLiteDanger = () => {
   const [reportData, setReportData] = useState([]);
-
+  const [loadingExcel, setLoadingExcel] = useState(false);
+  const [loadingReport, setLoadingReport] = useState(false);
   const [dataRegion, setDataRegion] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -160,6 +161,9 @@ const reportNCBLiteDanger = () => {
   };
 
   const handleShowReport = async () => {
+    // 🔹 กันกดซ้ำ
+
+
     const hasMonth = filters.monthSMS;
     const hasYear =
       filters.yearSMS && !isNaN(filters.yearSMS)
@@ -189,15 +193,15 @@ const reportNCBLiteDanger = () => {
     }
 
     // 3️⃣ ตรวจสถานะ
-    // if (!filters.status && !hasMonth && !hasYear) {
-    //   await Swal.fire({
-    //     icon: "warning",
-    //     title: "แจ้งเตือน",
-    //     text: "กรุณาเลือกสถานะ",
-    //     confirmButtonText: "ตกลง",
-    //   });
-    //   return;
-    // }
+    if (!filters.status && !hasMonth && !hasYear) {
+      await Swal.fire({
+        icon: "warning",
+        title: "แจ้งเตือน",
+        text: "กรุณาเลือกสถานะ",
+        confirmButtonText: "ตกลง",
+      });
+      return;
+    }
 
     // 4️⃣ ตรวจวันที่เริ่ม
     // if (!filters.startDate && !hasMonth && !hasYear) {
@@ -234,8 +238,8 @@ const reportNCBLiteDanger = () => {
 
     // ✅ ผ่านทุกเงื่อนไข → ยิง API
     try {
-      setLoading(true);
-
+  
+      setLoadingReport(true);
       const { data } = await apiClient.get(
         "/api/insurances/datacustomers_AdminReportExcelDanger",
         {
@@ -254,7 +258,7 @@ const reportNCBLiteDanger = () => {
       const { status, sqlDataCustomers } = data;
 
       if (status === 200) {
-        console.log(sqlDataCustomers);
+        // console.log(sqlDataCustomers);
         setReportData(sqlDataCustomers);
       }
     } catch (err) {
@@ -265,7 +269,7 @@ const reportNCBLiteDanger = () => {
         text: "ไม่สามารถดึงข้อมูลรายงานได้",
       });
     } finally {
-      setLoading(false);
+      setLoadingReport(false);
     }
   };
 
@@ -292,6 +296,7 @@ const reportNCBLiteDanger = () => {
   };
 
   const handleExportExcel = async () => {
+    setLoadingExcel(true);
     const hasMonth = filters.monthSMS;
     const hasYear =
       filters.yearSMS && !isNaN(filters.yearSMS)
@@ -319,101 +324,55 @@ const reportNCBLiteDanger = () => {
       }
 
       // 🔹 เพิ่มคอลัมน์ลำดับ
-      const rows = data.sqlDataCustomers.map((item, index) => {
-        // แยกข้อมูลออกจาก |
-        const reasons = item.credit_reason_all
-          ? item.credit_reason_all.split("|")
-          : [];
+      const rows = data.sqlDataCustomers.map((item, index) => ({
+        ลำดับ: index + 1,
+        "วัน/เวลา ที่รับ Consent":
+          formatThaiDateTime(item.date_upEvidence) ?? "",
+        "วัน/เวลา รายงานผล": formatThaiDateTime(item.Form_date_inspertor) ?? "",
+        "Action Time": getActionTime(
+          item.date_upEvidence,
+          item.Form_date_inspertor,
+        ),
+        "ชื่อ-นามสกุล ลูกค้า":
+          `${item.CTM_title_name ?? ""}${item.CTM_firstname ?? ""} ${item.CTM_lastname ?? ""}` ??
+          "",
+        "วัน/เดือน/ปี เกิด": formatThaiDate(item.CTM_birthdate) ?? "-",
+        หมายเลขโทรศัพท์: item.CTM_phone ?? "-",
+        เลขที่บัตรประชาชน: item.CTM_citizen_id ?? "-",
+        ผู้ขอสืบค้น: item.CTM_recorder_fullname ?? "-",
+        "สาขา/หน่วย": item.CTM_business_zone ?? "-",
+        เขต: item.CTM_branch,
+        ภาค: item.CTM_business_region ?? "-",
+        เลขที่อ้างอิง: item.CTM_form_number ?? "-",
+        "ผู้สืบค้น (ผู้รายงานผล)": item.Form_Name_Inspector ?? "-",
+        ประเภทลูกค้า: item.CMTN_Name ?? "-",
+        ประเภทสินเชื่อ: item.LTNL_Name ?? "-",
+        วงเงินขอสินเชื่อ: item.Form_loan_amount ?? "-",
+        คะแนนเครดิต: item.SCORE_credit_score ?? "-",
+        "คุณสู้ เราช่วย":
+          item.SCORE_project_status === "y" ? "เข้าร่วม" : "ไม่เข้าร่วม",
+        บุคคลล้มละลาย: item.SCORE_project_status === "yes" ? "เป็น" : "ไม่เป็น",
+        ผลการพิจารณาการให้สินเชื่อ: renderApprovalResult(item),
+        ระดับคะแนนเครดิต: item.SCORE_credit_level ?? "-",
+        ความน่าจะเป็นในการชำระหนี้: item.SCORE_payment_behavior ?? "-",
+        เปอร์เซ็นต์การชำระหนี้: item.SCORE_percent_behavior ?? "-",
+        ผลการตรวจสอบเครดิต: item.SCORE_credit_check_result ?? "-",
+        ระดับความเสี่ยง: item.SCORE_Risk ?? "-",
+        เลขที่สัญญา: item.Form_Contract_number ?? "-",
+        การแก้ไขข้อมูล: item.Form_status_Edit === "1" ? "มี" : "",
+        รายละเอียดการแก้ไข: item.SCORE_additional_fee_Edit ?? "-",
 
-        return {
-          ลำดับ: index + 1,
+        หมายเหตุ: item.SCORE_additional_fee ?? "-",
+        หมายเหตุการขอยกเลิก: item.Form_note_approval ?? "-",
+        "สถานะการส่ง SMS": item.Form_status_SMS ?? "-",
+        วันที่รายงานผล: formatThaiDateTime(item.Form_verification_date) ?? "-",
 
-          // "วัน/เวลา ที่รับ Consent":
-          //   formatThaiDateTime(item.date_upEvidence) ?? "",
+        "เลขอ้างอิง SMS": item.Form_id_SMS ?? "-",
+        เลขพัสดุ: item.consentTruck_Number ?? "-",
+        ชืื่อขนส่ง: item.consentTruck_Namepost_office ?? "-",
+        สถานะบัญชี: item.account_status ?? "-",
+      }));
 
-          // "วัน/เวลา รายงานผล":
-          //   formatThaiDateTime(item.Form_date_inspertor) ?? "",
-
-          // "Action Time": getActionTime(
-          //   item.date_upEvidence,
-          //   item.Form_date_inspertor,
-          // ),
-
-          "ชื่อ-นามสกุล ลูกค้า": `${item.CTM_title_name ?? ""}${item.CTM_firstname ?? ""} ${item.CTM_lastname ?? ""}`,
-
-          "วัน/เดือน/ปี เกิด": formatThaiDate(item.CTM_birthdate) ?? "-",
-
-          หมายเลขโทรศัพท์: item.CTM_phone ?? "-",
-
-          เลขที่บัตรประชาชน: item.CTM_citizen_id ?? "-",
-
-          ผู้ขอสืบค้น: item.CTM_recorder_fullname ?? "-",
-
-          "สาขา/หน่วย": item.CTM_business_zone ?? "-",
-
-          เขต: item.CTM_branch,
-
-          ภาค: item.CTM_business_region ?? "-",
-
-          เลขที่อ้างอิง: item.CTM_form_number ?? "-",
-
-          "ผู้สืบค้น (ผู้รายงานผล)": item.Form_Name_Inspector ?? "-",
-
-          ประเภทลูกค้า: item.CMTN_Name ?? "-",
-
-          ประเภทสินเชื่อ: item.LTNL_Name ?? "-",
-
-          วงเงินขอสินเชื่อ: item.Form_loan_amount ?? "-",
-
-          คะแนนเครดิต: item.SCORE_credit_score ?? "-",
-
-          "คุณสู้ เราช่วย":
-            item.SCORE_project_status === "y" ? "เข้าร่วม" : "ไม่เข้าร่วม",
-
-          บุคคลล้มละลาย:
-            item.SCORE_project_status === "yes" ? "เป็น" : "ไม่เป็น",
-
-          ผลการพิจารณาการให้สินเชื่อ: renderApprovalResult(item),
-
-          ระดับคะแนนเครดิต: item.SCORE_credit_level ?? "-",
-
-          ความน่าจะเป็นในการชำระหนี้: item.SCORE_payment_behavior ?? "-",
-
-          เปอร์เซ็นต์การชำระหนี้: item.SCORE_percent_behavior ?? "-",
-
-          ผลการตรวจสอบเครดิต: item.SCORE_credit_check_result ?? "-",
-
-          ระดับความเสี่ยง: item.SCORE_Risk ?? "-",
-
-          เลขที่สัญญา: item.Form_Contract_number ?? "-",
-
-          การแก้ไขข้อมูล: item.Form_status_Edit === "1" ? "มี" : "",
-
-          รายละเอียดการแก้ไข: item.SCORE_additional_fee_Edit ?? "-",
-
-          หมายเหตุ: item.SCORE_additional_fee ?? "-",
-
-          หมายเหตุการขอยกเลิก: item.Form_note_approval ?? "-",
-
-          "สถานะการส่ง SMS": item.Form_status_SMS ?? "-",
-
-          วันที่รายงานผล:
-            formatThaiDateTime(item.Form_verification_date) ?? "-",
-
-          "เลขอ้างอิง SMS": item.Form_id_SMS ?? "-",
-
-          เลขพัสดุ: item.consentTruck_Number ?? "-",
-
-          ชืื่อขนส่ง: item.consentTruck_Namepost_office ?? "-",
-
-          // ✅ แตกหลายคอลัมน์
-          "สถานะบัญชี 1": reasons[0] ?? "-",
-          "สถานะบัญชี 2": reasons[1] ?? "-",
-          "สถานะบัญชี 3": reasons[2] ?? "-",
-          "สถานะบัญชี 4": reasons[3] ?? "-",
-          "สถานะบัญชี 5": reasons[4] ?? "-",
-        };
-      });
       // 🔹 สร้าง worksheet
       const worksheet = XLSX.utils.json_to_sheet(rows);
 
@@ -473,6 +432,8 @@ const reportNCBLiteDanger = () => {
     } catch (err) {
       console.error(err);
       Swal.fire("ผิดพลาด", "ไม่สามารถ Export Excel ได้", "error");
+    } finally {
+      setLoadingExcel(false);
     }
   };
 
@@ -516,7 +477,7 @@ const reportNCBLiteDanger = () => {
           </select>
         </div>
 
-        {/* <div className="filter-group">
+        <div className="filter-group">
           <label>สถานะ</label>
           <select name="status" value={filters.status} onChange={handleChange}>
             <option value="">- เลือกสถานะ -</option>
@@ -526,7 +487,7 @@ const reportNCBLiteDanger = () => {
             <option value="rejected">2N - ไม่ผ่านการอนุมัติ</option>
             <option value="approved">2Y - ผ่านการอนุมัติ</option>
           </select>
-        </div> */}
+        </div>
 
         <div className="filter-group">
           <label>เลือกวันที่</label>
@@ -552,89 +513,79 @@ const reportNCBLiteDanger = () => {
             </div>
           </div>
         </div>
-{/* 
-        <div className="filter-group">
-          <label>
-            เดือน / ปี{" "}
-            <span style={{ color: "#ff8c00", fontWeight: "600" }}>
-              หน้าบ้านรายงานผล
-            </span>
-          </label>
-
-          <div className="date-range">
-          
-            <select
-              name="monthSMS"
-              value={filters.monthSMS}
-              onChange={handleChange}
-            >
-              <option value="">เลือกเดือน</option>
-              {[
-                "มกราคม",
-                "กุมภาพันธ์",
-                "มีนาคม",
-                "เมษายน",
-                "พฤษภาคม",
-                "มิถุนายน",
-                "กรกฎาคม",
-                "สิงหาคม",
-                "กันยายน",
-                "ตุลาคม",
-                "พฤศจิกายน",
-                "ธันวาคม",
-              ].map((month, index) => (
-                <option key={index + 1} value={index + 1}>
-                  {month}
-                </option>
-              ))}
-            </select>
-
-    
-            <select
-              name="yearSMS"
-              value={filters.yearSMS}
-              onChange={handleChange}
-            >
-              <option value="">เลือกปี</option>
-              {getYearOptions().map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div> */}
       </div>
 
       {/* ปุ่มคำสั่ง */}
       <div className="filter-actions">
         <button
           className="btn"
+          onClick={handleShowReport}
+          disabled={loadingReport}
           style={{
-            backgroundColor: "#3056d2",
+            backgroundColor: loadingReport ? "#94a3b8" : "#2563eb",
             color: "#fff",
             border: "none",
-            borderRadius: "px",
-            padding: "6px 12px",
-            cursor: "pointer",
+            borderRadius: "8px",
+            padding: "8px 14px",
+            cursor: loadingReport ? "not-allowed" : "pointer",
+            opacity: loadingReport ? 0.85 : 1,
+
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+
+            minWidth: "170px",
+            transition: "all .2s ease",
           }}
-          onClick={handleShowReport}
         >
-          <FaChartBar /> แสดงรายงาน
+          {loadingReport ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              />
+              กำลังโหลดรายงาน...
+            </>
+          ) : (
+            <>แสดงรายงาน</>
+          )}
         </button>
         <button
           className="btn"
           onClick={handleExportExcel}
+          disabled={loadingExcel}
           style={{
-            backgroundColor: "#2f6b40ff",
+            backgroundColor: loadingExcel ? "#94a3b8" : "#2f6b40ff",
             color: "#fff",
             border: "none",
             borderRadius: "6px",
             padding: "6px 12px",
-            cursor: "pointer",
+            cursor: loadingExcel ? "not-allowed" : "pointer",
+            opacity: loadingExcel ? 0.8 : 1,
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            minWidth: "150px",
+            justifyContent: "center",
           }}
         >
-          <FaFileExcel /> Excel
+          {loadingExcel ? (
+            <>
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              />
+              กำลังสร้างรายงาน...
+            </>
+          ) : (
+            <>
+              <FaFileExcel />
+              Excel
+            </>
+          )}
         </button>
         <button
           className="btn"
@@ -655,9 +606,7 @@ const reportNCBLiteDanger = () => {
       {/* แสดงข้อมูลตาราง */}
 
       <div style={{ marginTop: "20px" }}>
-        {loading ? (
-          <div>กำลังโหลดข้อมูล...</div>
-        ) : reportData.length === 0 ? (
+        {reportData.length === 0 ? (
           <div
             style={{
               display: "flex",
@@ -762,12 +711,12 @@ const reportNCBLiteDanger = () => {
                     สถานะ
                   </th>
 
-                  {/* <th className="text" style={{ width: "10%" }}>
+                  <th className="text" style={{ width: "10%" }}>
                     เลขที่สัญญา
-                  </th> */}
-                  {/* <th className="text" style={{ width: "10%" }}>
+                  </th>
+                  <th className="text" style={{ width: "10%" }}>
                     เลขพัสดุ
-                  </th> */}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -859,12 +808,12 @@ const reportNCBLiteDanger = () => {
                       </center>
                     </td>
 
-                    {/* <td className="text-center">
+                    <td className="text-center">
                       {item.Form_Contract_number || "-"}
-                    </td> */}
-                    {/* <td className="text-center">
+                    </td>
+                    <td className="text-center">
                       {item.consentTruck_Number || "-"}
-                    </td> */}
+                    </td>
                   </tr>
                 ))}
               </tbody>
