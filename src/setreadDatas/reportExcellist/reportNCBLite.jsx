@@ -16,6 +16,9 @@ const reportNCBLite = () => {
   const [dataRegion, setDataRegion] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [loadingExcel, setLoadingExcel] = useState(false);
+  const [loadingReport, setLoadingReport] = useState(false);
+
   //ค้นข้อมูล
   const [regions, setRegions] = useState([]);
   const [belongs, setBelongs] = useState([]);
@@ -235,7 +238,7 @@ const reportNCBLite = () => {
     // ✅ ผ่านทุกเงื่อนไข → ยิง API
     try {
       setLoading(true);
-
+      setLoadingReport(true);
       const { data } = await apiClient.get(
         "/api/insurances/datacustomers_AdminReportExcel",
         {
@@ -266,6 +269,7 @@ const reportNCBLite = () => {
       });
     } finally {
       setLoading(false);
+      setLoadingReport(true);
     }
   };
 
@@ -292,6 +296,7 @@ const reportNCBLite = () => {
   };
 
   const handleExportExcel = async () => {
+    setLoadingExcel(true);
     const hasMonth = filters.monthSMS;
     const hasYear =
       filters.yearSMS && !isNaN(filters.yearSMS)
@@ -363,8 +368,16 @@ const reportNCBLite = () => {
         วันที่รายงานผล: formatThaiDateTime(item.Form_verification_date) ?? "-",
 
         "เลขอ้างอิง SMS": item.Form_id_SMS ?? "-",
-        "เลขพัสดุ": item.consentTruck_Number ?? "-",
-           "ชืื่อขนส่ง": item.consentTruck_Namepost_office ?? "-",
+        เลขพัสดุ: item.consentTruck_Number ?? "-",
+        ชืื่อขนส่ง: item.consentTruck_Namepost_office ?? "-",
+        วันที่นำส่งเอกสาร:
+          formatThaiDate(item.consentTruck_delivery_date) ?? "-",
+        สถานะนำส่ง:
+          item.consentTruck_LvStatus === "Lv0"
+            ? "รอการจัดส่ง"
+            : item.consentTruck_LvStatus === "Lv1"
+              ? "จัดส่งแล้ว"
+              : "",
       }));
 
       // 🔹 สร้าง worksheet
@@ -426,6 +439,8 @@ const reportNCBLite = () => {
     } catch (err) {
       console.error(err);
       Swal.fire("ผิดพลาด", "ไม่สามารถ Export Excel ได้", "error");
+    } finally {
+      setLoadingExcel(false);
     }
   };
 
@@ -563,28 +578,45 @@ const reportNCBLite = () => {
       <div className="filter-actions">
         <button
           className="btn"
+          onClick={handleShowReport}
+          disabled={loadingReport}
           style={{
-            backgroundColor: "#3056d2",
+            backgroundColor: loadingReport ? "#94a3b8" : "#2563eb",
             color: "#fff",
             border: "none",
-            borderRadius: "px",
-            padding: "6px 12px",
-            cursor: "pointer",
+            borderRadius: "8px",
+            padding: "8px 14px",
+            cursor: loadingReport ? "not-allowed" : "pointer",
+            opacity: loadingReport ? 0.85 : 1,
+
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+
+            minWidth: "170px",
+            transition: "all .2s ease",
           }}
-          onClick={handleShowReport}
         >
           <FaChartBar /> แสดงรายงาน
         </button>
         <button
           className="btn"
           onClick={handleExportExcel}
+          disabled={loadingExcel}
           style={{
-            backgroundColor: "#2f6b40ff",
+            backgroundColor: loadingExcel ? "#94a3b8" : "#2f6b40ff",
             color: "#fff",
             border: "none",
             borderRadius: "6px",
             padding: "6px 12px",
-            cursor: "pointer",
+            cursor: loadingExcel ? "not-allowed" : "pointer",
+            opacity: loadingExcel ? 0.8 : 1,
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            minWidth: "150px",
+            justifyContent: "center",
           }}
         >
           <FaFileExcel /> Excel
@@ -718,10 +750,9 @@ const reportNCBLite = () => {
                   <th className="text" style={{ width: "10%" }}>
                     เลขที่สัญญา
                   </th>
-                   <th className="text" style={{ width: "10%" }}>
+                  <th className="text" style={{ width: "10%" }}>
                     เลขพัสดุ
                   </th>
-                
                 </tr>
               </thead>
               <tbody>
@@ -816,7 +847,7 @@ const reportNCBLite = () => {
                     <td className="text-center">
                       {item.Form_Contract_number || "-"}
                     </td>
-                     <td className="text-center">
+                    <td className="text-center">
                       {item.consentTruck_Number || "-"}
                     </td>
                   </tr>

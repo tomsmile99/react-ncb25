@@ -28,7 +28,28 @@ const thaiMonths = [
 const currentYearBE = new Date().getFullYear() + 543;
 const maxYearBE = currentYearBE - 20; // 🔑 อายุ ≥ 20 ปี
 const minYearBE = maxYearBE - 80; // เผื่อย้อนหลัง (ปรับได้)
+const convertToThaiDate = (dateString) => {
+  const date = new Date(dateString);
+  const thaiMonths = [
+    "ม.ค.",
+    "ก.พ.",
+    "มี.ค.",
+    "เม.ย.",
+    "พ.ค.",
+    "มิ.ย.",
+    "ก.ค.",
+    "ส.ค.",
+    "ก.ย.",
+    "ต.ค.",
+    "พ.ย.",
+    "ธ.ค.",
+  ];
+  const day = date.getDate();
+  const month = thaiMonths[date.getMonth()];
+  const year = date.getFullYear() + 543;
 
+  return `${day} ${month} ${year}`;
+};
 const SalepersonView_addData = ({ idForm }) => {
   const navigate = useNavigate();
   const getstore = useRecoilValue(userToken);
@@ -59,6 +80,7 @@ const SalepersonView_addData = ({ idForm }) => {
   const [IdcardError, setIdcardError] = useState(false);
 
   const [isDifferentBranch, setIsDifferentBranch] = useState(false);
+  const [isCheckedConfirm, setIsCheckedConfirm] = useState(false);
 
   const GetDataTitle = async () => {
     try {
@@ -124,12 +146,16 @@ const SalepersonView_addData = ({ idForm }) => {
   const [showWitnessPopup1, setShowWitnessPopup1] = useState(false); // popup #1
   const [showWitnessPopup, setShowWitnessPopup] = useState(false); // popup #3
   const [showWarningPopup, setShowWarningPopup] = useState(false); // popup แจ้งเตือน
-
+  const [isOtherTitle, setIsOtherTitle] = useState(false);
   const [witness1, setWitness1] = useState({ firstname: "", lastname: "" });
-  const [witness2, setWitness2] = useState({ firstname: "", lastname: "" });
-
+  const [witness2, setWitness2] = useState({
+    title: "",
+    firstname: "",
+    lastname: "",
+  });
   const lastNameList = ["ใจดี", "สุขสันต์", "ยิ้มแย้ม", "สุขสม", "ทองแท้"];
-
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  const [confirmPayload, setConfirmPayload] = useState(null);
   const [recorder, setRecorder] = useState({
     fullname: FullNameTitle, //ชื่อ
     position: PerPST_N, //ตำแหน่ง
@@ -257,47 +283,27 @@ const SalepersonView_addData = ({ idForm }) => {
       //   setShowWarningPopup(true);
       //   return false;
       // }
+      const witness2ToSend = {
+        ...witness2,
+        firstname: `${witness2.title}${witness2.firstname}`.trim(),
+      };
 
       // ✅ รวม payload ส่ง API (พยาน 1 + พยาน 2)
       const payload = {
         ...formData,
-        birthday: birthdayCE, // ✅ เก็บเป็น ค.ศ.
+        birthday: birthdayCE,
         signMethod,
         witness1: witness1ToSend,
-        witness2: witness2, // ✅ สำคัญมาก
-        idForm: idForm,
+        witness2: witness2ToSend,
+        idForm,
       };
 
       // console.log("payload ลายเซ็น");
       // console.log(payload);
+      // return;
 
-      try {
-        const { data } = await apiClient.post(
-          "/api/insurances/datacustomers/adddata",
-          {
-            payload: JSON.stringify(payload),
-          },
-        );
-
-        const { status, data: result, message } = data;
-
-        if (status === 200) {
-          // console.log("✅ บันทึกสำเร็จ (ลายนิ้วมือ)");
-          // console.log("📦 ข้อมูลที่บันทึก:", result);
-          // console.log("📝 message:", message);
-
-          // ✅ เด้งกลับไปหน้าตาราง + ส่ง id ที่เพิ่งบันทึกไปด้วย
-          setShowChkStatusNew(0);
-          window.location.assign("/Salesperson");
-          // navigate("/Salesperson", {
-          //   state: {
-          //     highlightId: idForm, // ✅ id ของรายการที่เพิ่งบันทึก
-          //   },
-          // });
-        }
-      } catch (error) {
-        console.error("❌ ส่งข้อมูลไม่สำเร็จ (finger):", error);
-      }
+      setConfirmPayload(payload);
+      setOpenConfirmModal(true);
 
       return;
     }
@@ -337,35 +343,40 @@ const SalepersonView_addData = ({ idForm }) => {
       // console.log("payload มือชื่อ");
       // console.log(payload);
 
-      try {
-        const { data } = await apiClient.post(
-          "/api/insurances/datacustomers/adddata",
-          {
-            payload: JSON.stringify(payload),
-          },
-        );
-
-        const { status, data: result, message } = data;
-
-        if (status === 200) {
-          // console.log("✅ บันทึกสำเร็จ (ลายเซ็น)");
-          // console.log("📦 ข้อมูลที่บันทึก:", result);
-          // console.log("📝 message:", message);
-          // ✅ เด้งกลับไปหน้าตาราง + ส่ง id ที่เพิ่งบันทึกไปด้วย
-           setShowChkStatusNew(0)
-          window.location.assign("/Salesperson");
-          // navigate("/Salesperson", {
-          //   state: {
-          //     highlightId: idForm, // ✅ id ของรายการที่เพิ่งบันทึก
-          //   },
-          // });
-        }
-      } catch (error) {
-        console.error("❌ ส่งข้อมูลไม่สำเร็จ (signature):", error);
-      }
+      setConfirmPayload(payload);
+      setOpenConfirmModal(true);
     }
   };
 
+  const submitToApi = async (payload) => {
+    try {
+      const { data } = await apiClient.post(
+        "/api/insurances/datacustomers/adddata",
+        {
+          payload: JSON.stringify(payload),
+        },
+      );
+
+      if (data.status === 200) {
+        setShowChkStatusNew(0);
+        setShowWitnessPopup(false);
+        setShowSignMethod(false);
+
+        Swal.fire({
+          icon: "success",
+          title: "บันทึกข้อมูลสำเร็จ",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
+        setTimeout(() => {
+          window.location.assign("/Salesperson");
+        }, 1500);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const employeeLastname = FullNameTitle.split(" ").pop().trim();
   const customerLastname = formData.lastname.trim();
 
@@ -627,31 +638,6 @@ const SalepersonView_addData = ({ idForm }) => {
       CTM_citizen_id: value,
     }));
   };
-
-  // const validateWitness2Lastname = (lastname) => {
-  //   const w2Last = (lastname || "").trim();
-  //   const cLast = (customerLastname || "").trim();
-  //   const w1Last = (witness1?.lastname || "").trim();
-
-  //   // ถ้ายังไม่กรอก ไม่ต้องเช็ค
-  //   if (!w2Last) return true;
-
-  //   // ❌ ห้ามซ้ำกับลูกค้า
-  //   if (w2Last === cLast) {
-  //     setShowWarningPopup(true);
-  //     return false;
-  //   }
-
-  //   // ❌ ห้ามซ้ำกับพยาน 1
-  //   if (w2Last === w1Last) {
-  //     setShowWarningPopup(true);
-  //     return false;
-  //   }
-
-  //   return true;
-  // };
-
-  //คะแนนประเมินแต่ละรอบ
 
   useEffect(() => {
     GetDataTitle();
@@ -1114,13 +1100,122 @@ const SalepersonView_addData = ({ idForm }) => {
                 ** พยานห้ามมีนามสกุลเดียวกับลูกค้า กรุณาเปลี่ยนชื่อพยาน **
               </p>
             </div>
-
             <div className="form-group">
-              <label>คำนำหน้า + ชื่อ</label>
+              <label>คำนำหน้า</label>
+
+              {!isOtherTitle ? (
+                <select
+                  className="input-normal"
+                  style={{
+                    height: "46px",
+                    padding: "0 12px",
+                    fontSize: "14px",
+                    borderRadius: "10px",
+                  }}
+                  value={witness2.title}
+                  onChange={(e) => {
+                    if (e.target.value === "other") {
+                      setIsOtherTitle(true);
+
+                      setWitness2({
+                        ...witness2,
+                        title: "",
+                      });
+                    } else {
+                      setWitness2({
+                        ...witness2,
+                        title: e.target.value,
+                      });
+                    }
+                  }}
+                >
+                  <option value="">เลือกคำนำหน้า</option>
+                  <option value="นาย">นาย</option>
+                  <option value="นาง">นาง</option>
+                  <option value="นางสาว">นางสาว</option>
+
+                  <option value="ดร.">ดร.</option>
+                  <option value="ศ.">ศ.</option>
+                  <option value="รศ.">รศ.</option>
+                  <option value="ผศ.">ผศ.</option>
+                  <option value="อาจารย์">อาจารย์</option>
+
+                  <option value="นพ.">นพ.</option>
+                  <option value="พญ.">พญ.</option>
+                  <option value="ทพ.">ทพ.</option>
+                  <option value="ทพญ.">ทพญ.</option>
+                  <option value="ภก.">ภก.</option>
+                  <option value="ภกญ.">ภกญ.</option>
+                  <option value="สพ.">สพ.</option>
+                  <option value="สพญ.">สพญ.</option>
+
+                  <option value="ว่าที่ร้อยตรี">ว่าที่ร้อยตรี</option>
+                  <option value="ว่าที่ร้อยตรีหญิง">ว่าที่ร้อยตรีหญิง</option>
+
+                  <option value="ร.ต.">ร.ต.</option>
+                  <option value="ร.ท.">ร.ท.</option>
+                  <option value="ร.อ.">ร.อ.</option>
+
+                  <option value="พ.ต.">พ.ต.</option>
+                  <option value="พ.ท.">พ.ท.</option>
+                  <option value="พ.อ.">พ.อ.</option>
+
+                  <option value="พล.ต.">พล.ต.</option>
+                  <option value="พล.ท.">พล.ท.</option>
+                  <option value="พล.อ.">พล.อ.</option>
+
+                  <option value="ร.ต.ต.">ร.ต.ต.</option>
+                  <option value="ร.ต.ท.">ร.ต.ท.</option>
+                  <option value="ร.ต.อ.">ร.ต.อ.</option>
+
+                  <option value="พ.ต.ต.">พ.ต.ต.</option>
+                  <option value="พ.ต.ท.">พ.ต.ท.</option>
+                  <option value="พ.ต.อ.">พ.ต.อ.</option>
+
+                  <option value="คุณ">คุณ</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                  }}
+                >
+                  <input
+                    className="input-normal"
+                    placeholder="กรอกคำนำหน้า"
+                    value={witness2.title}
+                    onChange={(e) =>
+                      setWitness2({
+                        ...witness2,
+                        title: e.target.value,
+                      })
+                    }
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOtherTitle(false);
+
+                      setWitness2({
+                        ...witness2,
+                        title: "",
+                      });
+                    }}
+                  >
+                    ย้อนกลับ
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="form-group">
+              <label>ชื่อ</label>
               <input
                 className="input-normal"
                 value={witness2.firstname}
-                placeholder="ตัวอย่าง: นางสาวพรทิพย์"
+                placeholder="กรุณาระบุชื่อ"
                 onChange={(e) =>
                   setWitness2({ ...witness2, firstname: e.target.value })
                 }
@@ -1132,7 +1227,7 @@ const SalepersonView_addData = ({ idForm }) => {
               <input
                 className="input-normal"
                 value={witness2.lastname}
-                placeholder="ตัวอย่าง: สุขใจ"
+                placeholder="กรุณาระบุนามสกุล"
                 onChange={(e) => {
                   const value = e.target.value;
 
@@ -1170,7 +1265,8 @@ const SalepersonView_addData = ({ idForm }) => {
             <div className="witness-header"></div>
             <h6>เปลี่ยนชื่อ - นามสกุล พยาน</h6>
             <p style={{ color: "#e13030ff" }}>
-              *กรณี ฝากหน่วยอื่นรับเอกสารลูกค้าแทน* (พยานห้ามมีนามสกุลเดียวกับลูกค้า)
+              *กรณี ฝากหน่วยอื่นรับเอกสารลูกค้าแทน*
+              (พยานห้ามมีนามสกุลเดียวกับลูกค้า)
             </p>
 
             <div className="form-group pt-2">
@@ -1239,6 +1335,364 @@ const SalepersonView_addData = ({ idForm }) => {
                 onClick={() => setShowWarningPopup(false)}
               >
                 ตกลง
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {openConfirmModal && (
+        <div className="modal-overlay1">
+          <div
+            style={{
+              background: "#f8fafc",
+              width: "95%",
+              maxWidth: "600px",
+              borderRadius: "24px",
+              padding: "30px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              boxShadow: "0 25px 60px rgba(15,23,42,.15)",
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                textAlign: "center",
+                marginBottom: "24px",
+              }}
+            >
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "18px",
+                  fontWeight: 700,
+                  color: "#0f172a",
+                }}
+              >
+                ตรวจสอบข้อมูลก่อนบันทึก
+              </h2>
+
+              <p
+                style={{
+                  marginTop: "8px",
+                  color: "#64748b",
+                  fontSize: "14px",
+                }}
+              >
+                กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนยืนยันรายการ
+              </p>
+            </div>
+
+            {/* Card */}
+            <div
+              style={{
+                background: "#ffffff",
+                borderRadius: "20px",
+                overflow: "hidden",
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 8px 30px rgba(15,23,42,.05)",
+              }}
+            >
+              {/* ผู้บันทึก */}
+              <div
+                style={{
+                  padding: "8px 13px",
+                  background: "#f8fafc",
+                  borderBottom: "1px solid #e2e8f0",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "16px",
+                }}
+              >
+                <img
+                  src={`https://apimb.sakerp.org/file_photoEMP/${_PerPhotoProfile_N}`}
+                  alt="profile"
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "3px solid #fff",
+                    boxShadow: "0 4px 15px rgba(0,0,0,.08)",
+                  }}
+                />
+
+                <div>
+                  <div
+                    style={{
+                      fontWeight: 700,
+                      color: "#0f172a",
+                      fontSize: "15px",
+                    }}
+                  >
+                    {FullNameTitle}
+                  </div>
+
+                  <div
+                    style={{
+                      color: "#64748b",
+                      fontSize: "13px",
+                      marginTop: "2px",
+                    }}
+                  >
+                    {PerPST_N}
+                  </div>
+                </div>
+              </div>
+
+              {/* รายละเอียด */}
+              <div style={{ padding: "1px 24px" }}>
+                {[
+                  {
+                    label: "ชื่อ-นามสกุล (ลูกค้า)",
+                    value: `${confirmPayload?.title}${confirmPayload?.firstname} ${confirmPayload?.lastname}`,
+                  },
+                  {
+                    label: "เลขบัตรประชาชน",
+                    value: confirmPayload?.CTM_citizen_id,
+                  },
+                  {
+                    label: "วันเดือนปีเกิด",
+                    value: convertToThaiDate(confirmPayload?.birthday),
+                  },
+                  {
+                    label: "เบอร์โทรศัพท์",
+                    value: confirmPayload?.CTM_phone,
+                  },
+                  {
+                    label: "สาขา / หน่วย",
+                    value: confirmPayload?.CTM_business_zone,
+                  },
+                  {
+                    label: "เขตธุรกิจ",
+                    value: confirmPayload?.CTM_branch,
+                  },
+                  {
+                    label: "ภาคธุรกิจ",
+                    value: confirmPayload?.CTM_business_region,
+                  },
+                ].map((item, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: "14px 0",
+                      borderBottom: "1px solid #f1f5f9",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#64748b",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+
+                    <span
+                      style={{
+                        color: "#0f172a",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        textAlign: "right",
+                      }}
+                    >
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
+
+                {/* วิธีลงนาม */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "14px 0",
+                    borderBottom: "1px solid #f1f5f9",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#64748b",
+                      fontSize: "14px",
+                    }}
+                  >
+                    วิธีลงนาม
+                  </span>
+
+                  <span
+                    style={{
+                      padding: "6px 14px",
+                      borderRadius: "999px",
+                      background:
+                        confirmPayload?.signMethod === "finger"
+                          ? "#eff6ff"
+                          : "#ecfdf5",
+
+                      color:
+                        confirmPayload?.signMethod === "finger"
+                          ? "#2563eb"
+                          : "#16a34a",
+
+                      fontWeight: 600,
+                      fontSize: "13px",
+                    }}
+                  >
+                    {confirmPayload?.signMethod === "finger"
+                      ? "พิมพ์ลายนิ้วมือ"
+                      : "ลายมือชื่อ"}
+                  </span>
+                </div>
+
+                {/* พยาน */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "14px 0",
+                    borderBottom: "1px solid #f1f5f9",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#64748b",
+                    }}
+                  >
+                    พยานคนที่ 1
+                  </span>
+
+                  <span
+                    style={{
+                      fontWeight: 600,
+                      color: "#0f172a",
+                    }}
+                  >
+                    {confirmPayload?.witness1?.firstname}{" "}
+                    {confirmPayload?.witness1?.lastname}
+                  </span>
+                </div>
+
+                {confirmPayload?.witness2 && (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "14px 0",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#64748b",
+                      }}
+                    >
+                      พยานคนที่ 2
+                    </span>
+
+                    <span
+                      style={{ 
+                        fontWeight: 600,
+                        color: "#0f172a",
+                      }}
+                    >
+                      {confirmPayload?.witness2?.firstname}{" "}
+                      {confirmPayload?.witness2?.lastname}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            {/* Checkbox ยืนยัน */}
+            <div
+              style={{
+                marginTop: "20px",
+                padding: "14px 16px",
+                border: "1px solid #e2e8f0",
+                borderRadius: "12px",
+                background: "#f8fafc",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+              }}
+            >
+              <input
+                type="checkbox"
+                id="confirm-check"
+                checked={isCheckedConfirm}
+                onChange={(e) => setIsCheckedConfirm(e.target.checked)}
+                style={{
+                  width: "18px",
+                  height: "18px",
+                  cursor: "pointer",
+                }}
+              />
+
+              <label
+                htmlFor="confirm-check"
+                style={{
+                  margin: 0,
+                  cursor: "pointer",
+                  color: "#334155",
+                  fontWeight: 500,
+                  fontSize: "14px",
+                }}
+              >
+                ข้าพเจ้าได้ตรวจสอบข้อมูลทั้งหมดแล้ว
+                และยืนยันว่าข้อมูลถูกต้องครบถ้วน
+              </label>
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "12px",
+                marginTop: "24px",
+              }}
+            >
+              <button
+                onClick={() => setOpenConfirmModal(false)}
+                style={{
+                  height: "46px",
+                  padding: "0 20px",
+                  borderRadius: "12px",
+                  border: "1px solid #cbd5e1",
+                  background: "#ffffff",
+                  color: "#475569",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                กลับไปแก้ไข
+              </button>
+
+              <button
+                disabled={!isCheckedConfirm}
+                onClick={() => {
+                  setOpenConfirmModal(false);
+                  submitToApi(confirmPayload);
+                }}
+                style={{
+                  height: "46px",
+                  padding: "0 22px",
+                  borderRadius: "12px",
+                  border: "none",
+                  background: isCheckedConfirm ? "#0f172a" : "#cbd5e1",
+                  color: "#fff",
+                  fontWeight: 600,
+                  cursor: isCheckedConfirm ? "pointer" : "not-allowed",
+                  boxShadow: isCheckedConfirm
+                    ? "0 8px 20px rgba(15,23,42,.15)"
+                    : "none",
+                  transition: "all .2s ease",
+                }}
+              >
+                ✓ ยืนยันส่งข้อมูล
               </button>
             </div>
           </div>

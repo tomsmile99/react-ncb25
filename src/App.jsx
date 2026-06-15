@@ -29,6 +29,8 @@ import SalepersonView_Litemain_OutsideDistrict from "./setDefaultPages/salespers
 
 import Sale_CheckCredit_Outsidefinish from "./setDefaultPages/salesperson/sale_CheckCredit_Outsidefinish"; //ขอตรวจนอกหลักเกณฑ์
 
+import Sale_ManagementUser from "./setDefaultPages/salesperson/sale_ManagementUser";
+
 import Sale_ExaminationCredit_Pass from "./setDefaultPages/salesperson/sale_ExaminationCredit_Pass";
 import Sale_ExaminationCredit_Fail from "./setDefaultPages/salesperson/sale_ExaminationCredit_Fail";
 import Sale_ExaminationCredit_Cancel from "./setDefaultPages/salesperson/sale_ExaminationCredit_Cancel";
@@ -96,6 +98,8 @@ const App = () => {
                   element={<Sale_inputDataCredit />}
                 />
 
+
+
                 <Route
                   path="/Sale_Send_consent"
                   element={<Sale_Send_consent />}
@@ -125,6 +129,12 @@ const App = () => {
                 <Route
                   path="/Sale_ExaminationCredit"
                   element={<Sale_ExaminationCredit />}
+                />
+
+                
+                <Route
+                  path="/sale_ManagementUser"
+                  element={<Sale_ManagementUser />}
                 />
                 <Route
                   path="/Sale_ExaminationCredit_Pass"

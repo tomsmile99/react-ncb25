@@ -31,7 +31,7 @@ const Adminfollow_Send_consent = () => {
   const [currentRound, setCurrentRound] = useState([]);
   const [showCustomerData, setShowCustomerData] = useState(false);
 
-  const location = useLocation();
+  const location = useLocation(); 
   const resultRef = useRef(null);
   const getstore = useRecoilValue(userToken);
 
@@ -58,6 +58,7 @@ const Adminfollow_Send_consent = () => {
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
   const [pdfData, setPdfData] = useState(null);
   const [IdTruck, setIdTruck] = useState("");
+  const [idcusshow, setIdcusshow] = useState("");
   const [getDataShow, setgetDataShow] = useState({});
   const pdfRef = useRef();
   const [viewMode, setViewMode] = useState("current");
@@ -243,6 +244,8 @@ const Adminfollow_Send_consent = () => {
         // console.log(result);
         setgetDataShow(result);
 
+        setIdcusshow(result[0]);
+    
         setTimeout(async () => {
           const element = pdfRef.current;
 
@@ -351,8 +354,8 @@ const Adminfollow_Send_consent = () => {
     // getEmployeeDB_Admin();
     // setRoundFilter("all");
     // setStatusFilter("all");
-      // ✅ reload ทั้งหน้า
-  window.location.reload();
+    // ✅ reload ทั้งหน้า
+    window.location.reload();
   };
 
   const handlePageChange = (newPage) => {
@@ -1181,7 +1184,7 @@ const Adminfollow_Send_consent = () => {
               right: 10,
 
               fontSize: 16,
-              fontFamily: "TH Sarabun New, sans-serif",
+              fontFamily: "THSarabunPSK, sans-serif",
               color: "#444",
 
               textAlign: "right",
@@ -1192,7 +1195,7 @@ const Adminfollow_Send_consent = () => {
           >
             <div>เลขที่ฟอร์ม : {IdTruck}</div>
 
-            <div>พิมพ์วันที่ : {convertToThaiDatemonthnumber(new Date())}</div>
+            {/* <div>พิมพ์วันที่ : {convertToThaiDatemonthnumber(new Date())}</div> */}
           </div>
 
           {/* 🔷 หัวเอกสาร */}
@@ -1229,7 +1232,7 @@ const Adminfollow_Send_consent = () => {
                 fontSize: 22,
               }}
             >
-              สังกัด {PerWP_N} {PerRG_N}
+              สังกัด {idcusshow.CTM_business_zone} {idcusshow.CTM_branch} {idcusshow.CTM_business_region}
             </div>
           </div>
 
@@ -1237,18 +1240,17 @@ const Adminfollow_Send_consent = () => {
             style={{
               width: "100%",
               borderCollapse: "collapse",
-
-              // 🔷 เส้นรอบตารางบางลง
               border: "0.1px solid #777",
-
-              fontFamily: "TH Sarabun New, sans-serif",
-
-              // 🔷 ฟอร์มเอกสารทางการ
-              fontSize: 13,
+             fontFamily: "'THSarabunPSK'",
+              fontSize: 14,
               color: "#222",
             }}
           >
-            <thead>
+            <thead
+              style={{
+               fontFamily: "'THSarabunPSK'",
+              }}
+            >
               <tr>
                 {[
                   "ลำดับ",
@@ -1279,7 +1281,11 @@ const Adminfollow_Send_consent = () => {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody
+              style={{
+                fontFamily: "'THSarabunPSK'",
+              }}
+            >
               {getDataShow?.length > 0
                 ? getDataShow.map((item, index) => (
                     <tr key={index}>
@@ -1383,8 +1389,8 @@ const Adminfollow_Send_consent = () => {
               fontWeight: 700,
             }}
           >
-            หมายเหตุ : ส่งเฉพาะหนังสือให้ความยินยอมฯ เท่านั้น ไม่ต้องส่งสำเนา
-            บชช. กับใบสมัครขอสินเชื่อ
+           หมายเหตุ : ส่งเฉพาะหนังสือให้ความยินยอมฯ เท่านั้น ไม่ต้องส่งสำเนา บัตร ปชช.
+          กับใบสมัครขอสินเชื่อ
           </div>
 
           <div

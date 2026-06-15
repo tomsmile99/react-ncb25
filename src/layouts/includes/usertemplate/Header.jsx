@@ -28,6 +28,16 @@ const Header = () => {
               คู่มือการใช้งานระบบ
             </a>
           </li>
+          <li className="nav-item">
+            <a
+               href="/คู่มือการใช้งานระบบ สร้างใบนำส่ง.pdf"
+              className="nav-link font-weight-bold"
+              target="_blank"
+            >
+              <i className="mr-1 fas fa-book" />
+              คู่มือการสร้างหนังสือนำส่ง
+            </a>
+          </li>
 
           <li className="nav-item">
             <a
@@ -50,6 +60,17 @@ const Header = () => {
               <TiBusinessCard fontSize={18} /> ติดตั้งเครื่องเสียบบัตร
             </a>
           </li>
+
+            {/* <li className="nav-item">
+            <a
+              href="/คู่มือการใช้ระบบตรวจสอบเครดิต.pdf"
+              className="nav-link font-weight-bold"
+              target="_blank"
+            >
+              <i className="mr-1 fas fa-book" />
+              เงื่อนไขข้อตกลง
+            </a>
+          </li> */}
         </ul>
       </nav>
       {/* /.End Navbar */}

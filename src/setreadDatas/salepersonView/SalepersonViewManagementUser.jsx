@@ -105,7 +105,7 @@ const convertToThaiDate1 = (dateString) => {
   return `${day} ${month} ${year}`;
 };
 
-const AdminManagement = () => {
+const SalepersonViewManagementUser = () => {
   const getstore = useRecoilValue(userToken);
   const _PerWP = Base64.decode(getstore.PerWP);
   const PerD = Base64.decode(getstore.PerD);
@@ -130,16 +130,12 @@ const AdminManagement = () => {
   const [contractNumber, setContractNumber] = useState("");
   const [reasons, setReasons] = useState([]);
 
+  const [searchKeyword, setSearchKeyword] = useState("");
+
   const [editPhone, setEditPhone] = useState("");
   const [phoneError, setPhoneError] = useState(false);
 
   const [hasSearched, setHasSearched] = useState(false);
-
-  const [searchKeyword, setSearchKeyword] = useState(""); // ค่าที่กดค้นหาจริง
-  const [showModal, setShowModal] = useState(false);
-  const [selectedData, setSelectedData] = useState(null);
-  const [contractError, setContractError] = useState(false);
-  const [zoneList, setZoneList] = useState([]);
 
   const thaiMonths = [
     "มกราคม",
@@ -176,25 +172,37 @@ const AdminManagement = () => {
       _page: page,
       search: searchQuerySub, // ⭐ ส่ง keyword
       searchKeyword: searchType, // ✅ ใช้ตัวนี้เท่านั้น
+      _PerWP: _PerWP,
     };
 
     // console.log(params);
 
     try {
       const { data } = await apiClient.get(
-        `/api/insurances/datacustomers_AdminManagementUser`,
+        `/api/insurances/datacustomers_UserManagementUser`,
         { params },
       );
 
       const { status, sqlDataCustomers, totalPages } = data;
 
-      if (status) {
+      if (status === 200) {
         setProbationaryEmployees(sqlDataCustomers);
         setHasSearched(true);
+
         // setTotalPages(totalPages || 0);
       } else {
         setProbationaryEmployees([]);
         setTotalPages(0);
+
+        Swal.fire({
+          toast: true,
+          position: "top-end",
+          icon: "warning",
+          title: "ไม่พบข้อมูล",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -203,76 +211,7 @@ const AdminManagement = () => {
     }
   };
 
-  const handleSearch = async () => {
-    setHasSearched(true);
-    setCurrentPage(1);
-    await getEmployeeDB_Admin(1, query);
-  };
-
-  const handleReset = () => {
-    setQuery("");
-    setCurrentPage(1);
-    setProbationaryEmployees([]); // ✅ เคลียร์ตาราง ไม่โหลดทั้งหมด
-    setTotalPages(0);
-  };
-
-  const handleStatusClick = async (idForm) => {
-    setSelectedItem(idForm);
-
-    const params = {
-      idForm: idForm,
-    };
-    try {
-      // ✅ 1. ส่ง idForm ไป WHERE ที่ API (ถูกต้อง)
-      const { data } = await apiClient.get(
-        "/api/insurances/datacustomers_AdminSingle",
-        {
-          params,
-        },
-      );
-
-      const { status, result, message } = data;
-
-      if (status === 200) {
-        // console.log("✅ ดึงข้อมูล PDF สำเร็จ");
-        // console.log("📦 result จากหลังบ้าน:", result);
-        setgetDataShow(result[0]);
-      } else {
-        console.error("❌ ไม่สำเร็จ:", message);
-      }
-
-      if (!data || !data.status) {
-        console.error("ไม่พบข้อมูลสำหรับ PDF");
-        return;
-      }
-    } catch (error) {
-      console.error("โหลดข้อมูลสำหรับ PDF ไม่สำเร็จ:", error);
-    }
-
-    setShowPopup(true);
-  };
-
-  const closePopup = () => {
-    setShowPopup(false);
-    setSelectedItem(null);
-  };
-
-  const handleReasonChange = (e) => {
-    const { value, checked } = e.target;
-
-    setReasons((prev) => {
-      if (checked) {
-        // ✅ ติ๊ก → เพิ่มค่า
-        return [...prev, value];
-      } else {
-        // ❌ เอาติ๊กออก → ลบค่า
-        return prev.filter((item) => item !== value);
-      }
-    });
-  };
-
   const handleOpenModal = async (data) => {
-    setSelectedData(data);
     setShowModal(true);
     // console.log(data.CTM_business_zone_id)
 
@@ -298,109 +237,7 @@ const AdminManagement = () => {
     window.open(`${base}/${relativePath}`, "_blank");
   };
 
-  const reasonTextMap = {
-    1: "เนื่องจากคุณสมบัติไม่ผ่านตามนโยบายของบริษัท",
-    2: "เนื่องจากลูกค้ายกเลิกการขอสินเชื่อ",
-    3: "เนื่องจาก ย้ายหน่วยทำสินเชื่อ",
-    4: "เนื่องจากรายงาน ERROR / รายการไม่ถูกต้อง",
-  };
-
   //Report DSR Page
-  const handleSubmitReport = async () => {
-    // ==========================
-    // ❌ ดักกรณีผ่านอนุมัติแต่ไม่กรอกเลขที่สัญญา
-    // ==========================
-    if (approval === "approved" && !contractNumber.trim()) {
-      setContractError(true);
-
-      return; // ❌ หยุด ไม่ให้ยิง API
-    }
-
-    if (!editPhone || editPhone.length !== 10) {
-      setPhoneError(true);
-      return;
-    }
-
-    // ==========================
-    // ✅ ผ่านเงื่อนไข ค่อยทำงานต่อ
-    // ==========================
-
-    // const payload = {
-    //   ctmId: selectedItem,
-    //   approval,
-    //   reasons,
-    //   contractNumber,
-    //   CTM_phone: editPhone, // ✅ ใส่เบอร์โทร
-    //   CTM_business_zone: getDataShow?.CTM_business_zone || "",
-    // };
-
-    let payload = null;
-    if (approval === "approved") {
-      payload = {
-        ctmId: selectedItem,
-        approval,
-        CTM_phone: editPhone,
-        reasons,
-        contractNumber,
-      };
-
-      // console.log("payload approved:", payload);
-    } else if (approval === "rejected") {
-      payload = {
-        ctmId: selectedItem,
-        approval,
-        contractNumber: "", // ✅ เซตเป็นค่าว่าง
-        reasons,
-        CTM_phone: editPhone,
-        CTM_business_zone: getDataShow?.CTM_business_zone || "",
-      };
-
-      // console.log("payload not approved:", payload);
-    } else {
-      alert("กรุณาเลือกสถานะการแก้ไขรายงานผล");
-      return;
-    }
-
-    // console.log(payload);
-    // return;
-
-    try {
-      const res = await apiClient.post(
-        "/api/insurances/datacustomers/updateDataApproveAdmin",
-        { payload: JSON.stringify(payload) },
-      );
-
-      const { status, message } = res.data;
-
-      if (status === 200) {
-        console.log(message);
-        // return;
-        // console.log(smsDetail);
-        // console.log(smsSmid);
-
-        await getEmployeeDB_Admin();
-
-        setShowPopup(false);
-        setSelectedItem(null);
-
-        Swal.fire({
-          icon: "success",
-          title: "ส่งรายงานผลสำเร็จ!",
-          timer: 1800,
-          showConfirmButton: false,
-        });
-
-        // window.location.assign("/Admin_Management");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      Swal.fire({
-        icon: "error",
-        title: "เกิดข้อผิดพลาด",
-        text: "ไม่สามารถส่งรายงานผลได้",
-      });
-    }
-  };
 
   const handleView = (item) => {
     const id = item.CTM_form_number;
@@ -408,54 +245,6 @@ const AdminManagement = () => {
     const url = `${window.location.origin}/DataReportDSRs/${id}`;
 
     window.open(url, "_blank");
-  };
-
-  const handleViewModel = (item) => {
-    const id = item;
-
-    const url = `${window.location.origin}/DataReportDSRs/${id}`;
-
-    window.open(url, "_blank");
-  };
-
-  const handleSave = async () => {
-    try {
-      const payload = {
-        CTM_form_number: selectedData.CTM_form_number,
-        CTM_business_zone_id: selectedData.CTM_business_zone_id,
-        CTM_business_zone: selectedData.CTM_business_zone,
-        Form_Contract_number: selectedData.Form_Contract_number,
-        idperson: PerD,
-      };
-
-      // console.log(payload);
-
-      const { data } = await apiClient.post(
-        "/api/insurances/updateBusinessZone",
-        payload,
-      );
-
-      const { status, result, message } = data;
-
-      if (status) {
-        // ✅ Toast สำเร็จ
-        Swal.fire({
-          toast: true,
-          position: "top-end",
-          icon: "success",
-
-          text: message || "แก้ไขข้อมูลเรียบร้อย",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
-
-        setShowModal(false);
-        getEmployeeDB_Admin();
-      }
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   useEffect(() => {
@@ -493,7 +282,6 @@ const AdminManagement = () => {
                 <option value="name">ชื่อลูกค้า</option>
                 <option value="citizen">เลขบัตรประชาชน</option>
                 <option value="form">เลขที่แบบฟอร์ม</option>
-                <option value="branch">สาขา / หน่วย</option>
               </Form.Select>
             </div>
 
@@ -1017,208 +805,8 @@ const AdminManagement = () => {
           {/* )} */}
         </div>
       </div>
-
-      <Modal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        centered
-        size="xl"
-      >
-        <div className="section-title">
-          {" "}
-          <MdEditLocationAlt /> การแก้ไขข้อมูล
-        </div>
-
-        <Modal.Body>
-          {selectedData && (
-            <Form>
-              <div className="row">
-                {/* ================== ส่วนที่ 1 ================== */}
-                <div className="modern-card mr-2">
-                  <div className="section-title">
-                    ส่วนที่ 1 : รายละเอียดผู้ขอสืบค้น
-                  </div>
-
-                  <div className="info-grid">
-                    <div className="info-item">
-                      <span className="label">แบบฟอร์มเลขที่</span>
-                      <span className="value">
-                        {selectedData.CTM_form_number || "-"}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">ผู้ขอสืบค้น</span>
-                      <span className="value">
-                        {selectedData.CTM_recorder_fullname || "-"}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">ตำแหน่ง</span>
-                      <span className="value">
-                        {selectedData.CTM_position || "-"}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">สาขา/หน่วย</span>
-                      <span className="value">
-                        {selectedData.CTM_business_zone || "-"}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">สังกัด</span>
-                      <span className="value">
-                        {selectedData.CTM_branch || "-"}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">วัน/เวลาที่ ยื่นขอสืบค้น</span>
-                      <span className="value">
-                        {convertToThaiDate(selectedData.CTM_created_at) || "-"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ================== ส่วนที่ 2 ================== */}
-                <div className="modern-card">
-                  <div className="section-title">ส่วนที่ 2 : ข้อมูลลูกค้า</div>
-
-                  <div className="info-grid">
-                    <div className="info-item">
-                      <span className="label">ชื่อ - นามสกุล</span>
-                      <span className="value">
-                        {selectedData.CTM_title_name}
-                        {selectedData.CTM_firstname} {selectedData.CTM_lastname}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">วันเกิด</span>
-                      <span className="value">
-                        {convertToThaiDate1(selectedData.CTM_birthdate) || "-"}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">เลขบัตรประชาชน</span>
-                      <span className="value">
-                        {selectedData.CTM_citizen_id || "-"}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">เบอร์โทร</span>
-                      <span className="value">
-                        {selectedData.CTM_phone || "-"}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">ประเภทสินเชื่อ</span>
-                      <span className="value">
-                        {selectedData.LTNL_Name || "-"}
-                      </span>
-                    </div>
-
-                    <div className="info-item">
-                      <span className="label">วงเงิน</span>
-                      <span className="value">
-                        {selectedData.Form_loan_amount
-                          ? Number(
-                              selectedData.Form_loan_amount,
-                            ).toLocaleString()
-                          : "-"}{" "}
-                        บาท
-                      </span>
-                    </div>
-                  </div>
-                  <div className="info-item">
-                    <span className="label">ประเภทลูกค้า</span>
-                    <span className="value">
-                      {selectedData.CMTN_Name || "-"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              {/* ================== ส่วนแก้ไข ================== */}
-              <div className="modern-card">
-                <div className="section-title">แก้ไขข้อมูล</div>
-
-                <div className="row">
-                  <div className="col-md-6">
-                    <Form.Label>เลขฟอร์ม</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={selectedData.CTM_form_number}
-                      readOnly
-                    />
-                  </div>
-
-                  <div className="col-md-6">
-                    <Form.Label>พื้นที่ปฏิบัติงาน</Form.Label>
-                    <br />
-                    <Form.Select
-                      style={{ width: "100%" }}
-                      value={selectedData.CTM_business_zone_id || ""}
-                      onChange={(e) => {
-                        const selected = zoneList.find(
-                          (z) => z.WP_code === e.target.value,
-                        );
-
-                        setSelectedData({
-                          ...selectedData,
-                          CTM_business_zone_id: selected?.WP_code || "",
-                          CTM_business_zone: selected?.workplace || "",
-                        });
-                      }}
-                    >
-                      <option value="">-- เลือกพื้นที่ --</option>
-                      {zoneList.map((zone) => (
-                        <option key={zone.WP_code} value={zone.WP_code}>
-                          {zone.workplace}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </div>
-                  {"Form_Contract_number" in selectedData && (
-                    <div className="col-md-6 mt-1">
-                      <Form.Label>รหัสสัญญา</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={selectedData.Form_Contract_number || ""}
-                        maxLength={10}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, "");
-                          setSelectedData({
-                            ...selectedData,
-                            Form_Contract_number: value,
-                          });
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Form>
-          )}
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            ปิด
-          </Button>
-          <Button className="ml-2" variant="danger" onClick={handleSave}>
-            แก้ไขข้อมูล
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };
 
-export default AdminManagement;
+export default SalepersonViewManagementUser;

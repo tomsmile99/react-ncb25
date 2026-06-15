@@ -3,6 +3,10 @@ import apiClient from "../../recoilstore/userStores";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { TiUpload } from "react-icons/ti";
+import { GoChecklist } from "react-icons/go";
+import { GrDocumentText } from "react-icons/gr";
+import { HiOutlineClipboardDocumentList } from "react-icons/hi2";
+import { MdOutlineComputer } from "react-icons/md";
 const convertToThaiDate = (dateString) => {
   const date = new Date(dateString);
   const thaiMonths = [
@@ -48,6 +52,8 @@ const SalepersonView_updatephoto = ({ idForm }) => {
     CTM_postal_code: "",
   });
 
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+
   //PUT ส่งรูปหลักฐาน
   const [formData2, setFormData2] = useState({
     loanType: "",
@@ -61,6 +67,11 @@ const SalepersonView_updatephoto = ({ idForm }) => {
     img3: null,
   });
 
+  const [isModalOpen, setIsModalOpen] = useState(false); // popup #1
+  const [previewImage, setPreviewImage] = useState(false); // popup #3
+  const [getDataShow, setgetDataShow] = useState({});
+  const [acceptConfirm, setAcceptConfirm] = useState(false);
+  const [confirmChecked, setConfirmChecked] = useState(false);
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     const name = e.target.name;
@@ -80,10 +91,6 @@ const SalepersonView_updatephoto = ({ idForm }) => {
       },
     }));
   };
-
-  const [isModalOpen, setIsModalOpen] = useState(false); // popup #1
-  const [previewImage, setPreviewImage] = useState(false); // popup #3
-  const [getDataShow, setgetDataShow] = useState({});
 
   const handleDownloadPDF = async (idForm) => {
     const params = {
@@ -176,62 +183,70 @@ const SalepersonView_updatephoto = ({ idForm }) => {
     return !Object.values(newImageErrors).some(Boolean);
   };
 
-  // const handleUpdateCustomer = async () => {
-  //   if (!validateForm() || !validateImages()) return;
+  const InfoItem = ({ label, value }) => (
+    <div>
+      <div
+        style={{
+          color: "#64748b",
+          fontSize: "13px",
+          marginBottom: "4px",
+        }}
+      >
+        {label}
+      </div>
 
-  //   try {
-  //     const formDataUpload = new FormData();
+      <div
+        style={{
+          color: "#0f172a",
+          fontWeight: 600,
+          fontSize: "15px",
+        }}
+      >
+        {value || "-"}
+      </div>
+    </div>
+  );
 
-  //     formDataUpload.append("idForm", idForm);
-  //     formDataUpload.append("loanType", formData2.loanType);
-  //     formDataUpload.append("loanAmount", formData2.loanAmount);
-  //     formDataUpload.append("customerType", formData2.customerType);
+  const ImagePreviewCard = ({ file, title }) => (
+    <div
+      style={{
+        background: "#fff",
+        borderRadius: "18px",
+        overflow: "hidden",
+        border: "1px solid #e5e7eb",
+        boxShadow: "0 8px 24px rgba(15,23,42,0.06)",
+      }}
+    >
+      <div
+        style={{
+          padding: "14px 18px",
+          borderBottom: "1px solid #e5e7eb",
+          fontWeight: 700,
+          fontSize: "15px",
+          color: "#0f172a",
+        }}
+      >
+        {title}
+      </div>
 
-  //     // ✅ แนบไฟล์
-  //     if (images.img1) formDataUpload.append("img1", images.img1);
-  //     if (images.img2) formDataUpload.append("img2", images.img2);
-  //     if (images.img3) formDataUpload.append("img3", images.img3);
-
-  //     // console.log("📦 formDataUpload ก่อนส่ง:");
-
-  //     // for (let [key, value] of formDataUpload.entries()) {
-  //     //   if (value instanceof File) {
-  //     //     console.log(key, "=>", value.name, value.type, value.size + " bytes");
-  //     //   } else {
-  //     //     console.log(key, "=>", value);
-  //     //   }
-  //     // }
-
-  //     // return;
-
-  //     const { data } = await apiClient.post(
-  //       "/api/insurances/datacustomers/updateData_evidence",
-  //       formDataUpload
-  //     );
-  //     const { status, result, files, post } = data;
-
-  //     if (status === 200) {
-  //       // console.log("✅ status =", status);
-  //       // console.log("📨 message =", post);
-  //       // console.log("📄 files =", files);
-
-  //       Swal.fire({
-  //         icon: "success",
-  //         title: "บันทึกสำเร็จ",
-  //         timer: 2000,
-  //         showConfirmButton: false,
-  //       }).then(() => {
-  //         window.location.assign("/Salesperson");
-  //       });
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
+      <img
+        src={URL.createObjectURL(file)}
+        alt={title}
+        style={{
+          width: "100%",
+          maxHeight: "800px",
+          objectFit: "contain",
+          background: "#f8fafc",
+          cursor: "zoom-in",
+        }}
+        onClick={() => openModal(URL.createObjectURL(file))}
+      />
+    </div>
+  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleUpdateCustomer = async () => {
+  const submitCustomerData = async () => {
     if (isSubmitting) return; // ❌ กันกดซ้ำ
     if (!validateForm() || !validateImages()) return;
 
@@ -252,24 +267,22 @@ const SalepersonView_updatephoto = ({ idForm }) => {
       // ✅ เพิ่มบัตรประชาชน
       formDataUpload.append("CTM_citizen_id", formData.CTM_citizen_id);
 
-
       // formDataUpload.forEach((value, key) => {
       //   console.log(key, value);
       // });
 
       const { data } = await apiClient.post(
         "/api/insurances/datacustomers/updateData_evidence",
-        formDataUpload
+        formDataUpload,
       );
 
       if (data.status === 200) {
-        
         await Swal.fire({
           icon: "success",
           title: "บันทึกสำเร็จ",
           timer: 2000,
           showConfirmButton: false,
-          allowOutsideClick: false,      // ⭐ ห้ามคลิกนอก
+          allowOutsideClick: false, // ⭐ ห้ามคลิกนอก
           allowEscapeKey: false,
         });
 
@@ -314,6 +327,61 @@ const SalepersonView_updatephoto = ({ idForm }) => {
   const formatNumber = (value) => {
     if (!value) return "";
     return Number(value).toLocaleString("en-US");
+  };
+
+  const getCustomerTypeName = (type) => {
+    const customerTypes = {
+      1: "สินเชื่อส่วนบุคคล",
+      2: "สินเชื่อนาโนไฟแนนซ์",
+      3: "สินเชื่อที่ดิน",
+      4: "สินเชื่อโซลาร์รูฟท็อป",
+      // 5: "สินเชื่อโซลาร์แอร์",
+      6: "สินเชื่อโซลาร์ไมโครอินเวอร์เตอร์",
+      7: "สินเชื่อเช่าซื้อ (รถจักรยานยนต์ใหม่)",
+      8: "สินเชื่อเช่าซื้อ (รถแลกเงิน)",
+      9: "สินเชื่อทะเบียนรถ",
+      10: "สินเชื่อโซลาร์แอร์",
+    };
+
+    return customerTypes[type] || "-";
+  };
+  const getCustomerTypeText = (type) => {
+    const customerTypes = {
+      1: "ลูกค้าใหม่",
+      2: "ลูกค้าใหม่ (ลูกค้าเก่าปิดบัญชี ตั้งแต่ 1 ปี กลับมาใช้บริการ)",
+      3: "ลูกค้าใหม่ (ย้ายไฟแนนซ์)",
+      4: "ลูกค้าเก่า",
+      5: "ลูกค้าเก่า (ย้ายไฟแนนซ์)",
+      6: "ลูกค้าเก่าต่อสัญญา/RENEW (ขอตรวจนอกหลักเกณฑ์)",
+      7: "ลูกค้าเก่าต่อสัญญา/RENEW เพิ่มวงเงิน",
+      8: "ลูกค้าเก่าต่อสัญญา/RENEW เงื่อนไขการชำระรายงวด มีการต่อสัญญาต่อเนื่อง ตั้งแต่ 1 ปีขึ้นไป",
+      9: "ลูกค้าเก่า เงื่อนไขสินเชื่อเพื่อให้ความช่วยเหลือลูกหนี้",
+    };
+
+    return customerTypes[type] || "-";
+  };
+
+  const [checkList, setCheckList] = useState({
+    c1: false,
+    c2: false,
+    c3: false,
+    c4: false,
+    c5: false,
+    c6: false,
+    c7: false,
+    c8: false,
+    c9: false,
+    c10: false,
+  });
+
+  const checkedCount = Object.values(checkList).filter(Boolean).length;
+  const isAllChecked = checkedCount === 10;
+
+  const handleCheck = (key) => {
+    setCheckList((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
   };
 
   useEffect(() => {
@@ -451,126 +519,6 @@ const SalepersonView_updatephoto = ({ idForm }) => {
                 disabled
               />
             </div>
-            {/* <div className="form-group full">
-              <label>ที่อยู่ตามทะเบียนบ้าน</label>
-
-           
-              <div className="row">
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_house_no"
-                    value={formData.CTM_house_no}
-                    onChange={handleChange}
-                    placeholder="บ้านเลขที่"
-                    disabled
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_moo"
-                    value={formData.CTM_moo}
-                    onChange={handleChange}
-                    placeholder="หมู่"
-                    disabled
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_soi"
-                    value={formData.CTM_soi}
-                    onChange={handleChange}
-                    placeholder="ซอย"
-                    disabled
-                  />
-                </div>
-              </div>
-
-         
-              <div className="row mt-2">
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_road"
-                    value={formData.CTM_road}
-                    onChange={handleChange}
-                    placeholder="ถนน"
-                    disabled
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_village_or_building"
-                    value={formData.CTM_village_or_building}
-                    onChange={handleChange}
-                    placeholder="หมู่บ้าน / อาคาร"
-                    disabled
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_sub_district"
-                    value={formData.CTM_sub_district}
-                    onChange={handleChange}
-                    placeholder="แขวง / ตำบล"
-                    disabled
-                  />
-                </div>
-              </div>
-
-            
-              <div className="row mt-2">
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_district"
-                    value={formData.CTM_district}
-                    onChange={handleChange}
-                    placeholder="เขต / อำเภอ"
-                    disabled
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_province"
-                    value={formData.CTM_province}
-                    onChange={handleChange}
-                    placeholder="จังหวัด"
-                    disabled
-                  />
-                </div>
-
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="CTM_postal_code"
-                    value={formData.CTM_postal_code}
-                    onChange={handleChange}
-                    placeholder="รหัสไปรษณีย์"
-                    disabled
-                  />
-                </div>
-              </div>
-            </div> */}
           </div>
           {/* <button className="btn-submit" onClick={handleCheckLastname}>
             <LuScanText /> ตรวจสอบ
@@ -604,7 +552,7 @@ const SalepersonView_updatephoto = ({ idForm }) => {
                 <option value="2">สินเชื่อนาโนไฟแนนซ์</option>
                 <option value="3">สินเชื่อที่ดิน</option>
                 <option value="4">สินเชื่อโซลาร์รูฟท็อป</option>
-                <option value="5">สินเชื่อโซลาร์แอร์</option>
+                {/* <option value="5">สินเชื่อโซลาร์แอร์</option> */}
                 <option value="6">สินเชื่อโซลาร์ไมโครอินเวอร์เตอร์</option>
                 <option value="7">สินเชื่อเช่าซื้อ (รถจักรยานยนต์ใหม่)</option>
                 <option value="8">สินเชื่อเช่าซื้อ (รถแลกเงิน)</option>
@@ -661,7 +609,7 @@ const SalepersonView_updatephoto = ({ idForm }) => {
                   ลูกค้าเก่าต่อสัญญา/RENEW เงื่อนไขการชำระรายงวด
                   มีการต่อสัญญาต่อเนื่อง ตั้งแต่ 1 ปีขึ้นไป
                 </option>
-                 <option value="9">
+                <option value="9">
                   ลูกค้าเก่า เงื่อนไขสินเชื่อเพื่อให้ความช่วยเหลือลูกหนี้
                 </option>
               </select>
@@ -764,6 +712,426 @@ const SalepersonView_updatephoto = ({ idForm }) => {
                   );
                 })()}
             </div>
+            {openConfirmModal && (
+              <div className="modal-overlay1">
+                <div
+                  style={{
+                    background: "#ffffff",
+                    width: "92%",
+                    maxWidth: "1100px",
+                    maxHeight: "90vh",
+                    overflowY: "auto",
+                    borderRadius: "24px",
+                    padding: "30px",
+                    boxShadow: "0 25px 60px rgba(15,23,42,0.18)",
+                    border: "1px solid #e5e7eb",
+                  }}
+                >
+                  {/* Header */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      marginBottom: "25px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "52px",
+                        height: "52px",
+                        borderRadius: "14px",
+                        background: "#eff6ff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "22px",
+                      }}
+                    >
+                      <GoChecklist />
+                    </div>
+
+                    <div>
+                      <h3
+                        style={{
+                          margin: 0,
+                          color: "#0f172a",
+                          fontWeight: 700,
+                          fontSize: "22px",
+                        }}
+                      >
+                        ตรวจสอบข้อมูลก่อนส่ง
+                      </h3>
+
+                      <p
+                        style={{
+                          margin: "4px 0 0",
+                          color: "#64748b",
+                          fontSize: "14px",
+                        }}
+                      >
+                        กรุณาตรวจสอบรายละเอียดและเอกสารก่อนยืนยันส่งข้อมูล
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Customer Information */}
+                  <div
+                    style={{
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "18px",
+                      padding: "22px",
+                      marginBottom: "25px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: 700,
+                        color: "#1e293b",
+                        marginBottom: "18px",
+                      }}
+                    >
+                      ข้อมูลลูกค้า
+                    </div>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns:
+                          "repeat(auto-fit,minmax(260px,1fr))",
+                        gap: "18px",
+                      }}
+                    >
+                      <InfoItem
+                        label="ชื่อ - นามสกุล"
+                        value={`${formData.title}${formData.firstname} ${formData.CTM_lastname}`}
+                      />
+
+                      <InfoItem
+                        label="เลขบัตรประชาชน"
+                        value={formData.CTM_citizen_id}
+                      />
+
+                      <InfoItem
+                        label="เบอร์โทรศัพท์"
+                        value={formData.CTM_phone}
+                      />
+
+                      <InfoItem
+                        label="ประเภทสินเชื่อ"
+                        value={getCustomerTypeName(formData2.customerType)}
+                      />
+
+                      <InfoItem
+                        label="ประเภทลูกค้า"
+                        value={getCustomerTypeText(formData2.loanType)}
+                      />
+
+                      <InfoItem
+                        label="วงเงินสินเชื่อ"
+                        value={`${formatNumber(formData2.loanAmount)} บาท`}
+                      />
+                    </div>
+                  </div>
+
+               <div
+  style={{
+    border: "1px solid #e5e7eb",
+    borderRadius: "16px",
+    padding: "24px",
+    background: "#ffffff",
+    marginBottom: "20px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+  }}
+>
+  {/* Progress */}
+  <div
+    style={{
+      marginBottom: "20px",
+      padding: "12px 16px",
+      background: "#f8fafc",
+      borderRadius: "10px",
+      border: "1px solid #e2e8f0",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    }}
+  >
+    <span
+      style={{
+        fontWeight: 600,
+        color: "#334155",
+      }}
+    >
+      รายการตรวจสอบก่อนส่งข้อมูล
+    </span>
+
+    <span
+      style={{
+        background: "#dbeafe",
+        color: "#1d4ed8",
+        padding: "4px 10px",
+        borderRadius: "999px",
+        fontSize: "13px",
+        fontWeight: 700,
+      }}
+    >
+      {checkedCount}/10 ข้อ
+    </span>
+  </div>
+
+  {/* Section 1 */}
+  <div style={{ marginBottom: "20px" }}>
+    <h5
+      style={{
+        color: "#2563eb",
+        fontWeight: 700,
+        marginBottom: "12px",
+      }}
+    >
+      <GrDocumentText /> 1. ใบสมัครและหนังสือให้ความยินยอม
+    </h5>
+
+    <label style={{ display: "block", marginBottom: "10px", paddingLeft: "41px" }}>
+      <input
+        type="checkbox"
+        checked={checkList.c1}
+        onChange={() => handleCheck("c1")}
+      />{" "}
+      ชื่อ - นามสกุลลูกค้า ถูกต้องตรงกัน
+    </label>
+
+    <label style={{ display: "block", marginBottom: "10px" , paddingLeft: "41px" }}>
+      <input
+        type="checkbox"
+        checked={checkList.c2}
+        onChange={() => handleCheck("c2")}
+      />{" "}
+      วันเดือนปีเกิดลูกค้า ถูกต้องตรงกัน
+    </label>
+
+    <label style={{ display: "block", marginBottom: "10px" , paddingLeft: "41px" }}>
+      <input
+        type="checkbox"
+        checked={checkList.c3}
+        onChange={() => handleCheck("c3")}
+      />{" "}
+      เลขบัตรประชาชนลูกค้า ตรงกัน
+    </label>
+
+    <label style={{ display: "block" , paddingLeft: "41px"}}>
+      <input
+        type="checkbox"
+        checked={checkList.c4}
+        onChange={() => handleCheck("c4")}
+      />{" "}
+      เบอร์โทรศัพท์ ถูกต้องตรงกัน
+    </label>
+  </div>
+
+  <hr style={{ margin: "20px 0" }} />
+
+  {/* Section 2 */}
+  <div style={{ marginBottom: "20px" }}>
+    <h5
+      style={{
+        color: "#2563eb",
+        fontWeight: 700,
+        marginBottom: "12px",
+      }}
+    >
+      <HiOutlineClipboardDocumentList /> 2. เอกสารทั้ง 3 ฉบับ
+    </h5>
+
+    <label style={{ display: "block", marginBottom: "10px" , paddingLeft: "41px"}}>
+      <input
+        type="checkbox"
+        checked={checkList.c5}
+        onChange={() => handleCheck("c5")}
+      />{" "}
+      ไม่มีการลงนามเขียนทับ/ย้ำ
+    </label>
+
+    <label style={{ display: "block", marginBottom: "10px" , paddingLeft: "41px"}}>
+      <input
+        type="checkbox"
+        checked={checkList.c6}
+        onChange={() => handleCheck("c6")}
+      />{" "}
+      ลักษณะการลงนามเหมือนกันทุกฉบับ
+    </label>
+
+    <label style={{ display: "block", paddingLeft: "41px" }}>
+      <input
+        type="checkbox"
+        checked={checkList.c7}
+        onChange={() => handleCheck("c7")}
+      />{" "}
+      ลงนามครบถ้วนทั้งลูกค้า และพยาน
+    </label>
+  </div>
+
+  <hr style={{ margin: "20px 0" }} />
+
+  {/* Section 3 */}
+  <div>
+    <h5
+      style={{
+        color: "#2563eb",
+        fontWeight: 700,
+        marginBottom: "12px",
+      }}
+    >
+     <MdOutlineComputer />  3. ใบสมัครและข้อมูลในระบบ
+    </h5>
+
+    <label style={{ display: "block", marginBottom: "10px" , paddingLeft: "41px"}}>
+      <input
+        type="checkbox"
+        checked={checkList.c8}
+        onChange={() => handleCheck("c8")}
+      />{" "}
+      ประเภทสินเชื่อ ตรงกับในระบบ
+    </label>
+
+    <label style={{ display: "block", marginBottom: "10px" , paddingLeft: "41px"}}>
+      <input
+        type="checkbox"
+        checked={checkList.c9}
+        onChange={() => handleCheck("c9")}
+      />{" "}
+      วงเงินสินเชื่อ ตรงกับในระบบ
+    </label>
+
+    <label style={{ display: "block" , paddingLeft: "41px"}}>
+      <input
+        type="checkbox"
+        checked={checkList.c10}
+        onChange={() => handleCheck("c10")}
+      />{" "}
+      ประเภทลูกค้า เลือกถูกต้อง
+    </label>
+  </div>
+
+  {/* Alert */}
+  <div
+    style={{
+      marginTop: "24px",
+      padding: "14px 16px",
+      borderRadius: "12px",
+      background: isAllChecked ? "#f0fdf4" : "#fffbeb",
+      border: isAllChecked
+        ? "1px solid #86efac"
+        : "1px solid #fde68a",
+      color: isAllChecked ? "#166534" : "#92400e",
+    }}
+  >
+    <div style={{ fontWeight: 700 }}>
+      {isAllChecked ? "✅ ตรวจสอบครบถ้วนแล้ว" : "⚠️ กรุณาตรวจสอบข้อมูลให้ครบ"}
+    </div>
+
+    <div
+      style={{
+        marginTop: "4px",
+        fontSize: "13px",
+      }}
+    >
+      ต้องเลือกครบทั้ง 10 รายการก่อนจึงจะสามารถส่งข้อมูลได้
+    </div>
+  </div>
+</div>
+
+                  {/* <div
+                    style={{
+                      marginTop: "20px",
+                      padding: "14px 16px",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "12px",
+                    }}
+                  >
+                    <label
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        color: "#334155",
+                        fontWeight: 500,
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={confirmChecked}
+                        onChange={(e) => setConfirmChecked(e.target.checked)}
+                        style={{
+                          width: "18px",
+                          height: "18px",
+                          cursor: "pointer",
+                        }}
+                      />
+                      ข้าพเจ้าได้ตรวจสอบข้อมูลทั้งหมดถูกต้องครบถ้วนแล้ว
+                    </label>
+                  </div> */}
+
+                  {/* Footer */}
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      gap: "12px",
+                      borderTop: "1px solid #e5e7eb",
+                      paddingTop: "20px",
+                    }}
+                  >
+                    <button
+                      onClick={() => setOpenConfirmModal(false)}
+                      style={{
+                        height: "46px",
+                        padding: "0 22px",
+                        borderRadius: "12px",
+                        border: "1px solid #d1d5db",
+                        background: "#ffffff",
+                        color: "#374151",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                      }}
+                    >
+                      ย้อนกลับ
+                    </button>
+
+                    <button
+                      disabled={!isAllChecked}
+                      onClick={() => {
+                        // setOpenConfirmModal(false);
+                        submitCustomerData();
+                      }}
+                      style={{
+                        height: "46px",
+                        padding: "0 24px",
+                        borderRadius: "12px",
+                        border: "none",
+                        background: isAllChecked
+                          ? "linear-gradient(135deg,#1d4ed8,#2563eb)"
+                          : "#cbd5e1",
+                        color: "#ffffff",
+                        fontWeight: 600,
+                        cursor: isAllChecked ? "pointer" : "not-allowed",
+                        boxShadow: isAllChecked
+                          ? "0 8px 20px rgba(37,99,235,0.25)"
+                          : "none",
+                        transition: "all .2s ease",
+                      }}
+                    >
+                      ✓ ยืนยันส่งข้อมูล ({checkedCount}/10)
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {isModalOpen && (
               <div className="modal-overlay1" onClick={closeModal}>
@@ -792,7 +1160,11 @@ const SalepersonView_updatephoto = ({ idForm }) => {
                   cursor: isSubmitting ? "not-allowed" : "pointer",
                   opacity: isSubmitting ? 0.7 : 1,
                 }}
-                onClick={handleUpdateCustomer}
+                onClick={() => {
+                  if (!validateForm() || !validateImages()) return;
+
+                  setOpenConfirmModal(true);
+                }}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (

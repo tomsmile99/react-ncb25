@@ -3,6 +3,7 @@ import apiClient from "../../recoilstore/userStores";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import html2pdf from "html2pdf.js";
+import { GoChecklist } from "react-icons/go";
 const SalepersonView_DataCustomer = ({ idForm }) => {
   const navigate = useNavigate();
   const pdfRef = useRef();
@@ -13,7 +14,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
       "ก.พ.",
       "มี.ค.",
       "เม.ย.",
-      "พ.ค.", 
+      "พ.ค.",
       "มิ.ย.",
       "ก.ค.",
       "ส.ค.",
@@ -114,7 +115,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
 
   const [oldConsentFile, setOldConsentFile] = useState(null);
   const [openConsentModal, setOpenConsentModal] = useState(false);
-
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [consentError, setConsentError] = useState(false);
   const [IdcardError, setIdcardError] = useState(false);
 
@@ -122,8 +123,31 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
 
   const [showDownloadBtn, setShowDownloadBtn] = useState(false);
 
+  const [confirmEditChecked, setConfirmEditChecked] = useState(false);
   const chksentFileRef = useRef(2);
 
+  const InfoItem = ({ label, value }) => (
+    <div>
+      <div
+        style={{
+          color: "#64748b",
+          fontSize: "13px",
+          marginBottom: 4,
+        }}
+      >
+        {label}
+      </div>
+
+      <div
+        style={{
+          color: "#0f172a",
+          fontWeight: 600,
+        }}
+      >
+        {value || "-"}
+      </div>
+    </div>
+  );
   const handleDownloadPDF = async (idForm) => {
     const params = {
       idForm: idForm,
@@ -336,7 +360,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
         }).then(() => {
           // 🔥 เงื่อนไขใหม่: ถ้ายังไม่เลื
           setConsentError(false);
-           window.location.assign("/Salesperson");
+          window.location.assign("/Salesperson");
           // if (!formData2.customerType) {
           //   window.location.assign("/Salesperson");
           //   return; // ⛔ หยุดการทำงานตรงนี้ทันที
@@ -487,6 +511,38 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
     const ceYear = parseInt(year, 10) - 543;
 
     return `${ceYear}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  };
+
+  const getCustomerTypeName = (type) => {
+    const customerTypes = {
+      1: "สินเชื่อส่วนบุคคล",
+      2: "สินเชื่อนาโนไฟแนนซ์",
+      3: "สินเชื่อที่ดิน",
+      4: "สินเชื่อโซลาร์รูฟท็อป",
+      // 5: "สินเชื่อโซลาร์แอร์",
+      6: "สินเชื่อโซลาร์ไมโครอินเวอร์เตอร์",
+      7: "สินเชื่อเช่าซื้อ (รถจักรยานยนต์ใหม่)",
+      8: "สินเชื่อเช่าซื้อ (รถแลกเงิน)",
+      9: "สินเชื่อทะเบียนรถ",
+      10: "สินเชื่อโซลาร์แอร์",
+    };
+
+    return customerTypes[type] || "-";
+  };
+  const getCustomerTypeText = (type) => {
+    const customerTypes = {
+      1: "ลูกค้าใหม่",
+      2: "ลูกค้าใหม่ (ลูกค้าเก่าปิดบัญชี ตั้งแต่ 1 ปี กลับมาใช้บริการ)",
+      3: "ลูกค้าใหม่ (ย้ายไฟแนนซ์)",
+      4: "ลูกค้าเก่า",
+      5: "ลูกค้าเก่า (ย้ายไฟแนนซ์)",
+      6: "ลูกค้าเก่าต่อสัญญา/RENEW (ขอตรวจนอกหลักเกณฑ์)",
+      7: "ลูกค้าเก่าต่อสัญญา/RENEW เพิ่มวงเงิน",
+      8: "ลูกค้าเก่าต่อสัญญา/RENEW เงื่อนไขการชำระรายงวด มีการต่อสัญญาต่อเนื่อง ตั้งแต่ 1 ปีขึ้นไป",
+      9: "ลูกค้าเก่า เงื่อนไขสินเชื่อเพื่อให้ความช่วยเหลือลูกหนี้",
+    };
+
+    return customerTypes[type] || "-";
   };
 
   const handlePhoneChange = (e) => {
@@ -892,7 +948,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
                 <option value="2">สินเชื่อนาโนไฟแนนซ์</option>
                 <option value="3">สินเชื่อที่ดิน</option>
                 <option value="4">สินเชื่อโซลาร์รูฟท็อป</option>
-                <option value="5">สินเชื่อโซลาร์แอร์</option>
+                {/* <option value="5">สินเชื่อโซลาร์แอร์</option> */}
                 <option value="6">สินเชื่อโซลาร์ไมโครอินเวอร์เตอร์</option>
                 <option value="7">สินเชื่อเช่าซื้อ (รถจักรยานยนต์ใหม่)</option>
                 <option value="8">สินเชื่อเช่าซื้อ (รถแลกเงิน)</option>
@@ -950,8 +1006,8 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
                   ลูกค้าเก่าต่อสัญญา/RENEW เงื่อนไขการชำระรายงวด
                   มีการต่อสัญญาต่อเนื่อง ตั้งแต่ 1 ปีขึ้นไป
                 </option>
-                  <option value="9">
-                 ลูกค้าเก่า เงื่อนไขสินเชื่อเพื่อให้ความช่วยเหลือลูกหนี้
+                <option value="9">
+                  ลูกค้าเก่า เงื่อนไขสินเชื่อเพื่อให้ความช่วยเหลือลูกหนี้
                 </option>
               </select>
             </div>
@@ -971,7 +1027,7 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
                     maxWidth: "420px",
                   }}
                 >
-                   📄 ดาวน์โหลดหนังสือยินยอมฉบับใหม่ (ปรับแก้แล้ว)
+                  📄 ดาวน์โหลดหนังสือยินยอมฉบับใหม่ (ปรับแก้แล้ว)
                 </button>
               )}
 
@@ -1048,7 +1104,9 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
             </div>
 
             <div className="upload-group">
-              <label className="tag-label1 upload-group">รูปสำเนาบัตรประชาชน</label>
+              <label className="tag-label1 upload-group">
+                รูปสำเนาบัตรประชาชน
+              </label>
               <input
                 type="file"
                 name="img3"
@@ -1130,9 +1188,9 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
                   border: "none",
                   cursor: "pointer",
                 }}
-                onClick={handleUpdateCustomer}
+                onClick={() => setOpenConfirmModal(true)}
               >
-                บันทึกการแก้ไข
+                ตรวจสอบก่อนบันทึก
               </button>
               {/* <button
                 className="btn-submit"
@@ -1778,6 +1836,293 @@ const SalepersonView_DataCustomer = ({ idForm }) => {
             </span>
           </div>
         </div>
+
+        {openConfirmModal && (
+          <div className="modal-overlay1">
+            <div
+              style={{
+                background: "#fff",
+                width: "95%",
+                maxWidth: "1200px",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                borderRadius: "24px",
+                padding: "30px",
+              }}
+            >
+              {/* Header */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  marginBottom: "25px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "52px",
+                    height: "52px",
+                    borderRadius: "14px",
+                    background: "#eff6ff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "22px",
+                  }}
+                >
+                  <GoChecklist />
+                </div>
+
+                <div>
+                  <h3
+                    style={{
+                      margin: 0,
+                      color: "#0f172a",
+                      fontWeight: 700,
+                      fontSize: "22px",
+                    }}
+                  >
+                    ตรวจสอบข้อมูลก่อนส่ง
+                  </h3>
+
+                  <p
+                    style={{
+                      margin: "4px 0 0",
+                      color: "#64748b",
+                      fontSize: "14px",
+                    }}
+                  >
+                    กรุณาตรวจสอบรายละเอียดและเอกสารก่อนยืนยันส่งข้อมูล
+                  </p>
+                </div>
+              </div>
+
+              {/* Customer Information */}
+              <div
+                style={{
+                  background: "#f8fafc",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "18px",
+                  padding: "22px",
+                  marginBottom: "25px",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: 700,
+                    color: "#1e293b",
+                    marginBottom: "18px",
+                  }}
+                >
+                  ข้อมูลลูกค้า
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
+                    gap: "18px",
+                  }}
+                >
+                  <InfoItem
+                    label="ชื่อ - นามสกุล"
+                    value={`${formData.title}${formData.firstname} ${formData.lastname}`}
+                  />
+
+                  <InfoItem
+                    label="เลขบัตรประชาชน"
+                    value={formData.CTM_citizen_id}
+                  />
+
+                  <InfoItem label="เบอร์โทรศัพท์" value={formData.CTM_phone} />
+
+                  <InfoItem
+                    label="ประเภทสินเชื่อ"
+                    value={getCustomerTypeName(formData2.customerType)}
+                  />
+
+                  <InfoItem
+                    label="ประเภทลูกค้า"
+                    value={getCustomerTypeText(formData2.loanType)}
+                  />
+
+                  <InfoItem
+                    label="วงเงินสินเชื่อ"
+                    value={`${formatNumber(formData2.loanAmount)} บาท`}
+                  />
+                </div>
+              </div>
+
+              {/* รูปเอกสาร */}
+              <div>
+                {/* <center><h5>เอกสารประกอบ</h5></center>  */}
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "25px",
+                  }}
+                >
+                  {images.img1 && (
+                    <div>
+                      <center>
+                        {" "}
+                        <h5>หนังสือยินยอม</h5>
+                      </center>
+
+                      <img
+                        src={getPreviewSrc(images.img1, "consent")}
+                        style={{
+                          width: "100%",
+                          maxHeight: "700px",
+                          objectFit: "contain",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "12px",
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {images.img2 && (
+                    <div>
+                      <center>
+                        {" "}
+                        <h5>ใบสมัครสินเชื่อ</h5>
+                      </center>
+
+                      <img
+                        src={getPreviewSrc(images.img2, "application")}
+                        style={{
+                          width: "100%",
+                          maxHeight: "700px",
+                          objectFit: "contain",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "12px",
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {images.img3 && (
+                    <div>
+                      <center>
+                        {" "}
+                        <h5>บัตรประชาชน</h5>
+                      </center>
+
+                      <img
+                        src={getPreviewSrc(images.img3, "idcard")}
+                        style={{
+                          width: "100%",
+                          maxHeight: "700px",
+                          objectFit: "contain",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "12px",
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: "24px",
+                  padding: "16px",
+                  background: "#f8fafc",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "12px",
+                }}
+              >
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    color: "#334155",
+                    fontWeight: 500,
+                    margin: 0,
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={confirmEditChecked}
+                    onChange={(e) => setConfirmEditChecked(e.target.checked)}
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      cursor: "pointer",
+                    }}
+                  />
+                  ข้าพเจ้าได้ตรวจสอบข้อมูลที่แก้ไขทั้งหมดแล้ว
+                  และยืนยันว่าข้อมูลถูกต้องครบถ้วน
+                </label>
+              </div>
+
+              {/* Footer */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  gap: "12px",
+                  marginTop: "24px",
+                  paddingTop: "20px",
+                  borderTop: "1px solid #e5e7eb",
+                }}
+              >
+                <button
+                  onClick={() => setOpenConfirmModal(false)}
+                  style={{
+                    height: "46px",
+                    padding: "0 22px",
+                    borderRadius: "12px",
+                    border: "1px solid #d1d5db",
+                    background: "#ffffff",
+                    color: "#475569",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "all .2s ease",
+                  }}
+                >
+                  ย้อนกลับ
+                </button>
+
+                <button
+                  disabled={!confirmEditChecked}
+                  onClick={() => {
+                    setOpenConfirmModal(false);
+                    handleUpdateCustomer();
+                  }}
+                  style={{
+                    height: "46px",
+                    padding: "0 24px",
+                    borderRadius: "12px",
+                    border: "none",
+                    background: confirmEditChecked ? "#0f172a" : "#cbd5e1",
+                    color: "#ffffff",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    cursor: confirmEditChecked ? "pointer" : "not-allowed",
+                    boxShadow: confirmEditChecked
+                      ? "0 4px 12px rgba(15,23,42,0.15)"
+                      : "none",
+                    transition: "all .2s ease",
+                    opacity: confirmEditChecked ? 1 : 0.8,
+                  }}
+                >
+                  ✓ ยืนยันบันทึกการแก้ไข
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

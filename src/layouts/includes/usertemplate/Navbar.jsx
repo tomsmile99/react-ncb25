@@ -21,6 +21,7 @@ import { MdOutlineCancel } from "react-icons/md";
 import { RiTeamLine } from "react-icons/ri";
 import { BsFillSendCheckFill } from "react-icons/bs";
 import { FaCheckDouble } from "react-icons/fa";
+import { LuUserRoundSearch } from "react-icons/lu";
 // icons
 import { FcDownLeft } from "react-icons/fc";
 import { FaOutdent } from "react-icons/fa";
@@ -42,7 +43,7 @@ const Navbar = ({
   const PerPST_LV = Base64.decode(getstore.PerPST_LV);
 
   // role หัวหน้าหน่วย ผจก.สาขา ผู้ช่วย
-  const allowRoles = ["LV007", "LV016", "LV017", "LV021"];
+  const allowRoles = ["LV007","LV008", "LV016", "LV017", "LV021", "LV021"];
   // role ผจก.เขต
   const ApproverRoles = ["LV006"];
 
@@ -285,6 +286,17 @@ const Navbar = ({
                 }}
               />
               <span>รายงานผลการอนุมัติ</span>
+            </li>
+
+            <li className="nav-item">
+              <NavLink to="/sale_ManagementUser" className={navClass}>
+                <LuUserRoundSearch
+                  className="nav-item"
+                  style={{ color: "#06407aff", fontSize: "14px" }}
+                />
+                <p style={{ fontSize: "13px" }}>ค้นหาข้อมูลเครดิตลูกค้า</p>
+                {/* <Badge count={getemployee_contain_Counts} /> */}
+              </NavLink>
             </li>
 
             <li className="nav-item">

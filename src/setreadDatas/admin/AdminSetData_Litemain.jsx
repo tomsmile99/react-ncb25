@@ -651,7 +651,6 @@ const AdminSetData_Litemain = () => {
   const handleSubmit = async (e) => {
     try {
       setSubmitted(true);
-
       e.preventDefault();
 
       // 🔴 ดักเฉพาะกรณี "พบข้อมูล"
@@ -805,12 +804,14 @@ const AdminSetData_Litemain = () => {
 
         // 2️⃣ แสดง SweetAlert แบบรอให้ผู้ใช้กด OK
 
-        await Swal.fire({
+        Swal.fire({
+          toast: true,
+          position: "top-end",
           icon: "success",
-          title: "บันทึกสำเร็จ",
-          text: "ข้อมูลถูกบันทึกเรียบร้อยแล้ว",
-          showConfirmButton: false, // ❌ ไม่แสดงปุ่ม
-          timer: 2000, // ⏱ ปิดอัตโนมัติ 2 วินาที
+          title: "บันทึกข้อมูลเรียบร้อยแล้ว",
+          showConfirmButton: false,
+          timer: 1800,
+          timerProgressBar: true,
         });
 
         // 3️⃣ ล้างค่าฟอร์มทั้งหมด ✅
@@ -1200,7 +1201,6 @@ const AdminSetData_Litemain = () => {
         setContDataMenuChkCD3(data.data.cancel);
         setContDataMenuChkCD4(data.data.rejected);
         setContDataMenuChkCD5(data.data.approved);
-
 
         // console.log(data)
       }

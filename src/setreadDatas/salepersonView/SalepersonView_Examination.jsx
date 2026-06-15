@@ -78,7 +78,7 @@ const convertToThaiDate1 = (dateString) => {
   return `${day} ${month} ${year}`;
 };
 
-const SalepersonView_Examination = () => { 
+const SalepersonView_Examination = () => {
   const getstore = useRecoilValue(userToken);
   const _PerWP = Base64.decode(getstore.PerWP);
 
@@ -386,6 +386,19 @@ const SalepersonView_Examination = () => {
       return;
     }
 
+    // ตรวจสอบเลขที่สัญญา เฉพาะกรณี "ผ่านการอนุมัติ"
+    if (approval === "approved" && contractNumber.length !== 10) {
+      setContractError(true);
+
+      Swal.fire({
+        icon: "warning",
+        title: "ข้อมูลไม่ครบ",
+        text: "กรุณากรอกเลขที่สัญญาให้ครบ 10 หลัก",
+      });
+
+      return;
+    }
+
     // ==========================
     // ❌ ดักกรณีผ่านอนุมัติแต่ไม่กรอกเลขที่สัญญา
     // ==========================
@@ -402,13 +415,13 @@ const SalepersonView_Examination = () => {
     const payload = {
       ctmId: selectedItem,
       approval,
-      reasons,
-      contractNumber,
+      reasons: approval === "approved" ? [] : reasons, // ✅ ผ่าน = ส่ง array ว่าง
+      contractNumber: approval === "approved" ? contractNumber : "",
       CTM_phone: getDataShow?.CTM_phone || "", // ✅ ใส่เบอร์โทร
       CTM_business_zone: getDataShow?.CTM_business_zone || "",
     };
     // console.log(payload);
-    // return
+    // return;
 
     try {
       const res = await apiClient.post(
@@ -1593,7 +1606,8 @@ const SalepersonView_Examination = () => {
 
                 <div>
                   ของ {getDataShowPdf?.CTM_title_name}
-                  {getDataShowPdf?.CTM_firstname} {getDataShowPdf?.CTM_lastname} จริง
+                  {getDataShowPdf?.CTM_firstname} {getDataShowPdf?.CTM_lastname}{" "}
+                  จริง
                 </div>
               </div>
             )}

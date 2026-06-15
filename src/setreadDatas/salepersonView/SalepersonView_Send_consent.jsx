@@ -16,7 +16,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { userToken } from "../../recoilstore/userStores";
 import { FaCalendarCheck } from "react-icons/fa";
 import { Button } from "@mui/material";
-
+import { FaBox } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import Pagination from "../../component/Pagination";
 
@@ -43,6 +43,7 @@ const SalepersonView_Send_consent = () => {
   const PerLV = Base64.decode(getstore.PerPST_LV);
   const PerPST = Base64.decode(getstore.PerPST);
   const PerRG_N = Base64.decode(getstore.PerRG_N);
+  const PerBL_N = Base64.decode(getstore.PerBL_N);
 
   const [showModal, setShowModal] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
@@ -59,6 +60,8 @@ const SalepersonView_Send_consent = () => {
   });
   const [editMode, setEditMode] = useState(false);
   const [editBatchId, setEditBatchId] = useState(null);
+
+  const [showExample, setShowExample] = useState(false);
 
   const handleAddRow = () => {
     // ✅ เช็คซ้ำ
@@ -1330,10 +1333,8 @@ const SalepersonView_Send_consent = () => {
                       }}
                     >
                       <option value="">เลือกขนส่ง</option>
-
                       <option value="ไปรษณีย์ไทย">ไปรษณีย์ไทย</option>
-
-                      <option value="ems">EMS</option>
+                      {/* <option value="ems">EMS</option> */}
 
                       <option value="flash">Flash Express</option>
 
@@ -1367,42 +1368,58 @@ const SalepersonView_Send_consent = () => {
                     </Form.Select>
 
                     {/* เลขพัสดุ */}
-                    <Form.Control
-                      placeholder="กรอกเลขพัสดุ"
-                      value={
-                        shippingData[item.consentTruck_id]
-                          ?.consentTruck_Number ||
-                        item.consentTruck_Number ||
-                        ""
-                      }
-                      onChange={(e) => {
-                        setShippingData((prev) => ({
-                          ...prev,
 
-                          [item.consentTruck_id]: {
-                            ...prev[item.consentTruck_id],
-
-                            consentTruck_Number: e.target.value,
-                          },
-                        }));
-                      }}
+                    <div
                       style={{
+                        position: "relative",
                         width: 200,
-                        height: 42,
-
-                        borderRadius: 12,
-
-                        border: "1px solid #dbe2ea",
-
-                        fontSize: 13,
-
-                        color: "#0f172a",
-
-                        boxShadow: "none",
-
-                        fontWeight: 500,
                       }}
-                    />
+                    >
+                      <span
+                        onClick={() => setShowExample(true)}
+                        style={{
+                          position: "absolute",
+                          top: -18,
+                          right: 0,
+                          fontSize: 11,
+                          color: "rgb(3, 58, 168)",
+                          cursor: "pointer",
+                          fontWeight: 600,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        <FaBox /> ตัวอย่างการดูเลขพัสดุ
+                      </span>
+
+                      <Form.Control
+                        placeholder="กรอกเลขพัสดุ"
+                        value={
+                          shippingData[item.consentTruck_id]
+                            ?.consentTruck_Number !== undefined
+                            ? shippingData[item.consentTruck_id]
+                                .consentTruck_Number
+                            : item.consentTruck_Number || ""
+                        }
+                        onChange={(e) => {
+                          setShippingData((prev) => ({
+                            ...prev,
+                            [item.consentTruck_id]: {
+                              ...prev[item.consentTruck_id],
+                              consentTruck_Number: e.target.value,
+                            },
+                          }));
+                        }}
+                        style={{
+                          width: "100%",
+                          height: 42,
+                          borderRadius: 12,
+                          border: "1px solid #dbe2ea",
+                          fontSize: 13,
+                          color: "#0f172a",
+                          fontWeight: 500,
+                        }}
+                      />
+                    </div>
                     <div
                       style={{
                         fontSize: 11,
@@ -1661,7 +1678,7 @@ const SalepersonView_Send_consent = () => {
                 fontSize: 14,
               }}
             >
-              สังกัด {PerWP_N} {PerRG_N}
+              สังกัด {PerWP_N} {PerBL_N} {PerRG_N}
             </div>
 
             <div
@@ -2588,7 +2605,7 @@ const SalepersonView_Send_consent = () => {
             right: 10,
 
             fontSize: 16,
-            fontFamily: "TH Sarabun New, sans-serif",
+            fontFamily: "THSarabunPSK, sans-serif",
             color: "#444",
 
             textAlign: "right",
@@ -2599,7 +2616,7 @@ const SalepersonView_Send_consent = () => {
         >
           <div>เลขที่ฟอร์ม : {IdTruck}</div>
 
-          <div>พิมพ์วันที่ : {convertToThaiDatemonthnumber(new Date())}</div>
+          {/* <div>พิมพ์วันที่ : {convertToThaiDatemonthnumber(new Date())}</div> */}
         </div>
 
         {/* 🔷 หัวเอกสาร */}
@@ -2636,7 +2653,7 @@ const SalepersonView_Send_consent = () => {
               fontSize: 22,
             }}
           >
-            สังกัด {PerWP_N} {PerRG_N}
+            สังกัด {PerWP_N} {PerBL_N} {PerRG_N}
           </div>
         </div>
 
@@ -2648,14 +2665,18 @@ const SalepersonView_Send_consent = () => {
             // 🔷 เส้นรอบตารางบางลง
             border: "0.1px solid #777",
 
-            fontFamily: "TH Sarabun New, sans-serif",
+            fontFamily: "THSarabunPSK, sans-serif",
 
             // 🔷 ฟอร์มเอกสารทางการ
             fontSize: 13,
             color: "#222",
           }}
         >
-          <thead>
+          <thead
+            style={{
+              fontFamily: "'THSarabunPSK'",
+            }}
+          >
             <tr>
               {[
                 "ลำดับ",
@@ -2686,7 +2707,11 @@ const SalepersonView_Send_consent = () => {
             </tr>
           </thead>
 
-          <tbody>
+          <tbody
+            style={{
+              fontFamily: "'THSarabunPSK'",
+            }}
+          >
             {getDataShow?.length > 0
               ? getDataShow.map((item, index) => (
                   <tr key={index}>
@@ -2790,8 +2815,8 @@ const SalepersonView_Send_consent = () => {
             fontWeight: 700,
           }}
         >
-          หมายเหตุ : ส่งเฉพาะหนังสือให้ความยินยอมฯ เท่านั้น ไม่ต้องส่งสำเนา บชช.
-          กับใบสมัครขอสินเชื่อ
+          หมายเหตุ : ส่งเฉพาะหนังสือให้ความยินยอมฯ เท่านั้น ไม่ต้องส่งสำเนา บัตร
+          ปชช. กับใบสมัครขอสินเชื่อ
         </div>
 
         <div
@@ -2840,6 +2865,49 @@ const SalepersonView_Send_consent = () => {
           </div>
         </div>
       </div>
+
+      <Modal
+        show={showExample}
+        onHide={() => setShowExample(false)}
+        centered
+        size="xl"
+      >
+        {/* <Modal.Header closeButton>
+          <Modal.Title>
+            <FaBox className="me-2" />
+            ตัวอย่างการดูเลขพัสดุ
+          </Modal.Title>
+        </Modal.Header> */}
+
+        <Modal.Body className="text-center">
+          <img
+            src="/178123333840411122.png"
+            alt="ตัวอย่างเลขพัสดุ"
+            style={{
+              width: "100%",
+              maxWidth: "800px",
+              borderRadius: "12px",
+              border: "1px solid #e2e8f0",
+            }}
+          />
+
+          <div
+            style={{
+              marginTop: "12px",
+              color: "#64748b",
+              fontSize: "14px",
+            }}
+          >
+            กรุณานำเลขพัสดุจากใบเสร็จหรือหน้าติดตามสถานะพัสดุมาใส่ในช่องกรอกข้อมูล
+          </div>
+        </Modal.Body>
+
+        {/* <Modal.Footer> */}
+        <Button variant="secondary" onClick={() => setShowExample(false)}>
+          ปิด
+        </Button>
+        {/* </Modal.Footer> */}
+      </Modal>
     </>
   );
 };
