@@ -300,30 +300,41 @@ const ViewReportDSR = () => {
                   <b style={{ color: "red" }}>3.1 เหตุผลประกอบเพิ่มเติม</b>
 
                   <div className="reason-content">
-                    {getDataReasons.length > 0 ? (
-                      getDataReasons.map((item, index) => (
-                        <div
-                          key={index}
-                          style={{ fontSize: "22px", marginBottom: "8px" }}
-                        >
-                          <span
-                            style={{
-                              display: "inline-block",
-                              minWidth: "650px",
-                            }}
+                    {getDataReasons && getDataReasons.length > 0 ? (
+                      getDataReasons.map((item, index) => {
+                        const statusCode =
+                          item.account_status?.match(/\((\d+)\)/)?.[1];
+
+                        const warningStatus = ["30", "31", "33"];
+                        const isWarning = warningStatus.includes(statusCode);
+
+                        return (
+                          <div
+                            key={index}
+                            style={{ fontSize: "22px", marginBottom: "8px" }}
                           >
-                            {item.account_status}
-                            {item.account_total ? (
-                              <> จำนวน {item.account_total} บัญชี</>
-                            ) : null}
-                          </span>{" "}
-                          <span style={{ fontWeight: "bold" }}>
-                            {item.account_total ? item.account_detal : "-"}
-                          </span>
-                        </div>
-                      ))
+                            <span
+                              style={{
+                                display: "inline-block",
+                                minWidth: "650px",
+                                color: isWarning ? "#d32f2f" : "#000",
+                                fontWeight: isWarning ? 700 : 400,
+                              }}
+                            >
+                              {item.account_status || ""}
+                              {item.account_total ? (
+                                <> จำนวน {item.account_total} บัญชี</>
+                              ) : null}
+                            </span>
+
+                            <span style={{ fontWeight: "bold" }}>
+                              {item.account_detal || "-"}
+                            </span>
+                          </div>
+                        );
+                      })
                     ) : (
-                      <div className="reason-item">-</div>
+                      <div style={{ fontSize: "22px" }}>-</div>
                     )}
                   </div>
 
