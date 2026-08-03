@@ -1082,15 +1082,27 @@ const AdminSetData_Litemain = () => {
   // };
 
   //ออกมาใหม่เลยข้าง
-  const openFileInNewTab = (relativePath) => {
-    const base = import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB;
+  // const openFileInNewTab = (relativePath) => {
+  //   const base = import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB;
 
-    window.open(
-      `${base}/${relativePath}`,
-      "_blank",
-      "noopener,noreferrer,width=1200,height=800,left=100,top=100",
-    );
-  };
+  //   window.open(
+  //     `${base}/${relativePath}`,
+  //     "_blank",
+  //     "noopener,noreferrer,width=1200,height=800,left=100,top=100",
+  //   );
+  // };
+
+  const openFileInNewTab = (relativePath) => {
+  const base = import.meta.env.VITE_REACT_APP_UPLOAD_API_NCB;
+
+  const url = `${base}/${relativePath}?t=${new Date().getTime()}`;
+
+  window.open(
+    url,
+    "_blank",
+    "noopener,noreferrer,width=1200,height=800,left=100,top=100",
+  );
+};
 
   useEffect(() => {
     const timer = setInterval(() => {

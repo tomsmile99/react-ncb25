@@ -19,7 +19,7 @@ body {
 
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 10mm; 
   }
 }
 
@@ -28,6 +28,14 @@ body {
   src: url("/fonts/TH Sarabun PSK V-1/THSarabun.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
+}
+
+.swal-agreement-container {
+  z-index: 200000 !important;
+}
+
+.swal-agreement-popup {
+  z-index: 200001 !important;
 }
 
 
