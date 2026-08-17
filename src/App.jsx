@@ -107,28 +107,44 @@ const App = () => {
   // ==========================
   // GET ตรวจสอบข้อตกลง
   // ==========================
-  const role = localStorage.getItem("role"); // user หรือ admin
+  // const role = localStorage.getItem("role"); // user หรือ admin
   const getAgreement = async () => {
     try {
+      const role = localStorage.getItem("role")?.trim().toLowerCase();
+
+      // console.log("ROLE =", role);
+
+      // role ยังไม่พร้อม → ยังไม่ตรวจ Agreement
+      if (role !== "admin" && role !== "user") {
+        console.warn("Role ยังไม่พร้อม:", role);
+        return;
+      }
+
       const { data } = await apiClient.get(
         `/api/insurances/agreement_status?id=${PerD}`,
       );
 
       const { status, sqlDataCustomers } = data;
 
-      if (status === 200) {
+      if (status === 200 && sqlDataCustomers?.length > 0) {
+        const customer = sqlDataCustomers[0];
+
+        // console.log("Agreement Data =", customer);
+
         const agreementField =
           role === "admin"
             ? "NCB_Agreement_Admin_Confirm"
             : "NCB_Agreement_EM_Confirm";
 
-        const agree = sqlDataCustomers[0][agreementField];
+        const agree = Number(customer[agreementField]);
+
+        // console.log("agreementField =", agreementField);
+        // console.log("agree =", agree);
 
         setAgreement(agree);
 
-        if (agree === "0" || agree === 0) {
-          setOpenAgreement(true);
-        }
+        // ⭐ กำหนดทั้ง true และ false
+        setOpenAgreement(agree === 0);
       }
     } catch (error) {
       console.error("GET Agreement Error:", error);
@@ -166,7 +182,7 @@ const App = () => {
         "/api/insurances/datacustomers/updateData_NCB_Agreement",
         {
           id: PerD,
-          role:role
+          role: role,
         },
       );
 

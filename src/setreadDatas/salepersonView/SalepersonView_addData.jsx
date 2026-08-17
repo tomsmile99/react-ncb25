@@ -4,7 +4,7 @@ import { Base64 } from "js-base64";
 import { userToken } from "../../recoilstore/userStores";
 import { useRecoilValue } from "recoil";
 import { RiIdCardFill } from "react-icons/ri";
-import { LuScanText } from "react-icons/lu";
+import { LuArrowLeft, LuScanText } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { FaLocationDot } from "react-icons/fa6";
@@ -147,6 +147,7 @@ const SalepersonView_addData = ({ idForm }) => {
   const [showWitnessPopup, setShowWitnessPopup] = useState(false); // popup #3
   const [showWarningPopup, setShowWarningPopup] = useState(false); // popup แจ้งเตือน
   const [isOtherTitle, setIsOtherTitle] = useState(false);
+  const [witness2TitleError, setWitness2TitleError] = useState(false);
   const [witness1, setWitness1] = useState({ firstname: "", lastname: "" });
   const [witness2, setWitness2] = useState({
     title: "",
@@ -223,7 +224,10 @@ const SalepersonView_addData = ({ idForm }) => {
       year: String(parseInt(year, 10) + 543), // 🔑 ค.ศ. → พ.ศ.
     });
   };
-  const handleSubmitWitness = async () => {
+  const handleSubmitWitness = async (shouldShowWitnessErrors = false) => {
+    if (typeof shouldShowWitnessErrors !== "boolean") {
+      shouldShowWitnessErrors = false;
+    }
     // ✅ 0. ต้องเลือกวิธีลงชื่อก่อน
     if (!signMethod) {
       setShowWarningPopup(true);
@@ -250,7 +254,13 @@ const SalepersonView_addData = ({ idForm }) => {
         setWitness1(witness1ToSend);
       }
       // ✅ ถ้ายังไม่กรอกพยาน 2 → เปิด popup ก่อน
-      if (!witness2?.firstname || !witness2?.lastname) {
+      const isWitness2TitleEmpty = !witness2?.title?.trim();
+      if (
+        isWitness2TitleEmpty ||
+        !witness2?.firstname?.trim() ||
+        !witness2?.lastname?.trim()
+      ) {
+        setWitness2TitleError(shouldShowWitnessErrors && isWitness2TitleEmpty);
         setShowWitnessPopup(true);
         return;
       }
@@ -284,8 +294,8 @@ const SalepersonView_addData = ({ idForm }) => {
       //   return false;
       // }
       const witness2ToSend = {
-        ...witness2,
         firstname: `${witness2.title}${witness2.firstname}`.trim(),
+        lastname: witness2.lastname,
       };
 
       // ✅ รวม payload ส่ง API (พยาน 1 + พยาน 2)
@@ -1114,6 +1124,7 @@ const SalepersonView_addData = ({ idForm }) => {
                   }}
                   value={witness2.title}
                   onChange={(e) => {
+                    setWitness2TitleError(false);
                     if (e.target.value === "other") {
                       setIsOtherTitle(true);
 
@@ -1173,7 +1184,7 @@ const SalepersonView_addData = ({ idForm }) => {
                   <option value="พ.ต.อ.">พ.ต.อ.</option>
 
                   <option value="คุณ">คุณ</option>
-                  <option value="อื่นๆ">อื่นๆ</option>
+                  <option value="other">อื่นๆ</option>
                 </select>
               ) : (
                 <div
@@ -1186,16 +1197,33 @@ const SalepersonView_addData = ({ idForm }) => {
                     className="input-normal"
                     placeholder="กรอกคำนำหน้า"
                     value={witness2.title}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      setWitness2TitleError(false);
                       setWitness2({
                         ...witness2,
                         title: e.target.value,
-                      })
-                    }
+                      });
+                    }}
                   />
 
                   <button
                     type="button"
+                    title="กลับไปเลือกคำนำหน้า"
+                    aria-label="กลับไปเลือกคำนำหน้า"
+                    style={{
+                      width: "46px",
+                      height: "46px",
+                      border: "1px solid #d7dce3",
+                      borderRadius: "50%",
+                      background: "#fff",
+                      color: "#475569",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      flex: "0 0 46px",
+                      boxShadow: "0 1px 3px rgba(15, 23, 42, 0.08)",
+                    }}
                     onClick={() => {
                       setIsOtherTitle(false);
 
@@ -1203,11 +1231,17 @@ const SalepersonView_addData = ({ idForm }) => {
                         ...witness2,
                         title: "",
                       });
+                      setWitness2TitleError(false);
                     }}
                   >
-                    ย้อนกลับ
+                    <LuArrowLeft size={18} />
                   </button>
                 </div>
+              )}
+              {witness2TitleError && (
+                <small style={{ color: "red", marginTop: "4px", display: "block" }}>
+                  กรุณาระบุคำนำหน้า
+                </small>
               )}
             </div>
             <div className="form-group">
@@ -1250,7 +1284,10 @@ const SalepersonView_addData = ({ idForm }) => {
               >
                 กลับ
               </button>
-              <button className="modal-btn next" onClick={handleSubmitWitness}>
+              <button
+                className="modal-btn next"
+                onClick={() => handleSubmitWitness(true)}
+              >
                 บันทึก
               </button>
             </div>
