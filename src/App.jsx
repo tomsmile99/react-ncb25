@@ -57,6 +57,8 @@ import AdminViewPage from "./setDefaultPages/admin/AdminViewPage";
 import Admin_CheckCredit from "./setDefaultPages/admin/Admin_CheckCredit";
 import Admin_ReportTableChkCredit from "./setDefaultPages/admin/Admin_ReportTableChkCredit";
 import Admin_Management from "./setDefaultPages/admin/Admin_Management";
+// import Admin_ManagementCustomType from "./setDefaultPages/admin/Admin_ManagementCustomType";
+
 import Admin_ManagementUser from "./setDefaultPages/admin/Admin_ManagementUser";
 
 import AdminView_Litemain_OutsideNcb from "./setDefaultPages/admin/Admin_CheckCredit_OutsideNcb"; //ขอตรวจนอกหลักเกณฑ์
@@ -177,12 +179,24 @@ const App = () => {
 
     if (!result.isConfirmed) return;
 
+    const role = localStorage.getItem("role")?.trim().toLowerCase();
+
+    if (role !== "admin" && role !== "user") {
+      Swal.fire({
+        icon: "error",
+        title: "ไม่พบสิทธิ์ผู้ใช้งาน",
+        text: "กรุณาเข้าสู่ระบบใหม่อีกครั้ง",
+        confirmButtonColor: "#0f172a",
+      });
+      return;
+    }
+
     try {
       const { data } = await apiClient.post(
         "/api/insurances/datacustomers/updateData_NCB_Agreement",
         {
           id: PerD,
-          role: role,
+          role,
         },
       );
 
@@ -357,6 +371,13 @@ const App = () => {
                   path="/Admin_ManagementUser"
                   element={<Admin_ManagementUser />}
                 />
+
+{/*                 
+                <Route
+                  path="/Admin_ManagementCustomType"
+                  element={<Admin_ManagementCustomType />}
+                /> */}
+
 
                 <Route
                   path="/ReportNCBLiteMainDanger"
